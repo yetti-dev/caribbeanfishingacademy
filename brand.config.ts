@@ -1,73 +1,69 @@
 /**
- * ────────────────────────────────────────────────────────────────────────────
- *  BRAND CONFIG — the single source of truth for this site.
- * ────────────────────────────────────────────────────────────────────────────
+ * BRAND CONFIG — the single source of truth for this site.
  *
- *  This is the ONLY file most people need to edit to make the starter their own.
+ * Edit values here, then run `npm run brand` to propagate the build-time-only
+ * surfaces (package.json name, globals.css theme, lib/fonts.ts, README title).
+ * Everything else (UI text, <title>, OG tags, footer) imports this file directly.
  *
- *  1. Edit the values below.
- *  2. Run:  npm run brand
+ * Colors are OKLCH. Change the hue (0-360) to re-skin the whole site:
+ *   265 violet · 230 blue · 160 emerald · 25 red · 70 amber
  *
- *  The `brand` script propagates everything that can't be imported at runtime
- *  (package.json name, README title, theme colors in globals.css, env hints).
- *  Everything else (site name in the UI, <title>, OG metadata, footer, links)
- *  is imported directly from this file, so it updates the instant you save.
- *
- *  Colors use OKLCH — a perceptual color space. Keep the same lightness/chroma
- *  and just change the hue (the 3rd number) to re-skin the whole site:
- *    hue 265 = violet · 230 = blue · 160 = emerald · 25 = red · 70 = amber
+ * Copy does NOT live here. Page copy lives in content/*.ts (see content/types.ts).
  */
 
 export const brand = {
-  /** Product / company name. Shows in the nav, hero, footer, <title>, OG tags. */
-  name: "Aurora",
+  /** Company name. Nav, hero, footer, <title>, OG tags. `/build` sets it. */
+  name: "New Site",
 
-  /** One-line value prop. Used in the hero sub-headline + meta description. */
-  tagline: "The starter pack for shipping websites that don't look AI-built.",
+  /** One-line value prop. Hero sub-headline + meta description. `/build` sets it. */
+  tagline: "",
 
-  /** Longer description for SEO / Open Graph. ~150 chars is ideal. */
-  description:
-    "A production-grade Next.js + Tailwind + shadcn starter with a real design system, motion, and one-command deploy to Vercel.",
+  /** Longer SEO / Open Graph description, ~150 chars. `/build` sets it. */
+  description: "",
 
-  /** Primary domain WITHOUT protocol. `/build` sets this to <project>.getyetti.com. */
-  domain: "aurora.getyetti.com",
+  /** Production domain, no protocol. Only used for metadataBase + canonical URLs. */
+  domain: "example.com",
 
-  /** Theme — drives the whole color system. Run `npm run brand` after editing. */
+  /** Theme. Run `npm run brand` after editing. */
   theme: {
-    /** Brand hue in OKLCH degrees (0–360). This single number re-skins the site. */
+    /** Brand hue in OKLCH degrees (0-360). This one number re-skins the site. */
     hue: 265,
-    /** Corner style. "sharp" = modern/editorial, "rounded" = friendly, "pill" = playful. */
+    /** Corner style. "sharp" = editorial, "rounded" = friendly, "pill" = playful. */
     corners: "rounded" as "sharp" | "rounded" | "pill",
-    /** Default color scheme on first paint. */
-    defaultScheme: "dark" as "light" | "dark",
+    /** Light only. Dark mode is not supported. */
+    defaultScheme: "light" as const,
   },
 
-  /** Fonts. Any Google Font name works — edit, then run `npm run brand`. */
+  /** Any Google Font name works. Run `npm run brand` after editing. */
   fonts: {
-    /** Big headlines. Pick something with PERSONALITY — this is what breaks the AI look. */
+    /** Headlines. Pick a face with personality, this is what breaks the AI look. */
     display: "Space Grotesk",
-    /** Body / UI text. Keep it clean and readable. */
+    /** Body / UI. Clean and readable. */
     sans: "Geist",
-    /** Code / labels / kbd. */
+    /** Code / labels / eyebrows. */
     mono: "JetBrains Mono",
   },
 
-  /** Links shown in the footer + used by deploy scripts. */
+  /** Footer links. Empty strings are skipped. */
   social: {
-    github: "your-org/your-repo",
-    x: "yourhandle",
-    email: "hello@aurora.example.com",
+    instagram: "",
+    facebook: "",
+    linkedin: "",
+    x: "",
+    github: "",
+    email: "",
   },
 
   /**
-   * Contact + location. `npm run ingest` fills these from the scraped site.
-   * - whatsapp: digits only, country code first, no "+". Set it and a click-to-chat
+   * Contact. `npm run clone` fills these from the scraped site.
+   * - whatsapp: digits only, country code first, no "+". Set it and the click-to-chat
    *   widget appears (components/widget/whatsapp-widget.tsx).
-   * - address + mapQuery: set them and the <Map> section renders a pin + embedded map.
+   * - address + mapQuery: set them and a map section can render a pin + embed.
    */
   contact: {
     whatsapp: "",
     phone: "",
+    email: "",
     address: "",
     mapQuery: "",
   },

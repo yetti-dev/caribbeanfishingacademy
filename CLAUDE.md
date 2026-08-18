@@ -1,195 +1,211 @@
 # CLAUDE.md — how to build in this repo
 
-This repo is a **website factory**. A colleague gives an idea, a reference URL, and a
-project name. We scrape that site's branding + content + media, then build a
-**stunning, unique** website around it with an AI FAQ widget — and deploy it.
+This repo is a **website factory**. Someone gives an idea, a reference URL, and a project
+name. We clone that site's branding, copy and media, build a **stunning, unique** site
+around it with an AI FAQ widget, then push it to a GitHub repo they created.
 
-Three commands run the whole thing:
+Five commands, in order:
 
-- **`/build`** — colleague describes the idea + URL + project name → whole repo becomes their site.
-- **`/run`** — run the app, fix every build/runtime error until it's clean.
-- **`/deploy`** — push to GitHub, create + link a Vercel project, attach `<project>.getyetti.com`.
+- **`/check`** — sub-second preflight.
+- **`/update`** — bring Next.js and every dependency to latest, prove the build passes.
+  **Run this first on a fresh clone.**
+- **`/build`** — idea + URL + project name, and the whole repo becomes their site.
+- **`/run`** — build, fix every error until green, start the dev server.
+- **`/ship`** — force-push a clean export to the GitHub repo URL they give you.
 
-Keep it simple. No PRODUCT.md / DESIGN.md / ceremony. The rules below + `brand.config.ts`
-are all you need. Build fast, make it look amazing.
+**No tokens anywhere.** No GitHub API, no Vercel API, no `GITHUB_TOKEN`, no `VERCEL_TOKEN`.
+The user creates the repo, pastes the URL, and imports it into Vercel by hand. The only key
+in `.env` is `OPENAI_API_KEY` for the FAQ widget.
+
+**The starter ships blank.** `app/page.tsx` is an empty canvas, `components/sections/` does
+not exist, `brand.config.ts` holds neutral placeholders, `content/*.ts` is empty scaffolding.
+`/build` authors all of it. The blank starter is the reset, there is no clean command.
+
+**`/build` is agentic.** It orchestrates `.claude/agents/`: `site-scraper` ->
+`design-director` -> parallel (`section-smith` + `widget-smith` + one `page-smith` per inner
+page) -> `build-fixer`. Fan out independent work in one message. Agents return
+caveman-compressed output. Keep responses lean.
 
 ---
 
 ## The stack (don't fight it)
 
-Next.js 16 (App Router, RSC) · Tailwind v4 (CSS-first `@theme`, **no tailwind.config.js**;
-tokens live in `app/globals.css`) · shadcn/ui (`npm run ui -- <name>`) · `motion` for
-animation · **`lucide-react` for all icons** · OpenAI for the FAQ widget.
+Next.js (App Router, RSC) · Tailwind v4 (CSS-first `@theme`, **no tailwind.config.js**, tokens
+in `app/globals.css`) · shadcn/ui (`npm run ui -- <name>`) · `motion` for animation ·
+**`lucide-react` for every icon** · OpenAI for the FAQ widget.
 
-**Dev/build run on Webpack, not Turbopack.** `npm run dev` and `npm run build` pass
-`--webpack` with a 4GB heap cap (`NODE_OPTIONS=--max-old-space-size=4096`). Turbopack (the
-Next 16 default) leaks uncapped native memory on M-series Macs / Node 25+ and can grow to
-tens of GB (vercel/next.js#93896); the Webpack path peaks at ~500MB. `npm run dev:turbo` is
-the opt-in escape hatch if you want to try Turbopack. Use Node 20.9–24 (see `.nvmrc` → 24).
+**This is not the Next.js in your training data.** Read
+`node_modules/next/dist/docs/` for the installed version before writing anything unfamiliar.
 
-**`brand.config.ts` is the single source of truth** — name, colors, fonts, domain, socials.
-UI/metadata import it directly; `npm run brand` syncs build-time surfaces. Never hardcode
-the name, brand color, or domain in a component.
+**Dev and build run on Webpack, not Turbopack.** `npm run dev` and `npm run build` pass
+`--webpack` with a 4GB heap cap. Turbopack leaks uncapped native memory on M-series Macs and
+can grow to tens of GB (vercel/next.js#93896); the Webpack path peaks near 500MB.
+`npm run dev:turbo` is the deliberate escape hatch. Do not make it the default.
+
+**Two sources of truth, and they are separate:**
+- `brand.config.ts` — name, hue, corners, fonts, domain, socials, contact. UI and metadata
+  import it; `npm run brand` syncs the build-time surfaces. Never hardcode the name, brand
+  color, or domain in a component.
+- `content/*.ts` — **all page copy**, one typed file per page (`home.ts`, `about.ts`, ...)
+  plus `site.ts` for nav and footer, typed against `content/types.ts`. A component with a
+  hardcoded headline is a bug.
 
 ---
 
 ## Design law — make it look designed, not generated
 
-The goal: a visitor asks "who made this?", never "which AI made this?". Average is
-invisible. Have a point of view and commit to it.
+A visitor should ask "who made this?", never "which AI made this?". Average is invisible.
+Have a point of view and commit to it.
 
-### 0. Absolute bans (these come from real failures — do not ship them)
-- **No em dashes or en dashes (— –) in ANY user-facing copy or generated content.**
-  Use a period, comma, colon, or parentheses. This is strict. (Code/markdown docs aside,
-  never put a — in headings, body, buttons, alt text, metadata, or knowledge.md.)
-- **No text laid over a photo behind a dark gradient scrim.** That overlay pattern reads
-  cheap and the text turns unreadable (dark text on dark gradient is the worst case).
-  Pair image + text the right way: image in its own area, text BELOW on a solid surface.
-  Use `components/magic/image-card.tsx` (`ImageCard`) so nobody reaches for the overlay.
-- **No unreadable contrast.** Body text must clear ~4.5:1 on its background. Never dark
-  text on a dark/saturated surface or a busy image. On a colored/photographic panel, put
-  text on a solid token surface (`bg-card`/`bg-background`) or invert to a light token.
-- **The favicon is NOT the logo.** The logo is the branded mark in the navbar + footer
-  (`ideas/<slug>/brand.json` → `logo`). The favicon is a tiny tab/metadata icon only.
-  Never use the favicon as the site logo.
-- **No grid-grid-grid.** Do not stack three `md:grid-cols-3` sections in a row. Vary the
-  layout (see §3).
+### 0. Absolute bans (these come from real failures)
+- **No em dashes or en dashes (— –) in any user-facing copy.** Use a period, comma, colon,
+  or parentheses. Applies to headings, body, buttons, alt text, metadata, `knowledge.md`.
+- **No text over a photo behind a dark gradient scrim.** Unreadable and cheap. Image in its
+  own area, text BELOW on a solid surface. Use `components/magic/image-card.tsx` (`ImageCard`).
+- **No unreadable contrast.** Body text clears ~4.5:1. Never dark text on a dark or saturated
+  surface or a busy image. On a colored/photo panel, put text on `bg-card`/`bg-background`
+  or invert to a light token.
+- **The favicon is not the logo.** The logo is the branded mark in navbar and footer
+  (`brand.json` -> `logo`). The favicon is a tab icon only.
+- **No grid-grid-grid.** Do not stack three `md:grid-cols-3` sections in a row.
+- **No `AuroraBackground` or `GridPattern` in the hero, ever.** Biggest "AI made this" tell.
+  Build hero atmosphere from a real image, a color block, a border or texture, or a custom
+  shape. They are fine sparingly behind a mid-page CTA.
+- **No full-capital-letter headings.** No `uppercase` on `h1`/`h2`/`h3`. Reserve
+  `uppercase tracking-[0.2em]` for small eyebrow labels only.
 
-### 1. Color — tokens, and gradients are welcome
-- Drive color from the semantic tokens (`bg-primary`, `text-foreground`,
-  `text-muted-foreground`, `bg-card`, `border-border`, `bg-accent`). The palette derives
-  from one OKLCH hue in `globals.css`, so the site re-skins from `brand.config.ts`.
-- **Gradients and gradient text ARE allowed and encouraged** here — use them with taste.
-  `text-gradient`, aurora backgrounds, gradient borders/buttons, mesh gradients: all fair
-  game when they add energy. Don't make *everything* a gradient; let it punctuate.
-- Pull the brand color from the customer's site (the scraper sets the hue). Commit to it.
+### 1. Color
+Drive everything from the semantic tokens (`bg-primary`, `text-foreground`,
+`text-muted-foreground`, `bg-card`, `border-border`, `bg-accent`) so the site re-skins from
+one OKLCH hue. **Gradients and gradient text are encouraged** (`text-gradient`, mesh
+backgrounds, gradient borders) as punctuation, not as a coat of paint. Have one dominant
+color and use it with conviction: a saturated hero, a color-blocked section, a dark section
+for contrast. Sites that whisper in grey read as templates.
 
-### 2. Typography — the display face does the work
-- Headings use `--font-display`; body `--font-sans`; code/labels `font-mono`. Big
-  headlines (`text-5xl`–`text-7xl`, `font-bold`, tight tracking, `text-balance`).
-- Strong hierarchy: hero ≫ section heading ≫ body. Never a flat 16px wall.
+### 2. Typography
+Headings `--font-display`, body `--font-sans`, labels `font-mono`. **Do not default to
+Inter/Geist/Roboto for headings** (reach for Space Grotesk, Fraunces, Instrument Serif, Sora,
+Bricolage Grotesque, General Sans). Hero `text-6xl`–`text-8xl`, `font-bold`,
+`tracking-tight`, `text-balance`, `leading-[0.95]`. Section heads `text-4xl`–`text-5xl`. Body
+`text-base`–`text-lg` `leading-relaxed`. A small tracked mono eyebrow above section heads is
+a good recurring motif. Never a flat 16px wall.
 
-### 3. Uniqueness + structure — mirror the source, vary the layout
-Every site must feel custom. Don't ship hero → 3 cards → footer.
+### 3. Structure — mirror the source, vary the layout
+- **Follow the source site's chronology** (`brand.json` -> `sectionOrder`). Lead with what
+  they lead with, then make it better. 6+ distinct sections on home.
+- **Build every inner page** the clone found (`innerPages`, `navItems`, `footerItems`). One
+  real route each, with navbar, footer, metadata, real images, 2-4 sections, a CTA. Never
+  ship a one-page site when the source has more, and never a thin stub.
+- **Vary the layout.** Grids where a grid is right, then break the rhythm:
+  `AutoSlider` (`components/magic/auto-slider.tsx`), `Marquee`, `Carousel`, `Gallery` with
+  lightbox, bento with varied cells, alternating image/text rows, sticky scroll.
+- **A distinctive navbar**, not logo-left + centered-links + button-right. Pill/floating,
+  split, mega-menu, or a bordered editorial header. Scroll state, real mobile sheet, real logo.
+- **Cards, authored not stock.** No row of identical `rounded-xl border p-6` boxes. Vary
+  sizes, add a featured card, an image bleed, a number or eyebrow. Reserve `BorderBeam` for
+  one element.
 
-- **Follow the source site's chronology.** The landing page sections should track the
-  order of the real site (`ideas/<slug>/brand.json` → `sectionOrder`, and
-  `content.md` → "Section order on home"). If they lead with services, you lead with
-  services. Mirror their narrative, then make each section better.
-- **Build the inner pages.** The scrape lists them (`brand.json` → `innerPages`,
-  `navItems`, `footerItems`). Create a real route under `app/<path>/page.tsx` for each
-  (About, Services, a detail/[slug] template, Contact, etc.). Do NOT ship a one-page site
-  when the source has more. Every inner page gets the navbar, footer, proper metadata,
-  real images, and the same level of polish as home (see the build skill's inner-page bar).
-- **Vary the layout — not grid, grid, grid.** Use grids where a grid is right, but break
-  the rhythm with other shapes:
-  - an **auto-advancing slider** (`components/magic/auto-slider.tsx`, `AutoSlider`) for
-    cards/testimonials/gallery rows,
-  - a **marquee** (`components/magic/marquee.tsx`) for logos/tags,
-  - a **carousel** (`components/magic/carousel.tsx`) slideshow,
-  - an **image gallery** (`components/magic/gallery.tsx`) with lightbox,
-  - **bento** grids with varied cell sizes, alternating image/text rows, sticky scroll.
-- **A distinctive navbar** — not the generic centered-links bar. Mega-menu, pill nav,
-  sidebar, or a bold split layout, with the real **logo** in it. Make it brand-specific.
-- **Image + text pairs use `ImageCard`** (image on top, text below). No overlay scrims.
+### 4. Icons
+Every icon from `lucide-react`; brand glyphs in `components/icons.tsx`. No emoji-as-icons,
+no stray SVGs. Icon-only buttons get `aria-label`.
 
-### 4. Icons — lucide, always
-All icons come from `lucide-react` (brand glyphs like GitHub/X live in
-`components/icons.tsx`). No emoji-as-icons, no random SVGs. Icon-only buttons get `aria-label`.
+### 5. Images — never empty, never colored boxes, never unbounded
+- **A site without imagery is a bug.** Colored `<div>` placeholders are forbidden.
+- `npm run clone` downloads up to 60 real images to `public/ingested/<slug>/`, already
+  resized to <=1600px WebP. Use them in the hero, galleries, sliders, sections.
+- Thin scrape or greenfield: use **Unsplash or Pexels** and verify the URLs resolve
+  (`https://images.unsplash.com/photo-{id}?auto=format&fit=crop&w=1600&q=80`). Prefer fewer
+  real photos over many guessed ones. Pull the source's videos and YouTube links too.
+- Meaningful `alt` text in the brand voice.
 
-### 5. Images — never empty, never colored boxes, **never unbounded**
-- **A site without imagery is a bug.** Colored `<div>` placeholders where a photo
-  belongs are forbidden.
-- **If the customer's site has images, importing them is mandatory: download ≥50** of
-  their real images during `/build` (the scraper saves them to `public/ingested/`,
-  already compressed — see the hard limits below). Use them in the hero, galleries,
-  slideshows, and section backgrounds.
-- **Greenfield / not enough source images:** use **Pexels or Unsplash**. Verify URLs
-  resolve before shipping (Unsplash shape:
-  `https://images.unsplash.com/photo-{id}?auto=format&fit=crop&w=1600&q=80`). Prefer fewer
-  real photos over many guessed ones. Also pull the customer's **videos + YouTube links**
-  where relevant.
-- Meaningful `alt` text in the brand's voice.
-
-#### 🚨 Image performance — HARD RULES (breaking these crashes the build)
-Rendering many full-size images at once melts the dev server / build (Next optimizes
-every `next/image` on demand, and large source files exhaust memory). These limits are
-**not optional**:
-
-1. **≤ 10 images rendered per page** with `next/image`. This cap does **not** apply to:
-   - images inside `Gallery` (`components/magic/gallery.tsx`) or `Carousel`
-     (`components/magic/carousel.tsx`) — these use plain lazy `<img>`, not the
-     optimizer, so a 50-image gallery is fine; **and**
-   - cases where the **user explicitly asks** for more standalone images.
-   If a layout needs many images, it IS a grid → put them in `Gallery`/`Carousel`.
-2. **Compress at the source.** Every file in `public/ingested/` is auto-resized to
-   ≤ 1600px on the long edge and re-encoded (`npm run ingest` does this with `sharp`).
-   Never commit an image > ~400 KB. If you add images by hand, run them through the
-   compressor or keep them small.
-3. **`next/image` discipline** for the ≤10 standalone images:
-   - Always set `sizes` (e.g. `sizes="(max-width:768px) 100vw, 50vw"`) and explicit
-     `width`/`height` (or `fill` + a sized parent) — no layout shift.
-   - `quality={70}`–`{80}`, never the default 100.
-   - Exactly **one** `priority` image per page (the hero). Everything else is lazy
-     (the default). Never put `priority` on more than one image.
-4. **Bulk imagery → plain lazy `<img>`** (`loading="lazy" decoding="async"`) via
+#### Image performance — HARD RULES (breaking these crashes the build)
+1. **<=10 images per page rendered with `next/image`.** Does not apply to images inside
+   `Gallery` or `Carousel` (plain lazy `<img>`, so a 50-image gallery is fine), or when the
+   user explicitly asks for more standalone images. If a layout needs many images, it is a
+   gallery.
+2. **Compress at the source.** Nothing over ~400KB in `public/`. `npm run clone` handles it;
+   hand-added images go through the same treatment.
+3. **`next/image` discipline** for those <=10: always set `sizes` and explicit
+   `width`/`height` (or `fill` + a sized parent), `quality={70}`–`{80}`, and exactly **one**
+   `priority` per page (the hero).
+4. **Bulk imagery -> plain lazy `<img>`** (`loading="lazy" decoding="async"`) via
    `Gallery`/`Carousel`, never 50 `next/image` tags. This is the rule that prevents the
-   "100-image repo won't compile" failure.
+   "100-image repo won't compile" failure. One colleague rendered ~100 unbounded images and
+   the dev server collapsed before it could compile.
 
-> Why: one colleague rendered ~100 unbounded images and the dev server collapsed before
-> it could compile. Stay under the caps and route bulk images through the lazy
-> grid/carousel components.
+### 6. Motion
+Wrap entering content in `Reveal`/`RevealGroup`, stagger children 50-80ms, keep durations
+300-500ms ease-out. **Banned:** everything fading up in unison, the same `whileInView` on
+every block, 1s+ floaty fades, looping pulse on static content, gratuitous parallax. Animate
+on purpose: a hero word reveal, a stat count-up, a logo marquee, hover micro-interactions.
+All motion respects `prefers-reduced-motion` (the wrappers do, keep it that way).
 
-> ⚠️ Turbopack is **intentionally disabled** (`npm run dev`/`build` use `--webpack` + a 4GB
-> heap cap). It leaks uncapped native memory and can balloon to tens of GB; don't re-enable
-> it as the default. Use `npm run dev:turbo` only to deliberately test Turbopack.
+### 7. Interaction
+**Everything clickable shows `cursor-pointer`** (buttons, links, cards-as-links, tabs,
+carousel controls). Disabled -> `cursor-not-allowed`. Every interactive element gets a visible
+hover AND `focus-visible:ring`: buttons lift or shift background, cards
+`hover:-translate-y-1 hover:shadow-lg`, links move, with `transition` `duration-200`–`300`
+`ease-out`.
 
-### 6. Motion — present, tasteful, accessible
-- Wrap entering content in `Reveal` / `RevealGroup` (`components/magic/reveal`). Stagger lists.
-- Carousels/galleries animate smoothly; ease-out curves. Reserve `BorderBeam` for one
-  featured element. All motion respects `prefers-reduced-motion` (the wrappers do).
+### 8. Copy
+No "Welcome to our platform" or "Empower your workflow". Concrete outcomes, real verbs. Pull
+from the per-page scrape files (`.scrape/<slug>/pages/*.md`) and sharpen them. Copy goes in
+`content/*.ts`, never in JSX.
 
-### 7. Depth & polish
-- Cards, glass (`backdrop-blur`), gradients, tinted shadows (`shadow-primary/10`) all
-  allowed. Layer `AuroraBackground` / `GridPattern` behind heroes & CTAs for atmosphere.
-
-### 8. Copy — specific, never filler
-- No "Welcome to our platform" / "Empower your workflow". Lead with concrete outcomes,
-  real verbs. Pull source copy from the scrape (`ideas/<slug>/content.md`) and sharpen it.
-
-### 9. Widgets + contact (FAQ, WhatsApp, Map)
+### 9. Widgets and contact
 - **FAQ widget** (`components/widget/faq-widget.tsx`) is mounted globally and answers from
-  `content/knowledge.md` (the scraper fills it). Always wired. Bottom-right.
-- **WhatsApp widget** (`components/widget/whatsapp-widget.tsx`) is also mounted globally
-  and renders ONLY when `brand.contact.whatsapp` is set (the scraper hunts for a
-  wa.me / api.whatsapp number). Bottom-left, click-to-chat. If the source exposes a
-  WhatsApp number, it MUST appear.
-- **Map / location** (`components/sections/map.tsx`, `Map`) renders when
-  `brand.contact.address`/`mapQuery` is set: a pin + embedded map. If the source has a
-  location, add this section (place it where they place it in their chronology).
+  `content/knowledge.md`. Always wired. Bottom-right.
+- **WhatsApp widget** (`components/widget/whatsapp-widget.tsx`) is mounted globally and
+  renders only when `brand.contact.whatsapp` is set. Bottom-left. If the source exposes a
+  number, it must appear.
+- **Map / location**: when `brand.contact.address`/`mapQuery` is set, build
+  `components/sections/map.tsx` and place it where the source places its location.
 
 ### 10. Accessibility
-One `<h1>` per page; real landmarks (`main`/`nav`/`footer`/`section`); icon buttons
-labeled; decorative layers `aria-hidden`; keep contrast (don't put
-`text-muted-foreground` on `bg-muted`).
+One `<h1>` per page. Real landmarks (`main`/`nav`/`footer`/`section`). Labeled icon buttons.
+Decorative layers `aria-hidden`. Keep contrast (no `text-muted-foreground` on `bg-muted`).
 
 ---
 
 ## Conventions
-- `"use client"` only for state/effects/motion; default to Server Components.
+
+- `"use client"` only for state, effects, or motion. Default to Server Components.
 - Class merging: `cn()` from `@/lib/utils`. Named exports, PascalCase files in
   `components/{sections,ui,magic,widget}`.
-- Always finish with `/run` so `npm run build` passes before `/deploy`.
+- Design decisions come from the **`ui-ux-pro-max`** skill (local design DB: styles,
+  palettes, font pairings, product types, UX rules, motion). Query it before writing UI:
+  ```bash
+  python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --domain <style|color|typography|landing|product|ux|icons|gsap|chart|web> -n 3
+  python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry>" --design-system -p "Name" --stack nextjs
+  ```
+  Where it conflicts with the bans above, the bans win.
+- Always finish with `/run` before `/ship`. `/run` ends with `npm run verify`, which
+  asserts the build emitted a real stylesheet and every page links it. A green build can
+  still ship unstyled.
+- **Never move `tailwindcss`, `@tailwindcss/postcss`, or `typescript` into
+  `devDependencies`.** A Vercel project with `NODE_ENV=production` skips devDependencies,
+  and the deploy then fails on unresolved `@/` imports or renders with no CSS. `npm run
+  ship` refuses to push if they are misplaced.
+- Class names must be literal. `bg-primary` is scanned, `` `bg-${color}` `` is not and gets
+  purged. Keep a lookup object of complete class strings instead. The `@source` globs at
+  the top of `app/globals.css` declare every directory that gets scanned; add one if you
+  put class names somewhere new.
 
 ## Commands
-`npm run ingest -- <url> --slug <s> --apply` (scrape brand + ≥50 images + media) ·
-`npm run brand` (sync theme/fonts) · `npm run ui -- <c>` (add shadcn) ·
-`npm run dev` / `npm run build` · `npm run ship` (deploy).
 
----
+`npm run clone -- <url> --slug <s>` (scrape brand + copy + images) · `npm run brand` (sync
+theme/fonts) · `npm run up` (latest deps) · `npm run check` (preflight) ·
+`npm run ui -- <c>` (add shadcn) · `npm run dev` / `npm run build` ·
+`npm run ship -- <repo-url>` (push clean export).
 
-## Project instructions
+## Layout
 
-<!-- ▼▼▼ Your house style. Brand voice, do/don'ts, favorite references. ▼▼▼ -->
-
-_Add your own rules here._
+```
+app/           layout.tsx, page.tsx (blank), globals.css (tokens), api/chat (FAQ)
+components/    magic/ (Reveal, ImageCard, Gallery, Carousel, AutoSlider, Marquee, BorderBeam)
+               ui/ (shadcn) · widget/ (faq, whatsapp) · sections/ (yours to author)
+content/       types.ts · site.ts · home.ts · <page>.ts · knowledge.md
+lib/           fonts.ts (generated by npm run brand) · utils.ts
+scripts/       clone.mjs · apply-brand.mjs · check.mjs · ship.mjs · update-deps.mjs
+.scrape/<slug>/  clone output (gitignored, never pushed)
+```

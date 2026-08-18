@@ -1,8 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Class-based dark mode so we can ship a theme toggle (not OS-locked). */
-@custom-variant dark (&:is(.dark *));
+/*
+ * Explicit source globs. Tailwind v4 auto-detects sources, but auto-detection
+ * skips anything matched by .gitignore and depends on where the CSS file sits.
+ * Declaring them makes the utility scan identical in dev, in CI, and on Vercel,
+ * so a class used only in content/*.ts or brand.config.ts can never get purged
+ * out of the production stylesheet.
+ */
+@source "../app";
+@source "../components";
+@source "../content";
+@source "../lib";
+@source "../brand.config.ts";
 
 /*
  * ────────────────────────────────────────────────────────────────────────────
@@ -23,12 +33,12 @@
 
   /* Neutrals tuned with a hint of brand hue (cool, not dead gray) */
   --background: oklch(0.99 0.004 var(--brand-hue));
-  --foreground: oklch(0.18 0.02 var(--brand-hue));
+  --foreground: oklch(0.12 0.01 var(--brand-hue));
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 var(--brand-hue));
+  --card-foreground: oklch(0.12 0.01 var(--brand-hue));
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 var(--brand-hue));
+  --popover-foreground: oklch(0.12 0.01 var(--brand-hue));
 
   /* Brand primary scale — all derived from --brand-hue */
   --primary: oklch(0.58 0.2 var(--brand-hue));
@@ -38,7 +48,7 @@
   --secondary-foreground: oklch(0.25 0.03 var(--brand-hue));
 
   --muted: oklch(0.96 0.008 var(--brand-hue));
-  --muted-foreground: oklch(0.52 0.02 var(--brand-hue));
+  --muted-foreground: oklch(0.42 0.015 var(--brand-hue));
 
   --accent: oklch(0.95 0.03 var(--brand-hue));
   --accent-foreground: oklch(0.25 0.05 var(--brand-hue));
@@ -54,40 +64,6 @@
   --aurora-1: oklch(0.7 0.2 var(--brand-hue));
   --aurora-2: oklch(0.72 0.18 calc(var(--brand-hue) + 60));
   --aurora-3: oklch(0.75 0.16 calc(var(--brand-hue) - 50));
-}
-
-.dark {
-  /* Near-black mono base: surfaces stay neutral; violet is reserved as the accent. */
-  --background: oklch(0.15 0.004 var(--brand-hue));
-  --foreground: oklch(0.97 0.006 var(--brand-hue));
-
-  --card: oklch(0.185 0.005 var(--brand-hue));
-  --card-foreground: oklch(0.97 0.006 var(--brand-hue));
-  --popover: oklch(0.185 0.005 var(--brand-hue));
-  --popover-foreground: oklch(0.97 0.006 var(--brand-hue));
-
-  --primary: oklch(0.7 0.19 var(--brand-hue));
-  --primary-foreground: oklch(0.15 0.02 var(--brand-hue));
-
-  --secondary: oklch(0.24 0.006 var(--brand-hue));
-  --secondary-foreground: oklch(0.97 0.006 var(--brand-hue));
-
-  --muted: oklch(0.23 0.006 var(--brand-hue));
-  --muted-foreground: oklch(0.72 0.012 var(--brand-hue));
-
-  --accent: oklch(0.27 0.012 var(--brand-hue));
-  --accent-foreground: oklch(0.97 0.006 var(--brand-hue));
-
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.97 0.01 25);
-
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.7 0.19 var(--brand-hue));
-
-  --aurora-1: oklch(0.65 0.22 var(--brand-hue));
-  --aurora-2: oklch(0.68 0.2 calc(var(--brand-hue) + 60));
-  --aurora-3: oklch(0.7 0.18 calc(var(--brand-hue) - 50));
 }
 
 /* Map tokens → Tailwind theme so you can use bg-primary, text-muted-foreground… */

@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 /**
  * AI FAQ assistant. Streams answers grounded ONLY in content/knowledge.md
- * (populated by the URL ingest pipeline). Uses OPENAI_API_KEY from the env.
+ * (seeded by `npm run clone`). Uses OPENAI_API_KEY from the env.
  */
 
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";

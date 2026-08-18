@@ -1,39 +1,22 @@
 ---
 name: check
-description: Fast preflight "doctor" for the factory — reports permission mode, git cleanliness, .env tokens, project name/brand sync, CLAUDE.md and skills, deps. Use for "/check", "status", "are we ready", or before clean/build/run/deploy.
+description: Sub-second preflight for the factory — node, deps, brand sync, content files, image weight, .env, git remote, skills. Use for "/check", "status", "are we ready".
 user-invocable: true
-argument-hint: "(no args — prints a status report and a go / no-go verdict)"
+argument-hint: "(no args)"
 ---
 
-# /check — preflight status
+# /check — preflight
 
-Run before the pipeline to see what's ready at a glance. Files-only, no build, sub-second.
-
-## Run it
 ```
 npm run check
 ```
 
-## What it reports
-- **Permissions** — whether bypass mode is pinned in `.claude/settings*.json`. If it
-  isn't (the usual case), it's set at session launch (`--dangerously-skip-permissions`
-  or Shift+Tab in Claude Code) — confirm with the user that the pipeline won't stall on
-  prompts.
-- **Git** — repo present, current branch, clean vs. uncommitted changes.
-- **Project** — name + domain are real (not placeholders), and `package.json` /
-  `globals.css` are in sync with `brand.config.ts` (else `npm run brand`).
-- **Conventions** — `CLAUDE.md` present, the core skills (`build run deploy clean check`)
-  exist, and whether Impeccable is installed.
-- **Environment** — `node_modules`, `.env`, and the tokens `GITHUB_TOKEN` /
-  `VERCEL_TOKEN` (deploy) and `OPENAI_API_KEY` (FAQ widget).
+Files only, no network, no build. Reports node and `node_modules`, whether
+`brand.config.ts` is real or still placeholder, whether `globals.css` and `lib/fonts.ts`
+are in sync with it (`npm run brand` fixes drift), whether copy is split into
+`content/*.ts`, the scraped image count and any file over 400KB, `OPENAI_API_KEY`, the git
+branch and `origin`, and that the five skills plus `CLAUDE.md` are present.
 
-## Reading the result
-- `✗` = blocker → exit code 1. Fix before proceeding.
-- `⚠` = warning → safe to build/run; deploy needs the flagged item (e.g. tokens).
-- `✓` = good.
+`x` = blocker, exit 1. `!` = warning, safe to build. `v` = good.
 
-## How to use it in a flow
-1. Run `npm run check` and relay the summary.
-2. If there are `✗` blockers, stop and fix them (install deps, restore `CLAUDE.md`, …).
-3. If only `⚠`, tell the user what's missing for each downstream step, then proceed:
-   **`/clean` → `/build` → `/run` → `/deploy`** (deploy only once tokens are set).
+Flow: `/check` -> `/update` -> `/build` -> `/run` -> `/ship`.

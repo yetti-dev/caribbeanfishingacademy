@@ -11,7 +11,7 @@ const siteUrl = `https://${brand.domain}`;
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${brand.name} — ${brand.tagline}`,
+    default: brand.tagline ? `${brand.name}: ${brand.tagline}` : brand.name,
     template: `%s · ${brand.name}`,
   },
   description: brand.description,
@@ -41,7 +41,7 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-full flex flex-col antialiased">
+      <body className="min-h-full flex flex-col bg-background text-foreground antialiased">
         {children}
         <FaqWidget />
         <WhatsAppWidget />

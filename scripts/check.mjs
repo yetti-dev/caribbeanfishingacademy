@@ -1,176 +1,126 @@
 #!/usr/bin/env node
 /**
- * check — fast preflight "doctor" for the factory. Run it before the pipeline
- * (clean → build → run → deploy) to see at a glance what's ready and what isn't.
+ * check — sub-second preflight. Files only, no network, no build.
  *
  *   npm run check
  *
- * It reads files only (no build, no network) so it returns in well under a second.
- * Exit code 0 when there are no blockers, 1 when something would break the pipeline.
+ * Exit 1 if anything is a blocker (x), 0 otherwise (warnings are fine to build on).
  */
-import { readFile, readdir, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const C = {
+const c = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
-  bold: (s) => `\x1b[1m${s}\x1b[0m`,
   green: (s) => `\x1b[32m${s}\x1b[0m`,
   yellow: (s) => `\x1b[33m${s}\x1b[0m`,
   red: (s) => `\x1b[31m${s}\x1b[0m`,
-  cyan: (s) => `\x1b[36m${s}\x1b[0m`,
+  bold: (s) => `\x1b[1m${s}\x1b[0m`,
 };
-const MARK = { ok: C.green("✓"), warn: C.yellow("⚠"), fail: C.red("✗"), info: C.dim("·") };
+let blockers = 0;
+let warnings = 0;
+const ok = (label, note = "") => console.log(`  ${c.green("v")} ${label} ${c.dim(note)}`);
+const warn = (label, note = "") => { warnings++; console.log(`  ${c.yellow("!")} ${label} ${c.dim(note)}`); };
+const bad = (label, note = "") => { blockers++; console.log(`  ${c.red("x")} ${label} ${c.dim(note)}`); };
+const read = (p) => { try { return readFileSync(join(root, p), "utf8"); } catch { return ""; } };
+const sh = (cmd, args) => { try { return execFileSync(cmd, args, { cwd: root, encoding: "utf8" }).trim(); } catch { return null; } };
 
-const rows = [];
-let group = "";
-const head = (g) => ((group = g), rows.push({ head: g }));
-const add = (status, label, detail = "") => rows.push({ status, label, detail });
+console.log(`\n${c.bold("preflight")}\n`);
 
-const read = async (p) => readFile(join(root, p), "utf8").catch(() => null);
-const has = (p) => existsSync(join(root, p));
-const slug = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+// ── toolchain ────────────────────────────────────────────────────────────────
+const nodeMajor = Number(process.versions.node.split(".")[0]);
+if (nodeMajor >= 20) ok("node", process.version);
+else bad("node", `${process.version}, need >=20.9`);
+if (existsSync(join(root, "node_modules"))) ok("node_modules", "installed");
+else bad("node_modules", "run npm install");
 
-// ── load inputs ───────────────────────────────────────────────────────────────
-let brand = null;
-try {
-  ({ brand } = await import(join(root, "brand.config.ts")));
-} catch {}
-const pkg = JSON.parse((await read("package.json")) || "{}");
-const envText = (await read(".env")) || "";
-const envVal = (k) => {
-  const m = envText.match(new RegExp(`^\\s*${k}\\s*=\\s*(.+)\\s*$`, "m"));
-  return m && m[1].trim() ? m[1].trim() : "";
-};
-const settings = JSON.parse((await read(".claude/settings.json")) || "null");
-const localSettings = JSON.parse((await read(".claude/settings.local.json")) || "null");
+// ── brand ────────────────────────────────────────────────────────────────────
+const cfg = read("brand.config.ts");
+const val = (key) => cfg.match(new RegExp(`${key}:\\s*"([^"]*)"`))?.[1] ?? "";
+const name = val("name");
+const hue = cfg.match(/hue:\s*(\d+)/)?.[1];
+if (!name || name === "New Site") warn("brand name", "still the placeholder, /build sets it");
+else ok("brand name", name);
+if (val("tagline")) ok("tagline", val("tagline").slice(0, 50));
+else warn("tagline", "empty");
 
-// ── 1. Permissions ──────────────────────────────────────────────────────────
-head("Permissions");
-{
-  const mode =
-    settings?.permissions?.defaultMode ||
-    localSettings?.permissions?.defaultMode ||
-    null;
-  const inClaude = process.env.CLAUDECODE === "1" || !!process.env.CLAUDE_CODE_ENTRYPOINT;
-  if (mode === "bypassPermissions") add("ok", "Bypass permissions", "defaultMode = bypassPermissions");
-  else if (mode === "acceptEdits") add("warn", "Permission mode", "acceptEdits — Bash still prompts; pipeline may pause");
-  else if (mode) add("warn", "Permission mode", `${mode} — pipeline may pause on prompts`);
-  else
-    add(
-      "info",
-      "Bypass permissions",
-      inClaude
-        ? "not pinned in settings — set at launch (--dangerously-skip-permissions / Shift+Tab)"
-        : "not in a Claude Code session"
-    );
-}
+const css = read("app/globals.css");
+const cssHue = css.match(/--brand-hue:\s*(\d+)/)?.[1];
+if (hue && cssHue && hue !== cssHue) warn("theme sync", `config hue ${hue} vs css ${cssHue}, run npm run brand`);
+else if (hue) ok("theme hue", hue);
+const fontsFile = read("lib/fonts.ts");
+const display = val("display");
+if (display && fontsFile && !fontsFile.includes(display.replace(/ /g, "_"))) {
+  warn("font sync", `config wants ${display}, run npm run brand`);
+} else if (display) ok("display font", display);
 
-// ── 2. Git ────────────────────────────────────────────────────────────────────
-head("Git");
-{
-  const { execSync } = await import("node:child_process");
-  const git = (cmd) => {
-    try { return execSync(`git ${cmd}`, { cwd: root, stdio: "pipe", encoding: "utf8" }).trim(); }
-    catch { return null; }
-  };
-  if (!has(".git")) add("warn", "Git repo", "not initialized — deploy will `git init`");
-  else {
-    const branch = git("rev-parse --abbrev-ref HEAD") || "?";
-    const dirty = git("status --porcelain");
-    if (dirty === null) add("warn", "Working tree", "couldn't read git status");
-    else if (dirty === "") add("ok", "Working tree clean", `on ${branch}`);
-    else add("warn", "Uncommitted changes", `${dirty.split("\n").length} file(s) on ${branch}`);
+// Build-time CSS/TS deps must never sit in devDependencies: a Vercel project with
+// NODE_ENV=production skips those, and the deploy then renders unstyled.
+const pkg = JSON.parse(read("package.json") || "{}");
+const misplaced = ["tailwindcss", "@tailwindcss/postcss", "typescript"].filter((d) => pkg.devDependencies?.[d]);
+if (misplaced.length) bad("css deps", `${misplaced.join(" ")} in devDependencies, move to dependencies`);
+else ok("css deps", "tailwind + typescript in dependencies");
+const cssSources = read("app/globals.css").match(/@source\s/g)?.length ?? 0;
+if (cssSources) ok("@source globs", `${cssSources} declared in globals.css`);
+else warn("@source globs", "none, utilities rely on auto-detection and can purge in production");
+
+// ── content ──────────────────────────────────────────────────────────────────
+const knowledge = read("content/knowledge.md");
+if (knowledge.length > 200) ok("knowledge.md", `${knowledge.length} chars, feeds the FAQ widget`);
+else warn("knowledge.md", "thin, the FAQ widget has little to answer from");
+const contentFiles = existsSync(join(root, "content")) ? readdirSync(join(root, "content")).filter((f) => f.endsWith(".ts")) : [];
+if (contentFiles.length > 1) ok("content files", contentFiles.join(" "));
+else warn("content files", "only types.ts, copy is not split per page yet");
+
+// ── images ───────────────────────────────────────────────────────────────────
+const ingest = join(root, "public", "ingested");
+let imgCount = 0;
+const heavy = [];
+if (existsSync(ingest)) {
+  for (const dir of readdirSync(ingest)) {
+    const d = join(ingest, dir);
+    if (!statSync(d).isDirectory()) continue;
+    for (const f of readdirSync(d)) {
+      imgCount++;
+      const size = statSync(join(d, f)).size;
+      if (size > 400 * 1024) heavy.push(`${dir}/${f}`);
+    }
   }
 }
+if (!imgCount) warn("images", "none scraped yet, /build downloads them");
+else if (heavy.length) warn("images", `${imgCount} found, ${heavy.length} over 400KB (${heavy[0]})`);
+else ok("images", `${imgCount} compressed`);
 
-// ── 3. Project identity ───────────────────────────────────────────────────────
-head("Project");
-{
-  const placeholders = ["", "New Project", "Aurora", "Acme"];
-  if (!brand) add("fail", "brand.config.ts", "missing or won't import");
-  else {
-    if (placeholders.includes(brand.name))
-      add("warn", "Project name", `still "${brand.name}" — run /build or edit brand.config.ts`);
-    else add("ok", "Project name", brand.name);
+// ── env ──────────────────────────────────────────────────────────────────────
+const env = read(".env");
+if (!env) warn(".env", "missing, copy .env.example");
+else if (/OPENAI_API_KEY=\S+/.test(env)) ok("OPENAI_API_KEY", "set, FAQ widget will answer");
+else warn("OPENAI_API_KEY", "not set, FAQ widget cannot answer");
 
-    if (!brand.domain || /example\.com$/.test(brand.domain))
-      add("warn", "Domain", `${brand.domain || "unset"} — set <project>.getyetti.com`);
-    else add("ok", "Domain", brand.domain);
-
-    // package.json name should match the slug of the brand name
-    const want = slug(brand.name);
-    if (pkg.name !== want)
-      add("warn", "brand sync", `package.json "${pkg.name}" ≠ "${want}" — run \`npm run brand\``);
-
-    // globals.css hue should match brand.theme.hue
-    const css = (await read("app/globals.css")) || "";
-    const hue = css.match(/--brand-hue:\s*([\d.]+)/)?.[1];
-    if (hue && brand.theme && String(brand.theme.hue) !== hue)
-      add("warn", "theme sync", `globals hue ${hue}° ≠ config ${brand.theme.hue}° — run \`npm run brand\``);
-    else if (hue) add("ok", "Theme", `hue ${hue}° · ${brand.theme?.corners}`);
-  }
+// ── git ──────────────────────────────────────────────────────────────────────
+if (!existsSync(join(root, ".git"))) warn("git", "not a repo, run git init before ship");
+else {
+  const branch = sh("git", ["rev-parse", "--abbrev-ref", "HEAD"]) || "?";
+  const dirty = (sh("git", ["status", "--porcelain"]) || "").split("\n").filter(Boolean).length;
+  ok("git", `${branch}, ${dirty ? `${dirty} uncommitted` : "clean"}`);
+  const remote = sh("git", ["remote", "get-url", "origin"]);
+  if (remote) ok("origin", remote);
+  else warn("origin", "none, pass the repo URL to npm run ship");
 }
 
-// ── 4. Conventions (CLAUDE.md + skills) ───────────────────────────────────────
-head("Conventions");
-{
-  const claude = await read("CLAUDE.md");
-  if (!claude || claude.trim().length < 200) add("fail", "CLAUDE.md", "missing or stub");
-  else add("ok", "CLAUDE.md", `${Math.round(claude.length / 1000)}k chars`);
+// ── factory ──────────────────────────────────────────────────────────────────
+const skills = ["update", "build", "run", "ship", "check"].filter((s) => existsSync(join(root, ".claude/skills", s, "SKILL.md")));
+if (skills.length === 5) ok("skills", skills.join(" "));
+else bad("skills", `missing: ${["update", "build", "run", "ship", "check"].filter((s) => !skills.includes(s)).join(" ")}`);
+if (existsSync(join(root, "CLAUDE.md"))) ok("CLAUDE.md", "design law loaded");
+else bad("CLAUDE.md", "missing");
+if (existsSync(join(root, ".claude/skills/ui-ux-pro-max/scripts/search.py"))) ok("ui-ux-pro-max", "design DB available");
+else warn("ui-ux-pro-max", "design DB missing");
 
-  const skills = await readdir(join(root, ".claude/skills")).catch(() => []);
-  const core = ["build", "run", "deploy", "clean", "check"];
-  const missing = core.filter((s) => !skills.includes(s));
-  if (missing.length) add("warn", "Pipeline skills", `missing: ${missing.join(", ")}`);
-  else add("ok", "Pipeline skills", core.join(", "));
-
-  if (skills.includes("impeccable")) {
-    const hookOk = has(".claude/skills/impeccable/scripts/hook.mjs");
-    add(hookOk ? "ok" : "warn", "Impeccable", hookOk ? "installed (design detector on)" : "skill present, hook script missing");
-  } else {
-    const refsHook = JSON.stringify(localSettings || "").includes("impeccable");
-    add(refsHook ? "warn" : "info", "Impeccable", refsHook ? "hook referenced but skill not installed — `npx impeccable install`" : "not installed");
-  }
-}
-
-// ── 5. Environment / tokens ───────────────────────────────────────────────────
-head("Environment");
-{
-  add(has("node_modules") ? "ok" : "fail", "Dependencies", has("node_modules") ? "node_modules present" : "run `npm install`");
-  if (!has(".env")) add("warn", ".env", "missing — `cp .env.example .env` and fill tokens");
-  else {
-    add("ok", ".env", "present");
-    const tok = (k, why) => add(envVal(k) ? "ok" : "warn", k, envVal(k) ? "set" : `empty — ${why}`);
-    tok("GITHUB_TOKEN", "needed for /deploy");
-    tok("VERCEL_TOKEN", "needed for /deploy");
-    tok("OPENAI_API_KEY", "needed for the FAQ widget");
-  }
-  add("info", "Node", process.version);
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-const counts = { ok: 0, warn: 0, fail: 0, info: 0 };
-console.log(`\n${C.bold("🩺 Preflight check")} ${C.dim(brand?.name ? `· ${brand.name}` : "")}\n`);
-for (const r of rows) {
-  if (r.head) { console.log(`${C.bold(r.head)}`); continue; }
-  counts[r.status]++;
-  console.log(`  ${MARK[r.status]} ${r.label.padEnd(20)} ${C.dim(r.detail)}`);
-}
-
-const blockers = counts.fail;
-console.log(
-  `\n${C.bold("Summary")}  ${C.green(counts.ok + " ok")} · ${C.yellow(counts.warn + " warn")} · ${C.red(counts.fail + " fail")}`
-);
-if (blockers) {
-  console.log(`${C.red("✗ Not ready")} — fix the ${C.red("✗")} items, then re-run ${C.bold("npm run check")}.\n`);
-  process.exit(1);
-} else if (counts.warn) {
-  console.log(`${C.yellow("⚠ Ready with warnings")} — review ${C.yellow("⚠")} items (deploy needs tokens; build/run are fine).\n`);
-  process.exit(0);
-} else {
-  console.log(`${C.green("✓ All clear")} — go: ${C.bold("/clean → /build → /run → /deploy")}.\n`);
-  process.exit(0);
-}
+// ── verdict ──────────────────────────────────────────────────────────────────
+console.log();
+if (blockers) console.log(`${c.red(`${blockers} blocker(s)`)}${warnings ? c.dim(`, ${warnings} warning(s)`) : ""}\n`);
+else console.log(`${c.green("ready")}${warnings ? c.dim(` (${warnings} warning(s))`) : ""}\n`);
+process.exit(blockers ? 1 : 0);
