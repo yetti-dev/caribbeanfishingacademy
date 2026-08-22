@@ -44,6 +44,9 @@ function typeErrors() {
     if (!m) continue;
     const [, file, , , code, msg] = m;
     if (!file.startsWith("components/blocks/")) continue;
+    // The generated registry is OUTPUT, not a block. Deleting it here would
+    // silently remove the showcase's index instead of the broken block.
+    if (file.endsWith("registry.generated.ts")) continue;
     if (!byFile.has(file)) byFile.set(file, []);
     byFile.get(file).push(`${code}: ${msg.slice(0, 90)}`);
   }
