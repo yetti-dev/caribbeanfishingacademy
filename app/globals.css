@@ -185,3 +185,15 @@
     color-mix(in oklch, var(--color-aurora-2) 80%, var(--color-primary))
   );
 }
+
+/*
+ * Slow zoom and pan for a photo background (Hero12). Kept subtle: a large scale
+ * on a full-bleed image reads as a wobble, not as production value. Wrapped in
+ * a motion query so it never runs for someone who asked for less movement.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes kenburns {
+    from { transform: scale(1) translate3d(0, 0, 0); }
+    to   { transform: scale(1.08) translate3d(0, -1.2%, 0); }
+  }
+}

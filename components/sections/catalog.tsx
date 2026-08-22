@@ -20,6 +20,13 @@ import { Hero07 } from "@/components/sections/hero/hero-07";
 import { Hero08 } from "@/components/sections/hero/hero-08";
 import { Hero09 } from "@/components/sections/hero/hero-09";
 import { Hero10 } from "@/components/sections/hero/hero-10";
+import { Hero11 } from "@/components/sections/hero/hero-11";
+import { Hero12 } from "@/components/sections/hero/hero-12";
+import { Hero13 } from "@/components/sections/hero/hero-13";
+import { Hero14 } from "@/components/sections/hero/hero-14";
+import { Hero15 } from "@/components/sections/hero/hero-15";
+import { Hero16 } from "@/components/sections/hero/hero-16";
+import { Hero17 } from "@/components/sections/hero/hero-17";
 import { Feature01 } from "@/components/sections/features/feature-01";
 import { Feature02 } from "@/components/sections/features/feature-02";
 import { Feature03 } from "@/components/sections/features/feature-03";
@@ -129,6 +136,47 @@ export const CATALOG: CatalogEntry[] = [
       body="Shot on an ordinary Tuesday in March, no drone operator and no actors."
       image={img(18, "Catamaran deck under way")} videoUrl="https://www.youtube.com/embed/dQw4w9WgXcQ"
       ctas={[demoCta, demoCtaAlt]} caption="Filmed on the full day coast run" /> },
+
+  { code: "HERO-11", category: "Hero", label: "Video background, copy on a solid card", leadsWithMedia: true,
+    file: "components/sections/hero/hero-11.tsx", component: "Hero11", props: "eyebrow?, title, body, videoSrc, poster, ctas[], footnote?",
+    node: <Hero11 eyebrow="Aboard the Marlin II" title="Twenty minutes from the dock to open water"
+      body="Muted autoplay, real footage, no stock drone reel. Pause it any time."
+      videoSrc="https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4"
+      poster={img(0, "Sailboat under way in open water")} ctas={[demoCta, demoCtaAlt]}
+      footnote="Filmed on the full day coast run, March 2026." /> },
+  { code: "HERO-12", category: "Hero", label: "Rotating photo background with Ken Burns", leadsWithMedia: true,
+    file: "components/sections/hero/hero-12.tsx", component: "Hero12", props: "eyebrow?, title, body, images[], ctas[], interval?, badge?",
+    node: <Hero12 badge="Most booked" eyebrow="Four trips daily" title="The coast changes every hour. So does the trip."
+      body="Sunrise dolphin runs, midday reef stops, and the sunset cruise everyone rebooks."
+      images={[img(1, "Catamaran at anchor in turquoise water"), img(8, "Sunset over the sea"), img(5, "Turquoise shallows over sand"), img(16, "Catamaran under full sail")]}
+      ctas={[demoCta, demoCtaAlt]} /> },
+  { code: "HERO-13", category: "Hero", label: "Copy left, photo bleeds full height right",
+    file: "components/sections/hero/hero-13.tsx", component: "Hero13", props: "eyebrow?, title, body, image, ctas[], bullets[]",
+    node: <Hero13 eyebrow="Half day from $68" title="Two reef stops, lunch aboard, back by one"
+      body="Out at nine from Slip 14. Twelve guests, two crew, and water calm enough for a four year old."
+      image={img(19, "Guests boarding at the dock")} ctas={[demoCta, demoCtaAlt]}
+      bullets={["Masks and fins in every size", "Lunch cooked on the back deck", "Free rebooking if weather cancels", "Reef safe sunscreen supplied"]} /> },
+  { code: "HERO-14", category: "Hero", label: "Photo bleeds full height left, copy right",
+    file: "components/sections/hero/hero-14.tsx", component: "Hero14", props: "eyebrow?, title, body, image, ctas[], stats[], rating?",
+    node: <Hero14 eyebrow="Twelve seasons" title="The crew grew up on this coast"
+      body="Every skipper is local and licensed, and knows which reef stays calm when the trades pick up."
+      image={img(11, "Crew member at the helm")} ctas={[demoCta, demoCtaAlt]} stats={demoStats} rating="4.9" /> },
+  { code: "HERO-15", category: "Hero", label: "Photo background, colour block copy", leadsWithMedia: true,
+    file: "components/sections/hero/hero-15.tsx", component: "Hero15", props: "eyebrow?, title, body, image, ctas[], note?",
+    node: <Hero15 eyebrow="Private charter" title="Book the boat, not a seat on it"
+      body="Up to twelve guests, catering to order, and a route you pick on the morning."
+      image={img(16, "Catamaran under sail in open water")} ctas={[demoCta, demoCtaAlt]}
+      note="Deposit refundable up to 72 hours before departure." /> },
+  { code: "HERO-16", category: "Hero", label: "Full photo with solid booking strip", leadsWithMedia: true,
+    file: "components/sections/hero/hero-16.tsx", component: "Hero16", props: "eyebrow?, title, image, ctas[], facts[]",
+    node: <Hero16 eyebrow="Sunset cruise" title="Anchor off the lighthouse as the sky goes orange"
+      image={img(15, "Sailboat silhouetted against a sunset")} ctas={[demoCta, demoCtaAlt]}
+      facts={[{ icon: "clock", label: "Duration", value: "3 hours, departs 17:30" }, { icon: "users", label: "Group size", value: "12 guests maximum" }, { icon: "pin", label: "Departs", value: "Slip 14, Oranjestad Marina" }]} /> },
+  { code: "HERO-17", category: "Hero", label: "Centred type on a measured scrim", leadsWithMedia: true,
+    file: "components/sections/hero/hero-17.tsx", component: "Hero17", props: "eyebrow?, title, body, image, ctas[], scrollHint?",
+    node: <Hero17 eyebrow="Marlin Charters, est. 2013" title="Sail the leeward coast"
+      body="Small groups, local captains, and twelve seasons of knowing where the water stays calm."
+      image={img(33, "Open ocean horizon at dusk")} ctas={[demoCta, demoCtaAlt]} scrollHint="Scroll for the trips" /> },
 
   { code: "FEAT-01", category: "Features", label: "Three-up icon grid",
     file: "components/sections/features/feature-01.tsx", component: "Feature01", props: "heading: SectionHeading, features: Feature[]",
