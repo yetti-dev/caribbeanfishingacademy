@@ -19,7 +19,6 @@
     "verify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-build.mjs",
     "blocks": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-sync.mjs",
     "blocks:prune": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-prune.mjs",
-    "blocks:showcase": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-showcase.mjs",
     "blocks:curate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-curate.mjs"
   },
   "dependencies": {
