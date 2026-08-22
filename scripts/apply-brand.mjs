@@ -10,6 +10,7 @@
  * build-time-only surfaces, between clearly marked regions, so it's idempotent.
  */
 import { readFile, writeFile } from "node:fs/promises";
+import { pickPrimary, pickBorder } from "./lib/color.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -67,8 +68,31 @@ await patch("app/globals.css", (src) => {
     /--radius:\s*[^;]+;/,
     `--radius: ${radius};`
   );
+
+  /*
+   * Solve --primary and --border for THIS hue instead of trusting one fixed
+   * lightness. At the L=0.58 this file used to hardcode, 51 of 72 hues put the
+   * button label below 4.5:1 — every cyan, teal, green and yellow brand shipped
+   * unreadable buttons. The solver keeps the colour as vivid as the hue allows
+   * and flips the label to near-black when the brand colour is intrinsically
+   * bright, which is what a designer would do.
+   */
+  const p = pickPrimary(brand.theme.hue);
+  if (p) {
+    out = out.replace(/--primary:\s*oklch\([^)]*\)[^;]*;/, `--primary: oklch(${p.L} ${p.C} var(--brand-hue));`);
+    out = out.replace(/--primary-foreground:\s*oklch\([^)]*\)[^;]*;/, `--primary-foreground: oklch(${p.fgL} ${p.fgC} var(--brand-hue));`);
+  }
+  const b = pickBorder(brand.theme.hue);
+  out = out.replace(/--border:\s*oklch\([^)]*\)[^;]*;/, `--border: oklch(${b.L} ${b.C} var(--brand-hue));`);
+  out = out.replace(/--input:\s*oklch\([^)]*\)[^;]*;/, `--input: oklch(${b.L} ${b.C} var(--brand-hue));`);
   return out;
 });
+{
+  const p = pickPrimary(brand.theme.hue);
+  const b = pickBorder(brand.theme.hue);
+  if (p) log("primary", `${p.hex} L=${p.L} + ${p.fgKind} label ${p.fgHex} (${p.ratio}:1)`);
+  log("border", `${b.hex} L=${b.L} (${b.ratio}:1 on page)`);
+}
 log("brand hue", brand.theme.hue);
 log("corners", `${brand.theme.corners} (${radiusFor[brand.theme.corners]})`);
 

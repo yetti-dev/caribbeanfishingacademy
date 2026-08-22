@@ -28,6 +28,7 @@ import {
   SECRET_PATTERNS, CODE_PATTERNS, INJECTION_PATTERNS, scanText,
   sniffType, svgIsClean, EXECUTABLE_TYPES, RASTER_TYPES,
 } from "./lib/security.mjs";
+import { auditTokens, pickPrimary } from "./lib/color.mjs";
 
 const argv = process.argv.slice(2);
 const STRICT = argv.includes("--strict");
@@ -251,12 +252,35 @@ function checkScrape() {
   }
 }
 
+/* ── 6. theme contrast ───────────────────────────────────────────────────── */
+/*
+ * The brand hue is SCRAPED, so it is effectively arbitrary. A hue that renders
+ * an unreadable button label is a defect the visitor sees on every page, and it
+ * is invisible in a build log. Measure the pairs that actually get rendered.
+ */
+function checkTheme() {
+  const cssPath = join(root, "app", "globals.css");
+  if (!existsSync(cssPath)) { warn("theme", "app/globals.css missing", "the site will render unstyled"); return; }
+  const { brandHue, results } = auditTokens(readFileSync(cssPath, "utf8"));
+  if (!results.length) { warn("theme", "no OKLCH token pairs could be resolved", "check the :root block in app/globals.css"); return; }
+  const bad = results.filter((r) => !r.ok);
+  for (const r of bad) {
+    const suggestion = r.fg === "primary-foreground"
+      ? (() => { const p = pickPrimary(brandHue); return p ? `run npm run brand — the solver picks L=${p.L} with a ${p.fgKind} label (${p.ratio}:1)` : "lower --primary lightness"; })()
+      : `raise the contrast between --${r.fg} and --${r.bg}`;
+    const level = r.min >= 4.5 ? block : warn;
+    level("theme", `${r.fg} on ${r.bg} is ${r.ratio}:1, needs ${r.min}:1 — ${r.what}`, suggestion);
+  }
+  if (!bad.length) note("theme", `hue ${brandHue}, all ${results.length} contrast pair(s) pass`);
+}
+
 /* ── run ──────────────────────────────────────────────────────────────────── */
 checkDeps();
 checkSecrets();
 checkCode();
 checkAssets();
 checkScrape();
+checkTheme();
 
 const blocks = findings.filter((f) => f.level === "block");
 const warns = findings.filter((f) => f.level === "warn");
@@ -265,7 +289,7 @@ if (JSON_OUT) {
   console.log(JSON.stringify({ ok: blocks.length === 0 && (!STRICT || warns.length === 0), findings }, null, 2));
 } else {
   console.log(`\n${c.bold("guard")} ${c.dim("supply-chain + malware scan")}\n`);
-  const order = ["deps", "secrets", "code", "assets", "scrape"];
+  const order = ["deps", "secrets", "code", "assets", "scrape", "theme"];
   for (const check of order) {
     const group = findings.filter((f) => f.check === check);
     if (!group.length) continue;

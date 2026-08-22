@@ -12,8 +12,8 @@ import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-export const STRIP = [".claude", ".scrape", "CLAUDE.md", "AGENTS.md", "scripts", "ideas", ".env.example"];
-export const FACTORY_SCRIPTS = ["brand", "check", "clone", "ship", "up", "deploy", "verify"];
+export const STRIP = [".claude", ".scrape", ".factory", ".security", "CLAUDE.md", "AGENTS.md", "scripts", "ideas", ".env.example", ".npmrc"];
+export const FACTORY_SCRIPTS = ["brand", "check", "clone", "guard", "deploy", "go", "up", "verify"];
 
 const git = (args, cwd) => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }).trim();
 

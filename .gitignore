@@ -44,3 +44,6 @@ next-env.d.ts
 
 # scrape workspace (never pushed)
 /.scrape/
+
+# factory run state (build timings for the notification emails)
+/.factory/

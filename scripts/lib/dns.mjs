@@ -27,9 +27,18 @@ const j = async (res, what) => {
  */
 const godaddy = {
   name: "godaddy",
-  credentials: () => ["GODADDY_API_KEY", "GODADDY_API_SECRET"],
+  /*
+   * Two auth schemes are live. GODADDY_TOKEN is a newer single Personal Access
+   * Token used as `Bearer`; the classic developer key is a pair sent as
+   * `sso-key KEY:SECRET`. Either is accepted, token first.
+   */
+  credentials: () => ["GODADDY_TOKEN"],
+  hasCreds: (env) => Boolean(env.GODADDY_TOKEN || (env.GODADDY_API_KEY && env.GODADDY_API_SECRET)),
   headers: (env) => ({
-    Authorization: `sso-key ${env.GODADDY_API_KEY}:${env.GODADDY_API_SECRET}`,
+    Authorization: env.GODADDY_TOKEN
+      ? `Bearer ${env.GODADDY_TOKEN}`
+      : `sso-key ${env.GODADDY_API_KEY}:${env.GODADDY_API_SECRET}`,
+    Accept: "application/json",
     "Content-Type": "application/json",
   }),
   async read(env, { zone, name, type }) {
@@ -181,6 +190,11 @@ const namecheap = {
 
 export const providers = { godaddy, cloudflare, vercel: vercelDns, namecheap };
 
+/** An adapter may accept more than one credential shape, so ask it. */
+export function hasCredentials(provider, env) {
+  return provider.hasCreds ? provider.hasCreds(env) : provider.credentials().every((k) => env[k]);
+}
+
 export function pickProvider(env) {
   const explicit = env.DNS_PROVIDER?.trim().toLowerCase();
   if (explicit) {
@@ -190,7 +204,7 @@ export function pickProvider(env) {
   }
   // No explicit choice: use whichever provider's credentials are actually present.
   for (const p of [godaddy, cloudflare, namecheap, vercelDns]) {
-    if (p.credentials().every((k) => env[k])) return p;
+    if (hasCredentials(p, env)) return p;
   }
   return null;
 }

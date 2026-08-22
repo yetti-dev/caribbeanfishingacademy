@@ -20,8 +20,9 @@ import { join } from "node:path";
 import { readEnv, root, mask } from "./lib/env.mjs";
 import { GitHub, scrub } from "./lib/github.mjs";
 import { Vercel, requiredRecords } from "./lib/vercel.mjs";
-import { pickProvider } from "./lib/dns.mjs";
+import { pickProvider, hasCredentials } from "./lib/dns.mjs";
 import { commitAll, buildExport, pushExport } from "./lib/export.mjs";
+import { loadRun, markPhase, closeRun, notifyDeployed, notifyFailed } from "./lib/notify.mjs";
 
 /* ── args ─────────────────────────────────────────────────────────────────── */
 const argv = process.argv.slice(2);
@@ -44,7 +45,14 @@ const c = {
 const env = readEnv();
 const secrets = [env.GITHUB_TOKEN, env.VERCEL_TOKEN, env.OPENAI_API_KEY, env.GODADDY_API_SECRET, env.CLOUDFLARE_API_TOKEN, env.NAMECHEAP_API_KEY].filter(Boolean);
 const say = (label, msg) => console.log(`  ${c.dim(label.padEnd(10))}${scrub(msg, ...secrets)}`);
-const die = (msg) => { console.error(`\n${c.red("deploy failed:")} ${scrub(msg, ...secrets)}\n`); process.exit(1); };
+const die = (msg) => {
+  const clean = scrub(msg, ...secrets);
+  console.error(`\n${c.red("deploy failed:")} ${clean}\n`);
+  // Fire and forget: a notification must never mask the real error.
+  const run = loadRun();
+  if (run && !DRY) notifyFailed(run, env, { stage: "deploy", error: clean }).catch(() => {});
+  process.exit(1);
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ── derive names ─────────────────────────────────────────────────────────── */
@@ -58,14 +66,20 @@ const DOMAIN = flag("domain")?.replace(/^https?:\/\//, "").replace(/\/.*$/, "").
 const NAME = slugify(flag("project") || flag("repo") || brandName || DOMAIN?.split(".")[0] || "new-site");
 const REPO = slugify(flag("repo") || NAME);
 const PRIVATE = !has("public");
-const WITH_WWW = DOMAIN && !DOMAIN.startsWith("www.") && !has("no-www");
-/** Apex of the domain, for splitting "www.acme.com" into zone "acme.com" + host "www". */
+/** Zone = the registrable domain. "sailcadence.getyetti.com" -> "getyetti.com". */
 const ZONE = flag("zone") || (DOMAIN ? DOMAIN.split(".").slice(-2).join(".") : null);
+/** A subdomain deploy has a host label; an apex deploy does not. */
+const IS_APEX = Boolean(DOMAIN) && DOMAIN === ZONE;
+/*
+ * www is an apex-only convenience. Adding it to a subdomain would try to attach
+ * www.sailcadence.getyetti.com, which nobody wants and which fails verification.
+ */
+const WITH_WWW = IS_APEX && !has("no-www");
 
 console.log(`\n${c.bold("deploy")} ${c.dim(DRY ? "(dry run, no side effects)" : "")}`);
 say("project", c.cyan(NAME));
 say("repo", c.cyan(REPO) + c.dim(PRIVATE ? " (private)" : " (public)"));
-say("domain", DOMAIN ? c.cyan(DOMAIN) + (WITH_WWW ? c.dim(` + www.${DOMAIN}`) : "") : c.dim("none, vercel.app only"));
+say("domain", DOMAIN ? c.cyan(DOMAIN) + (WITH_WWW ? c.dim(` + www.${DOMAIN}`) : IS_APEX ? "" : c.dim(` (subdomain of ${ZONE})`)) : c.dim("none, vercel.app only"));
 console.log();
 
 /* ── 0. preflight ─────────────────────────────────────────────────────────── */
@@ -92,12 +106,14 @@ const dnsProvider = DOMAIN ? pickProvider(env) : null;
 if (DOMAIN) {
   if (!dnsProvider) {
     console.log(`  ${c.yellow("warn")}      no DNS credentials in .env, so the record must be written by hand.`);
-    console.log(`  ${c.dim("          ")}add one of: GODADDY_API_KEY+GODADDY_API_SECRET, CLOUDFLARE_API_TOKEN, NAMECHEAP_*`);
+    console.log(`  ${c.dim("          ")}add one of: GODADDY_TOKEN (or GODADDY_API_KEY+GODADDY_API_SECRET), CLOUDFLARE_API_TOKEN, NAMECHEAP_*`);
   } else {
-    const ready = dnsProvider.credentials().every((k) => env[k]);
+    const ready = hasCredentials(dnsProvider, env);
     say("dns", `${c.cyan(dnsProvider.name)}${ready ? "" : c.yellow(" (credentials incomplete)")}`);
   }
 }
+
+if (!DRY) markPhase("Deploy + DNS");
 
 /* ── 1. security gate ─────────────────────────────────────────────────────── */
 /*
@@ -293,5 +309,19 @@ if (DRY) {
   say("repo", c.cyan(web));
   if (deployUrl) say("preview", c.cyan(deployUrl));
   if (DOMAIN) say("live", c.cyan(`https://${DOMAIN}`));
+
+  const run = closeRun();
+  if (run) {
+    const recs = DOMAIN ? requiredRecords(DOMAIN, await vc.domainConfig(DOMAIN).catch(() => ({})), ZONE) : [];
+    const r = await notifyDeployed(run, env, {
+      repo: web,
+      deployUrl,
+      domain: DOMAIN,
+      dns: recs.map((x) => `${x.type} ${x.name} -> ${x.value}`).join(", ") || null,
+      dnsProvider: dnsProvider?.name || null,
+      vercelProject: project ? `${project.name}${env.VERCEL_SCOPE ? ` (${env.VERCEL_SCOPE})` : ""}` : null,
+    }).catch((e) => ({ ok: false, error: e.message }));
+    say("email", r.ok ? c.green("sent") + c.dim(` — ${env.NOTIFY_TO || "anique.cs@gmail.com"}`) : c.yellow(`not sent: ${r.reason || r.error || "unknown"}`));
+  }
   console.log();
 }
