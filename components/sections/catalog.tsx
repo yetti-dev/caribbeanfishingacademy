@@ -45,6 +45,12 @@ export type CatalogEntry = {
    * next section needs its own top clearance.
    */
   overlay?: boolean;
+  /**
+   * Opens with a full-bleed photo rather than padded text. An overlay nav can
+   * sit straight on top of it, and adding clearance would insert a blank gap
+   * for the bar to float over instead.
+   */
+  leadsWithMedia?: boolean;
   node: React.ReactNode;
 };
 
@@ -72,7 +78,7 @@ export const CATALOG: CatalogEntry[] = [
     node: <Hero01 eyebrow="Small group sailing" title="Twelve guests, one reef, no queue for the ladder"
       body="Half and full day trips from Slip 14. Local captains, lunch cooked aboard, gear that actually fits."
       image={img(0, "Sailboat moored in clear water")} ctas={[demoCta, demoCtaAlt]} stats={demoStats} rating="4.9" /> },
-  { code: "HERO-02", category: "Hero", label: "Photo above, copy on a solid card",
+  { code: "HERO-02", category: "Hero", label: "Photo above, copy on a solid card", leadsWithMedia: true,
     file: "components/sections/hero/hero-02.tsx", component: "Hero02", props: "eyebrow?, title, body, image, ctas[]",
     node: <Hero02 eyebrow="Since 2013" title="The reef is twenty minutes out. We know the calm side."
       body="Twelve seasons of logbooks decide where we anchor, not a brochure."
