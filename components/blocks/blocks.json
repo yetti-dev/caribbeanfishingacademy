@@ -40,18 +40,6 @@
   },
   "blocks": [
     {
-      "name": "grid",
-      "registry": "aceternity",
-      "title": "Grid",
-      "description": null,
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/aceternity/grid.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "spotlight",
       "registry": "aceternity",
       "title": "Spotlight",
@@ -96,18 +84,6 @@
       "type": "registry:ui",
       "files": [
         "components/blocks/aceternity/following-pointer.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "background-beams",
-      "registry": "aceternity",
-      "title": "Background Beams",
-      "description": null,
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/aceternity/background-beams.tsx"
       ],
       "registryDependencies": []
     },
@@ -352,18 +328,6 @@
       "registryDependencies": []
     },
     {
-      "name": "aurora-background",
-      "registry": "aceternity",
-      "title": "Aurora Background",
-      "description": null,
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/aceternity/aurora-background.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "hover-border-gradient",
       "registry": "aceternity",
       "title": "Hover Border Gradient",
@@ -592,18 +556,6 @@
       "registryDependencies": []
     },
     {
-      "name": "dotted-glow-background",
-      "registry": "aceternity",
-      "title": "Dotted Glow Background",
-      "description": null,
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/aceternity/dotted-glow-background.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "tooltip-card",
       "registry": "aceternity",
       "title": "Tooltip Card",
@@ -748,30 +700,6 @@
       "registryDependencies": []
     },
     {
-      "name": "grid-pattern",
-      "registry": "magicui",
-      "title": "Grid Pattern",
-      "description": "A background grid pattern made with SVGs, fully customizable using Tailwind CSS.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/magicui/grid-pattern.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "dot-pattern",
-      "registry": "magicui",
-      "title": "Dot Pattern",
-      "description": "A background dot pattern made with SVGs, fully customizable using Tailwind CSS.",
-      "category": "misc",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/magicui/dot-pattern.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "hero-video-dialog",
       "registry": "magicui",
       "title": "Hero Video Dialog",
@@ -832,18 +760,6 @@
       "registryDependencies": []
     },
     {
-      "name": "retro-grid",
-      "registry": "magicui",
-      "title": "Retro Grid",
-      "description": "An animated scrolling retro grid effect",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/magicui/retro-grid.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "animated-shiny-text",
       "registry": "magicui",
       "title": "Animated Shiny Text",
@@ -852,18 +768,6 @@
       "type": "registry:ui",
       "files": [
         "components/blocks/magicui/animated-shiny-text.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "animated-grid-pattern",
-      "registry": "magicui",
-      "title": "Animated Grid Pattern",
-      "description": "A animated background grid pattern made with SVGs, fully customizable using Tailwind CSS.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/magicui/animated-grid-pattern.tsx"
       ],
       "registryDependencies": []
     },
@@ -1058,62 +962,6 @@
         "components/blocks/magicui/video-text.tsx"
       ],
       "registryDependencies": []
-    },
-    {
-      "name": "grid-pattern-linear-gradient",
-      "registry": "magicui",
-      "title": "Grid Pattern Linear Gradient",
-      "description": "Example showing a grid pattern with linear gradient effects.",
-      "category": "typography",
-      "type": "registry:example",
-      "files": [
-        "components/blocks/magicui/grid-pattern-linear-gradient.tsx"
-      ],
-      "registryDependencies": [
-        "@magicui/grid-pattern"
-      ]
-    },
-    {
-      "name": "grid-pattern-dashed",
-      "registry": "magicui",
-      "title": "Grid Pattern Dashed",
-      "description": "Example showing a dashed grid pattern.",
-      "category": "backgrounds",
-      "type": "registry:example",
-      "files": [
-        "components/blocks/magicui/grid-pattern-dashed.tsx"
-      ],
-      "registryDependencies": [
-        "@magicui/grid-pattern"
-      ]
-    },
-    {
-      "name": "dot-pattern-linear-gradient",
-      "registry": "magicui",
-      "title": "Dot Pattern Linear Gradient",
-      "description": "Example showing a dot pattern with linear gradient effects.",
-      "category": "typography",
-      "type": "registry:example",
-      "files": [
-        "components/blocks/magicui/dot-pattern-linear-gradient.tsx"
-      ],
-      "registryDependencies": [
-        "@magicui/dot-pattern"
-      ]
-    },
-    {
-      "name": "dot-pattern-with-glow-effect",
-      "registry": "magicui",
-      "title": "Dot Pattern with glow effect",
-      "description": "Example showing a dot pattern with glow effect",
-      "category": "backgrounds",
-      "type": "registry:example",
-      "files": [
-        "components/blocks/magicui/dot-pattern-with-glow-effect.tsx"
-      ],
-      "registryDependencies": [
-        "@magicui/dot-pattern"
-      ]
     },
     {
       "name": "hero-video-dialog-demo-top-in-bottom-out",
@@ -1478,18 +1326,6 @@
       "registryDependencies": []
     },
     {
-      "name": "ShapeGrid",
-      "registry": "reactbits",
-      "title": "ShapeGrid",
-      "description": "Animated grid with shape variants (square, hexagon, circle, triangle) + direction customization.",
-      "category": "backgrounds",
-      "type": "registry:component",
-      "files": [
-        "components/blocks/reactbits/ShapeGrid.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "Waves",
       "registry": "reactbits",
       "title": "Waves",
@@ -1502,18 +1338,6 @@
       "registryDependencies": []
     },
     {
-      "name": "backgrounds-bubble",
-      "registry": "animateui",
-      "title": "Bubble Background",
-      "description": "An interactive background featuring smoothly animated gradient bubbles, creating a playful, dynamic, and visually engaging backdrop.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/animateui/backgrounds-bubble.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
       "name": "backgrounds-gradient",
       "registry": "animateui",
       "title": "Gradient Background",
@@ -1522,42 +1346,6 @@
       "type": "registry:ui",
       "files": [
         "components/blocks/animateui/backgrounds-gradient.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "backgrounds-hexagon",
-      "registry": "animateui",
-      "title": "Hexagon Background",
-      "description": "A background component featuring an interactive hexagon grid.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/animateui/backgrounds-hexagon.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "backgrounds-hole",
-      "registry": "animateui",
-      "title": "Hole Background",
-      "description": "A background component featuring an animated hole grid.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/animateui/backgrounds-hole.tsx"
-      ],
-      "registryDependencies": []
-    },
-    {
-      "name": "backgrounds-stars",
-      "registry": "animateui",
-      "title": "Stars Background",
-      "description": "An interactive background featuring animated dots of varying sizes and speeds, simulating a dynamic and immersive starry space effect.",
-      "category": "backgrounds",
-      "type": "registry:ui",
-      "files": [
-        "components/blocks/animateui/backgrounds-stars.tsx"
       ],
       "registryDependencies": []
     },
@@ -4494,8 +4282,93 @@
       "name": "registry.generated",
       "registry": "registry.generated.ts",
       "reason": "does not compile — TS2307: Cannot find module './aceternity/background-lines' or its corresponding type declarations."
+    },
+    {
+      "name": "grid",
+      "registry": "aceternity",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "background-beams",
+      "registry": "aceternity",
+      "reason": "curated out: decorative background, adds nothing on a client site"
+    },
+    {
+      "name": "aurora-background",
+      "registry": "aceternity",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "dotted-glow-background",
+      "registry": "aceternity",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "grid-pattern",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "dot-pattern",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "retro-grid",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "animated-grid-pattern",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "grid-pattern-linear-gradient",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "grid-pattern-dashed",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "dot-pattern-linear-gradient",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "dot-pattern-with-glow-effect",
+      "registry": "magicui",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "ShapeGrid",
+      "registry": "reactbits",
+      "reason": "curated out: grid or dot pattern, banned by the design law"
+    },
+    {
+      "name": "backgrounds-bubble",
+      "registry": "animateui",
+      "reason": "curated out: decorative background, adds nothing on a client site"
+    },
+    {
+      "name": "backgrounds-hexagon",
+      "registry": "animateui",
+      "reason": "curated out: decorative background, adds nothing on a client site"
+    },
+    {
+      "name": "backgrounds-hole",
+      "registry": "animateui",
+      "reason": "curated out: decorative background, adds nothing on a client site"
+    },
+    {
+      "name": "backgrounds-stars",
+      "registry": "animateui",
+      "reason": "curated out: decorative background, adds nothing on a client site"
     }
   ],
-  "prunedAt": "2026-08-22T22:21:34.195Z",
-  "curatedAt": "2026-08-22T22:21:31.646Z"
+  "prunedAt": "2026-08-22T22:24:12.383Z",
+  "curatedAt": "2026-08-22T22:24:02.919Z"
 }

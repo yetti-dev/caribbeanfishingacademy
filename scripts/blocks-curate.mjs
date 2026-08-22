@@ -42,6 +42,15 @@ const DENY = [
   [/warp-background|background-ripple|interactive-grid|flickering-grid|layout-grid|hexagon-pattern|striped-pattern/i, "busy animated background"],
   [/^(splash-?cursor|smooth-cursor|blob-?cursor|crosshair|cursor-grid|text-cursor)/i, "custom cursor, fights usability"],
 
+  /*
+   * Grid and dot patterns. CLAUDE.md bans them in a hero as the biggest
+   * "AI made this" tell, and the same is true of the registry versions, so they
+   * are not worth keeping at all. Same for aurora: it is on the banned list and
+   * the local component was already deleted for the same reason.
+   */
+  [/grid-pattern|retro-grid|^grid$|^shape-grid$|dot-pattern|dotted-glow|^aurora-background$/i, "grid or dot pattern, banned by the design law"],
+  [/^background-beams|^backgrounds-(bubble|hexagon|hole|stars)$/i, "decorative background, adds nothing on a client site"],
+
   // Novelty type effects. Keep the tasteful ones, drop the toys.
   [/comic-text|squiggly|fuzzy-text|text-3d-flip|spinning-text|wavy-text|kinetic-text|depth-text|echo-text|text-flipping-board|canvas-text|text-pressure|circular-text|true-focus|variable-proximity/i, "novelty type effect"],
 
@@ -80,9 +89,10 @@ const KEEP = [
   /^(hover-border-gradient|shine-border|background-gradient|colourful-text|video-text)$/i,
   /^(interactive-hover-button|shimmer-button|shiny-button|animated-shiny-button|magnetic-button|ripple-button|animated-badge)$/i,
   /^(magnet|magnet-lines|glare-hover|click-spark|pointer-highlight|following-pointer)$/i,
-  /^(noise|noise-background|dot-pattern|grid-pattern|retro-grid|spotlight|spotlight-new|background-lines|waves|border-glow|shape-grid|dotted-glow-background|dot-pattern-with-glow-effect|grid|glowing-effect)$/i,
+  // Subtle surface treatments only. No grids, no dots, no aurora.
+  /^(noise|noise-background|spotlight|spotlight-new|background-lines|waves|border-glow|glowing-effect)$/i,
   /^(scroll-progress|animated-circular-progress-bar|images-badge|effects-image-zoom|elastic-slider)$/i,
-  /^(typing-animation|animated-grid-pattern|grid-pattern-dashed|3d-pin|text-reveal-card|tooltip-card)$/i,
+  /^(typing-animation|3d-pin|text-reveal-card|tooltip-card)$/i,
 ];
 
 const kebab = (s) => String(s).replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/[_\s]+/g, "-").toLowerCase();
