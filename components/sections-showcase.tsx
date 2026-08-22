@@ -22,7 +22,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  ChevronDown, ClipboardCheck, Copy, Eye, FileJson, LayoutList,
+  ChevronDown, ChevronLeft, ChevronRight, ClipboardCheck, Copy, Eye, FileJson, LayoutList,
   PanelRightClose, PanelRightOpen, Trash2, ArrowUp, ArrowDown, X, Download, Upload,
 } from "lucide-react";
 import { CATALOG, CATEGORIES, type CatalogEntry } from "@/components/sections/catalog";
@@ -77,6 +77,7 @@ export function SectionsShowcase() {
   const [jsonIn, setJsonIn] = useState("");
   const [jsonMsg, setJsonMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [showJson, setShowJson] = useState(false);
+  const [railOpen, setRailOpen] = useState(true);
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(CATEGORIES.map((c) => [c, true])),
   );
@@ -88,14 +89,15 @@ export function SectionsShowcase() {
     try {
       const raw = localStorage.getItem(STORE);
       if (!raw) return;
-      const st = JSON.parse(raw) as { picked?: string[]; theme?: Theme };
+      const st = JSON.parse(raw) as { picked?: string[]; theme?: Theme; railOpen?: boolean };
       if (Array.isArray(st.picked)) setPicked(st.picked.filter((c) => CATALOG.some((e) => e.code === c)));
       if (st.theme) setTheme({ ...DEFAULT_THEME, ...st.theme });
+      if (typeof st.railOpen === "boolean") setRailOpen(st.railOpen);
     } catch { /* ignore a corrupt entry */ }
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE, JSON.stringify({ picked, theme })); } catch { /* quota */ }
-  }, [picked, theme]);
+    try { localStorage.setItem(STORE, JSON.stringify({ picked, theme, railOpen })); } catch { /* quota */ }
+  }, [picked, theme, railOpen]);
 
   const pickedEntries = useMemo(
     () => picked.map((c) => CATALOG.find((e) => e.code === c)).filter(Boolean) as CatalogEntry[],
@@ -241,13 +243,33 @@ export function SectionsShowcase() {
 
       <div className={cn("flex", view === "split" && "lg:h-[calc(100vh-61px)]")}>
         {/* ── selector ─────────────────────────────────────────────────────── */}
-        {view !== "preview" ? (
+        {view !== "preview" && !railOpen ? (
+          // Collapsed rail: one affordance to bring the selector back.
+          <button
+            type="button" onClick={() => setRailOpen(true)} aria-label="Show the section list" aria-expanded={false}
+            className="sticky top-[61px] hidden h-[calc(100vh-61px)] w-9 shrink-0 cursor-pointer items-center justify-center border-r border-zinc-300 bg-zinc-50 text-zinc-500 transition-colors duration-200 hover:bg-zinc-200 hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none lg:flex"
+          >
+            <ChevronRight aria-hidden className="size-4" />
+            <span className="sr-only">Show the section list</span>
+          </button>
+        ) : null}
+
+        {view !== "preview" && railOpen ? (
           <aside
             className={cn(
               "shrink-0 border-r border-zinc-300 bg-zinc-50",
               view === "split" ? "w-full max-w-sm overflow-y-auto lg:w-80" : "hidden lg:block lg:w-80 lg:sticky lg:top-[61px] lg:h-[calc(100vh-61px)] lg:overflow-y-auto",
             )}
           >
+            <div className="flex items-center justify-between border-b border-zinc-300 px-4 py-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">Sections</span>
+              <button
+                type="button" onClick={() => setRailOpen(false)} aria-label="Collapse the section list"
+                className="cursor-pointer rounded p-1 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+              >
+                <ChevronLeft aria-hidden className="size-4" />
+              </button>
+            </div>
             {picked.length ? (
               <div className="border-b border-zinc-300 p-4">
                 <div className="flex items-center justify-between">

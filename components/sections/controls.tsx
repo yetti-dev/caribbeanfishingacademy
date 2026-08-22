@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { Check, PaintBucket, Type } from "lucide-react";
 import { ACCENT_FONTS, BODY_FONTS, DISPLAY_FONTS } from "@/lib/showcase-fonts";
+import { FontSelect } from "@/components/sections/font-select";
 import { resolvePrimary, type AccentSize, type Theme } from "@/components/sections/theme";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +23,6 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
   };
 
   const label = "block font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500";
-  const select =
-    "mt-1 h-9 w-full cursor-pointer rounded-lg border border-zinc-300 bg-white px-2.5 text-xs text-zinc-800 focus-visible:border-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:outline-none";
 
   return (
     <div className="relative">
@@ -38,7 +37,7 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-100 mt-2 w-80 rounded-xl border border-zinc-200 bg-white p-4 shadow-2xl">
+        <div className="absolute right-0 top-full z-100 mt-2 max-h-[calc(100vh-6rem)] w-84 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-4 shadow-2xl">
           {/* ── colour ── */}
           <p className={label}>Primary colour</p>
           <div className="mt-2 flex items-center gap-2">
@@ -82,26 +81,23 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
             ))}
           </div>
 
-          {/* ── fonts ── */}
+          {/* ── fonts, each option previewed in its own face ── */}
           <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4">
-            <div>
-              <label htmlFor="f-display" className={label}>Headings</label>
-              <select id="f-display" className={select} value={theme.displayFont} onChange={(e) => set({ displayFont: e.target.value })}>
-                {DISPLAY_FONTS.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="f-body" className={label}>Body text</label>
-              <select id="f-body" className={select} value={theme.bodyFont} onChange={(e) => set({ bodyFont: e.target.value })}>
-                {BODY_FONTS.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="f-accent" className={label}>Accent and eyebrow labels</label>
-              <select id="f-accent" className={select} value={theme.accentFont} onChange={(e) => set({ accentFont: e.target.value })}>
-                {ACCENT_FONTS.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-              </select>
-            </div>
+            <FontSelect
+              id="f-display" label={`Headings (${DISPLAY_FONTS.length})`} options={DISPLAY_FONTS}
+              value={theme.displayFont} onChange={(v) => set({ displayFont: v })}
+              sample="Sail the leeward coast"
+            />
+            <FontSelect
+              id="f-body" label={`Body text (${BODY_FONTS.length})`} options={BODY_FONTS}
+              value={theme.bodyFont} onChange={(v) => set({ bodyFont: v })}
+              sample="Half day trips from Slip 14, lunch aboard."
+            />
+            <FontSelect
+              id="f-accent" label={`Accent labels (${ACCENT_FONTS.length})`} options={ACCENT_FONTS}
+              value={theme.accentFont} onChange={(v) => set({ accentFont: v })}
+              sample="SMALL GROUP SAILING"
+            />
           </div>
 
           {/* ── accent treatment ── */}
