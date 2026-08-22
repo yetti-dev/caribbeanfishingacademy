@@ -40,14 +40,19 @@ export type CatalogEntry = {
   props: string;
   /** Sticky chrome should not be re-stuck inside a preview column. */
   sticky?: boolean;
+  /**
+   * Floats over the section beneath it and consumes no layout height, so the
+   * next section needs its own top clearance.
+   */
+  overlay?: boolean;
   node: React.ReactNode;
 };
 
 const withImages = demoFeatures.map((f, i) => ({ ...f, image: img(20 + i, f.title) }));
 
 export const CATALOG: CatalogEntry[] = [
-  { code: "NAV-01", category: "Navbar", label: "Floating pill, shrinks on scroll", sticky: true,
-    file: "components/sections/nav/nav-01.tsx", component: "Nav01", props: "brand, items: NavItem[], cta?",
+  { code: "NAV-01", category: "Navbar", label: "Floating pill over the hero", sticky: true, overlay: true,
+    file: "components/sections/nav/nav-01.tsx", component: "Nav01", props: "brand, items: NavItem[], cta?, overlay=true",
     node: <Nav01 brand="Marlin Charters" items={demoNav} cta={demoCta} /> },
   { code: "NAV-02", category: "Navbar", label: "Split with utility bar and phone", sticky: true,
     file: "components/sections/nav/nav-02.tsx", component: "Nav02", props: "brand, items, cta?, phone?",

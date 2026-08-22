@@ -5,7 +5,7 @@ import type { Cta, NavItem } from "@/content/types";
 import { cn } from "@/lib/utils";
 
 /** Pill navbar. Floats, shrinks on scroll, real mobile sheet. */
-export function Nav01({ brand, items, cta }: { brand: string; items: NavItem[]; cta?: Cta }) {
+export function Nav01({ brand, items, cta, overlay = true }: { brand: string; items: NavItem[]; cta?: Cta; overlay?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -16,11 +16,22 @@ export function Nav01({ brand, items, cta }: { brand: string; items: NavItem[]; 
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 w-full px-4 pt-4">
+    /*
+     * overlay: the pill FLOATS over the section beneath it. h-0 keeps it out of
+     * the layout so it does not push the hero down; pointer-events are handed
+     * back to the bar itself so the zero-height wrapper cannot eat clicks.
+     * The section below needs its own top clearance (see nav-01 usage docs).
+     */
+    <div
+      className={cn(
+        "sticky top-0 z-50 w-full px-4 pt-4",
+        overlay && "h-0 pointer-events-none",
+      )}
+    >
       <nav
         className={cn(
-          "mx-auto flex max-w-6xl items-center gap-6 rounded-full border border-border px-5 transition-all duration-300 ease-out",
-          scrolled ? "h-14 bg-background/90 shadow-lg backdrop-blur-md" : "h-16 bg-card",
+          "pointer-events-auto mx-auto flex max-w-6xl items-center gap-6 rounded-full border border-border px-5 transition-all duration-300 ease-out",
+          scrolled ? "h-14 bg-background/90 shadow-lg backdrop-blur-md" : "h-16 bg-card/95 backdrop-blur-md",
         )}
       >
         <a href="#" className="flex cursor-pointer items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-md">
@@ -63,7 +74,7 @@ export function Nav01({ brand, items, cta }: { brand: string; items: NavItem[]; 
       </nav>
 
       {open ? (
-        <div className="mx-auto mt-2 max-w-6xl rounded-2xl border border-border bg-card p-3 shadow-xl md:hidden">
+        <div className="pointer-events-auto mx-auto mt-2 max-w-6xl rounded-2xl border border-border bg-card p-3 shadow-xl md:hidden">
           {items.map((it) => (
             <a key={it.label} href={it.href} className="block cursor-pointer rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
               {it.label}

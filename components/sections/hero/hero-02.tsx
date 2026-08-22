@@ -11,9 +11,15 @@ export function Hero02({ eyebrow, title, body, image, ctas = [] }: {
   eyebrow?: string; title: string; body: string; image: Img; ctas?: Cta[];
 }) {
   return (
-    <section className="bg-background">
-      <img src={image.src} alt={image.alt} loading="lazy" decoding="async" className="h-[46vh] min-h-[320px] w-full object-cover sm:h-[58vh]" />
-      <div className="mx-auto -mt-16 max-w-5xl px-6">
+    <section className="relative isolate bg-background">
+      {/*
+        The photo and the card share a stacking context. Reveal renders a
+        motion.div, which opens its own context at z-index auto, so the card's
+        paint order against the image it overlaps was ambiguous. Both are given
+        an explicit z-index instead of relying on document order.
+      */}
+      <img src={image.src} alt={image.alt} loading="lazy" decoding="async" className="relative z-0 h-[46vh] min-h-[320px] w-full object-cover sm:h-[58vh]" />
+      <div className="relative z-10 mx-auto -mt-16 max-w-5xl px-6">
         <Reveal>
           <div className="rounded-2xl border border-border bg-card p-8 shadow-xl sm:p-12">
             {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p> : null}

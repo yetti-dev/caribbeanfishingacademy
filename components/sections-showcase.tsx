@@ -313,9 +313,21 @@ export function SectionsShowcase() {
                     <span className="ml-auto font-mono text-[10px] text-zinc-400">{i + 1}/{CATALOG.length}</span>
                   </div>
 
-                  {/* No overflow-hidden: navbar dropdowns must be able to escape. */}
-                  <div id={e.code} className="isolate relative z-0 scroll-mt-20 bg-background ring-1 ring-zinc-200">
+                  {/*
+                    No overflow-hidden: navbar dropdowns must be able to escape.
+                    An overlay nav has zero layout height, so it needs a backdrop
+                    here or the frame would render as an empty strip.
+                  */}
+                  <div id={e.code} className={cn(
+                    "isolate relative z-0 scroll-mt-20 bg-background ring-1 ring-zinc-200",
+                    e.overlay && "min-h-56 bg-linear-to-b from-muted to-background",
+                  )}>
                     {e.node}
+                    {e.overlay ? (
+                      <p className="px-6 pb-8 pt-28 text-center text-sm text-zinc-500">
+                        Floats over whatever follows. The next section gets top clearance automatically.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="mt-8 border-b-2 border-dotted border-zinc-300" />
@@ -325,11 +337,18 @@ export function SectionsShowcase() {
           ) : (
             <div className="bg-background">
               {pickedEntries.length ? (
-                pickedEntries.map((e) => (
-                  <Unstick key={e.code} on={view === "split" && e.sticky}>
-                    {e.node}
-                  </Unstick>
-                ))
+                pickedEntries.map((e, i) => {
+                  // An overlay nav consumes no height, so whatever follows has to
+                  // make room for it or the bar lands on top of the headline.
+                  const needsClearance = i > 0 && pickedEntries[i - 1]?.overlay;
+                  return (
+                    <Unstick key={e.code} on={view === "split" && e.sticky}>
+                      <div className={cn(needsClearance && "[&>section]:pt-28 [&>section>img:first-child]:mt-0")}>
+                        {e.node}
+                      </div>
+                    </Unstick>
+                  );
+                })
               ) : (
                 <div className="grid min-h-[70vh] place-items-center p-10 text-center">
                   <div>
