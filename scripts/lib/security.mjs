@@ -230,7 +230,8 @@ export const CODE_PATTERNS = [
   { sev: "med", name: "process.env spread into client", re: /\{\s*\.\.\.\s*process\.env\s*\}/ },
   { sev: "med", name: "crypto miner hint", re: /\b(?:coinhive|cryptonight|minero|webminepool|coinimp)\b/i },
   { sev: "med", name: "outbound beacon", re: /navigator\s*\.\s*sendBeacon\s*\(/ },
-  { sev: "low", name: "hardcoded http url", re: /["']http:\/\/(?!localhost|127\.0\.0\.1)/ },
+  // xmlns="http://www.w3.org/..." is an XML namespace identifier, not a fetch.
+  { sev: "low", name: "hardcoded http url", re: /["']http:\/\/(?!localhost|127\.0\.0\.1|www\.w3\.org)/ },
 ];
 
 /* ── prompt injection in scraped text (agents read these files) ───────────── */
