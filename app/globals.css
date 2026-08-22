@@ -212,3 +212,11 @@
   text-transform: var(--accent-transform, uppercase);
   letter-spacing: var(--accent-tracking, 0.2em);
 }
+
+/* Per-slide copy entrance for Hero20. Short and small on purpose. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translate3d(0, 0.75rem, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+}

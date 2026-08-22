@@ -27,6 +27,9 @@ import { Hero14 } from "@/components/sections/hero/hero-14";
 import { Hero15 } from "@/components/sections/hero/hero-15";
 import { Hero16 } from "@/components/sections/hero/hero-16";
 import { Hero17 } from "@/components/sections/hero/hero-17";
+import { Hero18 } from "@/components/sections/hero/hero-18";
+import { Hero19 } from "@/components/sections/hero/hero-19";
+import { Hero20 } from "@/components/sections/hero/hero-20";
 import { Feature01 } from "@/components/sections/features/feature-01";
 import { Feature02 } from "@/components/sections/features/feature-02";
 import { Feature03 } from "@/components/sections/features/feature-03";
@@ -177,6 +180,27 @@ export const CATALOG: CatalogEntry[] = [
     node: <Hero17 eyebrow="Marlin Charters, est. 2013" title="Sail the leeward coast"
       body="Small groups, local captains, and twelve seasons of knowing where the water stays calm."
       image={img(33, "Open ocean horizon at dusk")} ctas={[demoCta, demoCtaAlt]} scrollHint="Scroll for the trips" /> },
+
+  { code: "HERO-18", category: "Hero", label: "Rotating photos, centred text, arrows and timer", leadsWithMedia: true,
+    file: "components/sections/hero/hero-18.tsx", component: "Hero18", props: "eyebrow?, title, body, images[], ctas[], interval?",
+    node: <Hero18 eyebrow="Four trips daily" title="Sail the leeward coast"
+      body="Small groups, local captains, and twelve seasons of knowing where the water stays calm."
+      images={[img(33, "Open ocean at dusk"), img(1, "Catamaran at anchor"), img(8, "Sunset over the sea"), img(16, "Catamaran under full sail")]}
+      ctas={[demoCta, demoCtaAlt]} /> },
+  { code: "HERO-19", category: "Hero", label: "Rotating photos with a clickable thumbnail rail", leadsWithMedia: true,
+    file: "components/sections/hero/hero-19.tsx", component: "Hero19", props: "eyebrow?, title, body, images[], ctas[], interval?",
+    node: <Hero19 eyebrow="Slip 14, Oranjestad" title="Pick the trip, we will read the water"
+      body="The captain calls the route on the morning, based on wind and swell, not on a brochure."
+      images={[img(5, "Turquoise shallows over sand"), img(2, "Snorkeller above coral"), img(19, "Guests boarding at the dock"), img(15, "Sailboat at sunset"), img(11, "Crew at the helm")]}
+      ctas={[demoCta, demoCtaAlt]} /> },
+  { code: "HERO-20", category: "Hero", label: "Slideshow where each slide has its own copy", leadsWithMedia: true,
+    file: "components/sections/hero/hero-20.tsx", component: "Hero20", props: "slides: HeroSlide[], cta?, interval?",
+    node: <Hero20 cta={demoCta} slides={[
+      { image: img(15, "Sailboat silhouetted at sunset"), eyebrow: "Most booked", title: "Sunset cruise with dinner aboard", body: "Leave at golden hour, anchor off the lighthouse, eat while the sky goes orange.", price: "$88", duration: "3 hours, departs 17:30" },
+      { image: img(2, "Snorkeller above a shallow reef"), eyebrow: "Family favourite", title: "Snorkel and sail, half day", body: "Two reef stops in calm water, gear supplied, lunch cooked on the back deck.", price: "$68", duration: "3.5 hours, departs 09:00" },
+      { image: img(16, "Catamaran under full sail"), eyebrow: "For a full day out", title: "Coast run to the sand bar", body: "Down the coast with three swim stops and a beach landing before the run home.", price: "$124", duration: "6 hours, departs 09:30" },
+      { image: img(17, "Table set on a boat deck"), eyebrow: "Private", title: "The whole boat, your route", body: "Up to twelve guests, catering to order, and a departure time that suits you.", price: "$960", duration: "Flexible" },
+    ]} /> },
 
   { code: "FEAT-01", category: "Features", label: "Three-up icon grid",
     file: "components/sections/features/feature-01.tsx", component: "Feature01", props: "heading: SectionHeading, features: Feature[]",
