@@ -13,10 +13,10 @@ import type { FontOption } from "@/lib/showcase-fonts";
 import { cn } from "@/lib/utils";
 
 export function FontSelect({
-  id, label, options, value, onChange, sample = "Sail the leeward coast",
+  id, label, options, value, onChange, sample = "Sail the leeward coast", className,
 }: {
   id: string; label: string; options: FontOption[]; value: string;
-  onChange: (id: string) => void; sample?: string;
+  onChange: (id: string) => void; sample?: string; className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -50,7 +50,7 @@ export function FontSelect({
   };
 
   return (
-    <div ref={box} className="relative">
+    <div ref={box} className={cn("relative", className)}>
       <label htmlFor={id} className="block font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</label>
       <button
         id={id} type="button" onClick={() => setOpen((v) => !v)} onKeyDown={onKey}

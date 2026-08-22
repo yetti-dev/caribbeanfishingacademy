@@ -37,7 +37,7 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-100 mt-2 max-h-[calc(100vh-6rem)] w-84 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-4 shadow-2xl">
+        <div className="absolute right-0 top-full z-100 mt-2 max-h-[calc(100vh-5rem)] w-[min(30rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-xl border border-zinc-200 bg-white p-5 shadow-2xl">
           {/* ── colour ── */}
           <p className={label}>Primary colour</p>
           <div className="mt-2 flex items-center gap-2">
@@ -82,7 +82,7 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
           </div>
 
           {/* ── fonts, each option previewed in its own face ── */}
-          <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4">
+          <div className="mt-4 grid gap-3 border-t border-zinc-200 pt-4 sm:grid-cols-2">
             <FontSelect
               id="f-display" label={`Headings (${DISPLAY_FONTS.length})`} options={DISPLAY_FONTS}
               value={theme.displayFont} onChange={(v) => set({ displayFont: v })}
@@ -94,7 +94,7 @@ export function ThemeControls({ theme, onChange }: { theme: Theme; onChange: (t:
               sample="Half day trips from Slip 14, lunch aboard."
             />
             <FontSelect
-              id="f-accent" label={`Accent labels (${ACCENT_FONTS.length})`} options={ACCENT_FONTS}
+              id="f-accent" className="sm:col-span-2" label={`Accent labels (${ACCENT_FONTS.length})`} options={ACCENT_FONTS}
               value={theme.accentFont} onChange={(v) => set({ accentFont: v })}
               sample="SMALL GROUP SAILING"
             />

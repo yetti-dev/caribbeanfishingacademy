@@ -162,7 +162,13 @@ export function SectionsShowcase() {
   );
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    /*
+     * showcaseFontClass must wrap EVERYTHING, not just the preview canvas. The
+     * font dropdown lives in the header, and it renders each option in its own
+     * face; with the variables scoped to the canvas the header could not resolve
+     * var(--f-fraunces) and every option fell back to the same sans-serif.
+     */
+    <div className={cn("min-h-screen bg-zinc-100", showcaseFontClass)}>
       {/* Header. overflow stays visible so nested dropdowns can escape. */}
       <header className="sticky top-0 z-90 border-b border-zinc-300 bg-zinc-50/95 backdrop-blur-md">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-3">
@@ -355,7 +361,18 @@ export function SectionsShowcase() {
         ) : null}
 
         {/* ── canvas ───────────────────────────────────────────────────────── */}
-        <div className={cn("min-w-0 flex-1", view === "split" && "overflow-y-auto", showcaseFontClass)} style={themeVars(theme)}>
+        {/*
+          BUG worth remembering: globals.css sets `body { font-family: var(--font-sans) }`,
+          which resolves ONCE at body. Children inherit the computed font, not the
+          variable, so overriding --font-sans on a nested element changed nothing.
+          Headings escaped this because their rule targets h1-h6 directly, so the
+          var resolves at each heading. Setting font-family here re-resolves it for
+          the whole subtree, which is what makes the body choice take effect.
+        */}
+        <div
+          className={cn("min-w-0 flex-1 font-sans", view === "split" && "overflow-y-auto")}
+          style={{ ...themeVars(theme), fontFamily: "var(--font-sans), ui-sans-serif, system-ui, sans-serif" }}
+        >
           {view === "browse" ? (
             <div>
               {CATALOG.map((e, i) => (
