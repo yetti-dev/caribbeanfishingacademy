@@ -7,7 +7,7 @@ export function Hero08({ eyebrow, title, body, image, price, period, duration, r
   eyebrow?: string; title: string; body: string; image: Img; price: string; period?: string; duration?: string; rating?: string; ctas?: Cta[];
 }) {
   return (
-    <section className="bg-background">
+    <section className="relative isolate bg-background">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-end">
           <Reveal>
@@ -29,9 +29,15 @@ export function Hero08({ eyebrow, title, body, image, price, period, duration, r
           </Reveal>
         </div>
 
-        <Reveal delay={0.16} className="relative mt-12">
-          <img src={image.src} alt={image.alt} loading="lazy" decoding="async" className="aspect-21/9 w-full rounded-2xl border border-border object-cover" />
-          <div className="mx-6 -mt-14 rounded-2xl border border-border bg-card p-6 shadow-xl sm:ml-auto sm:mr-6 sm:max-w-xs">
+        {/*
+          The price card overlaps the photo by a negative margin, and both sit
+          inside Reveal, which renders a motion.div and so opens its own stacking
+          context at z-index auto. That left the paint order down to document
+          order rather than intent, so it is stated explicitly here.
+        */}
+        <Reveal delay={0.16} className="relative isolate mt-12">
+          <img src={image.src} alt={image.alt} loading="lazy" decoding="async" className="relative z-0 aspect-21/9 w-full rounded-2xl border border-border object-cover" />
+          <div className="relative z-10 mx-6 -mt-14 rounded-2xl border border-border bg-card p-6 shadow-xl sm:ml-auto sm:mr-6 sm:max-w-xs">
             <p className="eyebrow text-muted-foreground">From</p>
             <p className="mt-1 font-display text-4xl font-bold tracking-tight text-foreground">
               {price}
