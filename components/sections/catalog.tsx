@@ -137,14 +137,14 @@ export const CATALOG: CatalogEntry[] = [
       image={img(18, "Catamaran deck under way")} videoUrl="https://www.youtube.com/embed/dQw4w9WgXcQ"
       ctas={[demoCta, demoCtaAlt]} caption="Filmed on the full day coast run" /> },
 
-  { code: "HERO-11", category: "Hero", label: "Video background, copy on a solid card", leadsWithMedia: true,
+  { code: "HERO-11", category: "Hero", label: "Video background, text on the footage", leadsWithMedia: true,
     file: "components/sections/hero/hero-11.tsx", component: "Hero11", props: "eyebrow?, title, body, videoSrc, poster, ctas[], footnote?",
     node: <Hero11 eyebrow="Aboard the Marlin II" title="Twenty minutes from the dock to open water"
       body="Muted autoplay, real footage, no stock drone reel. Pause it any time."
       videoSrc="https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4"
       poster={img(0, "Sailboat under way in open water")} ctas={[demoCta, demoCtaAlt]}
       footnote="Filmed on the full day coast run, March 2026." /> },
-  { code: "HERO-12", category: "Hero", label: "Rotating photo background with Ken Burns", leadsWithMedia: true,
+  { code: "HERO-12", category: "Hero", label: "Rotating photo background, text on the image", leadsWithMedia: true,
     file: "components/sections/hero/hero-12.tsx", component: "Hero12", props: "eyebrow?, title, body, images[], ctas[], interval?, badge?",
     node: <Hero12 badge="Most booked" eyebrow="Four trips daily" title="The coast changes every hour. So does the trip."
       body="Sunrise dolphin runs, midday reef stops, and the sunset cruise everyone rebooks."
