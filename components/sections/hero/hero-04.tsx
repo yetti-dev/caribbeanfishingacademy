@@ -10,10 +10,10 @@ export function Hero04({ eyebrow, title, body, images, ctas = [], meta = [] }: {
       <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
         <Reveal>
           <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-border pb-5">
-            {eyebrow ? <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{eyebrow}</p> : null}
+            {eyebrow ? <p className="eyebrow text-muted-foreground">{eyebrow}</p> : null}
             <div className="flex flex-wrap gap-x-6 gap-y-1">
               {meta.map((m) => (
-                <span key={m} className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{m}</span>
+                <span key={m} className="eyebrow text-muted-foreground">{m}</span>
               ))}
             </div>
           </div>

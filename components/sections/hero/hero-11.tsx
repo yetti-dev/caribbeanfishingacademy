@@ -52,7 +52,7 @@ export function Hero11({ eyebrow, title, body, videoSrc, poster, ctas = [], foot
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:pb-20">
         <div className="max-w-3xl">
           {eyebrow ? (
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-background/85">{eyebrow}</p>
+            <p className="eyebrow text-background/85">{eyebrow}</p>
           ) : null}
           <h1 className="mt-5 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-background sm:text-7xl">
             {title}

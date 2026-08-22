@@ -15,7 +15,7 @@ export function Hero15({ eyebrow, title, body, image, ctas = [], note }: {
       <div className="relative z-10 mx-auto grid min-h-[84vh] max-w-7xl items-center px-0 sm:px-6">
         <Reveal className="w-full sm:max-w-2xl">
           <div className="bg-primary p-8 text-primary-foreground sm:rounded-2xl sm:p-12 sm:shadow-2xl">
-            <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] opacity-85">
+            <span className="inline-flex items-center gap-2 eyebrow opacity-85">
               <Anchor aria-hidden className="size-3.5" /> {eyebrow}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold leading-[0.94] tracking-tight text-balance sm:text-6xl">{title}</h1>

@@ -8,7 +8,7 @@ export function Nav03({ brand, items, cta }: { brand: string; items: NavItem[]; 
   const [open, setOpen] = useState(false);
   const half = Math.ceil(items.length / 2);
   const link =
-    "cursor-pointer font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none";
+    "cursor-pointer eyebrow text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
@@ -29,7 +29,7 @@ export function Nav03({ brand, items, cta }: { brand: string; items: NavItem[]; 
             ))}
           </ul>
           {cta ? (
-            <a href={cta.href} className="hidden cursor-pointer border-b-2 border-primary pb-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none lg:block">
+            <a href={cta.href} className="hidden cursor-pointer border-b-2 border-primary pb-0.5 eyebrow text-foreground transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none lg:block">
               {cta.label}
             </a>
           ) : null}
@@ -41,7 +41,7 @@ export function Nav03({ brand, items, cta }: { brand: string; items: NavItem[]; 
       {open ? (
         <div className="border-t border-border px-6 py-4 md:hidden">
           {items.map((it) => (
-            <a key={it.label} href={it.href} className="block cursor-pointer py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
+            <a key={it.label} href={it.href} className="block cursor-pointer py-2 eyebrow text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
               {it.label}
             </a>
           ))}

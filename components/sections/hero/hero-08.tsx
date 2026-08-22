@@ -11,7 +11,7 @@ export function Hero08({ eyebrow, title, body, image, price, period, duration, r
       <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-end">
           <Reveal>
-            {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p> : null}
+            {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
             <h1 className="mt-4 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
           </Reveal>
           <Reveal delay={0.1}>
@@ -32,7 +32,7 @@ export function Hero08({ eyebrow, title, body, image, price, period, duration, r
         <Reveal delay={0.16} className="relative mt-12">
           <img src={image.src} alt={image.alt} loading="lazy" decoding="async" className="aspect-21/9 w-full rounded-2xl border border-border object-cover" />
           <div className="mx-6 -mt-14 rounded-2xl border border-border bg-card p-6 shadow-xl sm:ml-auto sm:mr-6 sm:max-w-xs">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">From</p>
+            <p className="eyebrow text-muted-foreground">From</p>
             <p className="mt-1 font-display text-4xl font-bold tracking-tight text-foreground">
               {price}
               {period ? <span className="ml-1.5 text-sm font-normal text-muted-foreground">{period}</span> : null}

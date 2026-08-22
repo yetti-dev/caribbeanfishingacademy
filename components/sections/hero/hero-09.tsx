@@ -17,7 +17,7 @@ export function Hero09({ eyebrow, title, body, images, ctas = [], highlights = [
         </Reveal>
 
         <Reveal delay={0.1}>
-          {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.22em] text-primary">{eyebrow}</p> : null}
+          {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
           <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{body}</p>
           {highlights.length ? (

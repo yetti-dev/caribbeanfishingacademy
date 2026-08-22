@@ -23,7 +23,7 @@ export function Hero16({ eyebrow, title, image, ctas = [], facts = [] }: {
           <div className="mx-auto max-w-7xl rounded-2xl bg-background p-6 shadow-2xl sm:p-8">
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
               <div>
-                {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p> : null}
+                {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
                 <h1 className="mt-3 font-display text-3xl font-bold leading-[1] tracking-tight text-balance text-foreground sm:text-5xl">{title}</h1>
               </div>
               <div className="flex flex-wrap gap-3 lg:justify-end">
@@ -43,7 +43,7 @@ export function Hero16({ eyebrow, title, image, ctas = [], facts = [] }: {
                   <div key={f.label} className="flex items-center gap-2.5">
                     {iconFor(f.icon)}
                     <div>
-                      <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{f.label}</dt>
+                      <dt className="eyebrow text-[10px] text-muted-foreground">{f.label}</dt>
                       <dd className="text-sm font-medium text-foreground">{f.value}</dd>
                     </div>
                   </div>

@@ -197,3 +197,18 @@
     to   { transform: scale(1.08) translate3d(0, -1.2%, 0); }
   }
 }
+
+/*
+ * Eyebrow label. Sections use `eyebrow` instead of hardcoding
+ * `font-mono text-xs uppercase tracking-[0.2em]`, so the accent font, size,
+ * casing and tracking can all be driven from one place. The picker overrides
+ * these variables; a real build sets them once in globals.
+ */
+@utility eyebrow {
+  font-family: var(--accent-font, var(--font-mono));
+  font-size: var(--accent-size, 0.75rem);
+  line-height: 1;
+  font-weight: var(--accent-weight, 500);
+  text-transform: var(--accent-transform, uppercase);
+  letter-spacing: var(--accent-tracking, 0.2em);
+}

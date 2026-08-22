@@ -10,7 +10,7 @@ export function Hero05({ eyebrow, title, body, images, ctas = [], location }: {
     <section className="bg-muted/40">
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1fr_1.15fr] lg:py-24">
         <Reveal>
-          {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p> : null}
+          {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
           <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{body}</p>
           {location ? (

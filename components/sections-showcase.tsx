@@ -22,39 +22,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Check, ChevronDown, ClipboardCheck, Copy, Eye, LayoutList, Palette,
-  PanelRightClose, PanelRightOpen, Trash2, ArrowUp, ArrowDown, X,
+  ChevronDown, ClipboardCheck, Copy, Eye, FileJson, LayoutList,
+  PanelRightClose, PanelRightOpen, Trash2, ArrowUp, ArrowDown, X, Download, Upload,
 } from "lucide-react";
 import { CATALOG, CATEGORIES, type CatalogEntry } from "@/components/sections/catalog";
+import { ThemeControls } from "@/components/sections/controls";
+import { DEFAULT_THEME, decodeLayout, encodeLayout, themeVars, type Theme } from "@/components/sections/theme";
+import { showcaseFontClass } from "@/lib/showcase-fonts";
 import { cn } from "@/lib/utils";
-
-type Swatch = { name: string; hue: number; primaryL: number; fgL: number; borderL: number; hex: string };
-
-/** Solved by scripts/lib/color.mjs; every entry measured at >= 4.5:1. */
-const SWATCHES: Swatch[] = [
-  { name: "Violet", hue: 265, primaryL: 0.57, fgL: 0.99, borderL: 0.87, hex: "#3b6beb" },
-  { name: "Ocean", hue: 232, primaryL: 0.53, fgL: 0.99, borderL: 0.87, hex: "#0078c9" },
-  { name: "Teal", hue: 195, primaryL: 0.5, fgL: 0.99, borderL: 0.87, hex: "#008186" },
-  { name: "Emerald", hue: 160, primaryL: 0.51, fgL: 0.99, borderL: 0.87, hex: "#008539" },
-  { name: "Lime", hue: 128, primaryL: 0.54, fgL: 0.99, borderL: 0.87, hex: "#4b8100" },
-  { name: "Amber", hue: 75, primaryL: 0.56, fgL: 0.99, borderL: 0.87, hex: "#b55900" },
-  { name: "Orange", hue: 45, primaryL: 0.57, fgL: 0.99, borderL: 0.87, hex: "#d03e00" },
-  { name: "Crimson", hue: 22, primaryL: 0.58, fgL: 0.99, borderL: 0.87, hex: "#d73240" },
-  { name: "Magenta", hue: 340, primaryL: 0.58, fgL: 0.99, borderL: 0.87, hex: "#c13b9f" },
-  { name: "Indigo", hue: 285, primaryL: 0.57, fgL: 0.99, borderL: 0.87, hex: "#715ce6" },
-];
 
 const STORE = "section-picker-v1";
 type View = "browse" | "split" | "preview";
-
-const themeVars = (s: Swatch) =>
-  ({
-    "--brand-hue": String(s.hue),
-    "--primary": `oklch(${s.primaryL} 0.2 ${s.hue})`,
-    "--primary-foreground": `oklch(${s.fgL} 0.01 ${s.hue})`,
-    "--border": `oklch(${s.borderL} 0.01 ${s.hue})`,
-    "--input": `oklch(${s.borderL} 0.01 ${s.hue})`,
-  }) as React.CSSProperties;
 
 /** Cancel sticky positioning so nav chrome does not float inside a preview column. */
 function Unstick({ on, children }: { on?: boolean; children: React.ReactNode }) {
@@ -63,11 +41,13 @@ function Unstick({ on, children }: { on?: boolean; children: React.ReactNode }) 
 
 /* ── prompt ───────────────────────────────────────────────────────────────── */
 
-function buildPrompt(picked: CatalogEntry[], swatch: Swatch) {
+function buildPrompt(picked: CatalogEntry[], theme: Theme) {
   const lines = [
     "Build the site using the sections I already picked. Do not invent new section layouts.",
     "",
-    `Primary colour: OKLCH hue ${swatch.hue} (${swatch.name}). Set brand.config.ts theme.hue to ${swatch.hue} and run \`npm run brand\`.`,
+    `Primary colour: ${theme.hex}. Set brand.config.ts theme.hue from it and run \`npm run brand\`, which solves a contrast safe lightness.`,
+    `Fonts: headings ${theme.displayFont}, body ${theme.bodyFont}, accent ${theme.accentFont}.`,
+    `Accent labels: ${theme.accentUpper ? "all capitals" : "sentence case"}, ${theme.accentSize} size.`,
     "",
     `Page order, top to bottom (${picked.length} sections):`,
     "",
@@ -92,8 +72,11 @@ function buildPrompt(picked: CatalogEntry[], swatch: Swatch) {
 /* ── page ─────────────────────────────────────────────────────────────────── */
 
 export function SectionsShowcase() {
-  const [swatch, setSwatch] = useState<Swatch>(SWATCHES[0]);
+  const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
   const [picked, setPicked] = useState<string[]>([]);
+  const [jsonIn, setJsonIn] = useState("");
+  const [jsonMsg, setJsonMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [showJson, setShowJson] = useState(false);
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(CATEGORIES.map((c) => [c, true])),
   );
@@ -105,15 +88,14 @@ export function SectionsShowcase() {
     try {
       const raw = localStorage.getItem(STORE);
       if (!raw) return;
-      const s = JSON.parse(raw) as { picked?: string[]; hue?: number };
-      if (Array.isArray(s.picked)) setPicked(s.picked.filter((c) => CATALOG.some((e) => e.code === c)));
-      const hit = SWATCHES.find((x) => x.hue === s.hue);
-      if (hit) setSwatch(hit);
+      const st = JSON.parse(raw) as { picked?: string[]; theme?: Theme };
+      if (Array.isArray(st.picked)) setPicked(st.picked.filter((c) => CATALOG.some((e) => e.code === c)));
+      if (st.theme) setTheme({ ...DEFAULT_THEME, ...st.theme });
     } catch { /* ignore a corrupt entry */ }
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE, JSON.stringify({ picked, hue: swatch.hue })); } catch { /* quota */ }
-  }, [picked, swatch]);
+    try { localStorage.setItem(STORE, JSON.stringify({ picked, theme })); } catch { /* quota */ }
+  }, [picked, theme]);
 
   const pickedEntries = useMemo(
     () => picked.map((c) => CATALOG.find((e) => e.code === c)).filter(Boolean) as CatalogEntry[],
@@ -133,10 +115,35 @@ export function SectionsShowcase() {
 
   const copyPrompt = async () => {
     try {
-      await navigator.clipboard.writeText(buildPrompt(pickedEntries, swatch));
+      await navigator.clipboard.writeText(buildPrompt(pickedEntries, theme));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* clipboard blocked, the textarea below is the fallback */ }
+  };
+
+  const layoutJson = encodeLayout({ theme, sections: picked });
+
+  const copyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(layoutJson);
+      setJsonMsg({ kind: "ok", text: `Copied ${layoutJson.length} characters.` });
+    } catch {
+      setJsonMsg({ kind: "err", text: "Clipboard blocked. Select the text below and copy it by hand." });
+    }
+  };
+
+  const applyJson = () => {
+    const res = decodeLayout(jsonIn, CATALOG.map((c) => c.code));
+    if ("error" in res) { setJsonMsg({ kind: "err", text: res.error }); return; }
+    setTheme(res.layout.theme);
+    setPicked(res.layout.sections);
+    setView("preview");
+    setJsonMsg({
+      kind: "ok",
+      text: res.warnings.length
+        ? `Applied ${res.layout.sections.length} section(s). ${res.warnings.join(" ")}`
+        : `Applied ${res.layout.sections.length} section(s).`,
+    });
   };
 
   const viewBtn = (v: View, label: string, icon: React.ReactNode) => (
@@ -171,24 +178,16 @@ export function SectionsShowcase() {
             {viewBtn("preview", "Preview", <Eye aria-hidden className="size-3.5" />)}
           </div>
 
-          <div className="ml-auto flex items-center gap-2.5">
-            <Palette aria-hidden className="size-4 text-zinc-500" />
-            <div role="radiogroup" aria-label="Primary colour" className="flex flex-wrap gap-1.5">
-              {SWATCHES.map((s) => (
-                <button
-                  key={s.name} type="button" role="radio" aria-checked={s.name === swatch.name}
-                  onClick={() => setSwatch(s)} title={`${s.name} (hue ${s.hue})`}
-                  style={{ backgroundColor: s.hex }}
-                  className={cn(
-                    "grid size-6 cursor-pointer place-items-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none",
-                    s.name === swatch.name && "ring-2 ring-zinc-800 ring-offset-2",
-                  )}
-                >
-                  {s.name === swatch.name ? <Check aria-hidden className="size-3.5 text-white" /> : null}
-                  <span className="sr-only">{s.name}</span>
-                </button>
-              ))}
-            </div>
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeControls theme={theme} onChange={setTheme} />
+
+            <button
+              type="button" onClick={() => setShowJson((v) => !v)} aria-expanded={showJson}
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 transition-colors duration-200 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+            >
+              <FileJson aria-hidden className="size-4" />
+              JSON
+            </button>
 
             <button
               type="button" onClick={copyPrompt} disabled={!picked.length}
@@ -199,6 +198,45 @@ export function SectionsShowcase() {
             </button>
           </div>
         </div>
+
+        {showJson ? (
+          <div className="border-t border-zinc-200 bg-white px-5 py-4">
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="json-out" className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                    Export ({layoutJson.length} chars)
+                  </label>
+                  <button type="button" onClick={copyJson} className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-zinc-800 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-zinc-700 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
+                    <Download aria-hidden className="size-3" /> Copy JSON
+                  </button>
+                </div>
+                <textarea
+                  id="json-out" readOnly value={layoutJson} rows={5}
+                  className="mt-1.5 w-full resize-y rounded-lg border border-zinc-300 bg-zinc-50 p-2.5 font-mono text-[10px] leading-relaxed text-zinc-700 focus-visible:border-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:outline-none"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="json-in" className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                    Import a colleague&apos;s layout
+                  </label>
+                  <button type="button" onClick={applyJson} disabled={!jsonIn.trim()} className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-zinc-800 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
+                    <Upload aria-hidden className="size-3" /> Apply
+                  </button>
+                </div>
+                <textarea
+                  id="json-in" value={jsonIn} onChange={(e) => setJsonIn(e.target.value)} rows={5}
+                  placeholder={'{"v":1,"c":"#0078c9","d":"fraunces","b":"dm-sans","a":"plex-mono","u":1,"z":"xs","s":["NAV-02","HERO-13"]}'}
+                  className="mt-1.5 w-full resize-y rounded-lg border border-zinc-300 bg-white p-2.5 font-mono text-[10px] leading-relaxed text-zinc-800 focus-visible:border-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:outline-none"
+                />
+              </div>
+            </div>
+            {jsonMsg ? (
+              <p className={cn("mt-2.5 text-xs", jsonMsg.kind === "ok" ? "text-emerald-700" : "text-red-700")}>{jsonMsg.text}</p>
+            ) : null}
+          </div>
+        ) : null}
       </header>
 
       <div className={cn("flex", view === "split" && "lg:h-[calc(100vh-61px)]")}>
@@ -286,7 +324,7 @@ export function SectionsShowcase() {
               <div className="p-4">
                 <label htmlFor="prompt-out" className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Prompt</label>
                 <textarea
-                  id="prompt-out" readOnly value={buildPrompt(pickedEntries, swatch)} rows={8}
+                  id="prompt-out" readOnly value={buildPrompt(pickedEntries, theme)} rows={8}
                   className="mt-2 w-full resize-y rounded-lg border border-zinc-300 bg-white p-2.5 font-mono text-[10px] leading-relaxed text-zinc-700 focus-visible:border-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:outline-none"
                 />
               </div>
@@ -295,7 +333,7 @@ export function SectionsShowcase() {
         ) : null}
 
         {/* ── canvas ───────────────────────────────────────────────────────── */}
-        <div className={cn("min-w-0 flex-1", view === "split" && "overflow-y-auto")} style={themeVars(swatch)}>
+        <div className={cn("min-w-0 flex-1", view === "split" && "overflow-y-auto", showcaseFontClass)} style={themeVars(theme)}>
           {view === "browse" ? (
             <div>
               {CATALOG.map((e, i) => (

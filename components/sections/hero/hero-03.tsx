@@ -10,7 +10,7 @@ export function Hero03({ eyebrow, title, body, ctas = [], footnote }: {
     <section className="bg-primary text-primary-foreground">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:py-32">
         <Reveal>
-          {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.24em] opacity-80">{eyebrow}</p> : null}
+          {eyebrow ? <p className="eyebrow opacity-80">{eyebrow}</p> : null}
           <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance sm:text-7xl lg:text-8xl">{title}</h1>
           <div className="mt-10 grid gap-8 border-t border-primary-foreground/25 pt-8 lg:grid-cols-[1.4fr_1fr]">
             <p className="max-w-2xl text-lg leading-relaxed opacity-90">{body}</p>

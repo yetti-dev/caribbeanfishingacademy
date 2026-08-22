@@ -54,12 +54,12 @@ export function Hero12({ eyebrow, title, body, images, ctas = [], interval = 600
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:pb-20">
         <div className="max-w-3xl">
           {badge ? (
-            <span className="mb-5 inline-block rounded-full bg-primary px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-primary-foreground">
+            <span className="mb-5 inline-block rounded-full bg-primary px-3 py-1 eyebrow text-primary-foreground">
               {badge}
             </span>
           ) : null}
           {eyebrow ? (
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-background/85">{eyebrow}</p>
+            <p className="eyebrow text-background/85">{eyebrow}</p>
           ) : null}
           <h1 className="mt-4 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-background sm:text-7xl">
             {title}

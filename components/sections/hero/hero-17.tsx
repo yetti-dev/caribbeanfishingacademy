@@ -23,7 +23,7 @@ export function Hero17({ eyebrow, title, body, image, ctas = [], scrollHint }: {
       <div aria-hidden className="absolute inset-0 z-10 bg-foreground/85" />
 
       <Reveal className="relative z-20 mx-auto max-w-4xl px-6 py-24 text-center">
-        {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.28em] text-background/80">{eyebrow}</p> : null}
+        {eyebrow ? <p className="eyebrow text-background/80">{eyebrow}</p> : null}
         <h1 className="mt-6 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-background sm:text-7xl lg:text-8xl">{title}</h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-background/85">{body}</p>
         <div className="mt-9 flex flex-wrap justify-center gap-3">
@@ -36,7 +36,7 @@ export function Hero17({ eyebrow, title, body, image, ctas = [], scrollHint }: {
             </a>
           ))}
         </div>
-        {scrollHint ? <p className="mt-14 font-mono text-[11px] uppercase tracking-[0.2em] text-background/60">{scrollHint}</p> : null}
+        {scrollHint ? <p className="mt-14 eyebrow text-background/60">{scrollHint}</p> : null}
       </Reveal>
     </section>
   );

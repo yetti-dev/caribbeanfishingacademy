@@ -22,7 +22,7 @@ export function Hero02({ eyebrow, title, body, image, ctas = [] }: {
       <div className="relative z-10 mx-auto -mt-16 max-w-5xl px-6">
         <Reveal>
           <div className="rounded-2xl border border-border bg-card p-8 shadow-xl sm:p-12">
-            {eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p> : null}
+            {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
             <h1 className="mt-4 font-display text-4xl font-bold leading-[1] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">{body}</p>
             <div className="mt-8 flex flex-wrap gap-3">

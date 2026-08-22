@@ -8,7 +8,7 @@ export function Feature04({ heading, features }: { heading: SectionHeading; feat
     <section className="bg-foreground py-20 text-background">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Reveal>
-          {heading.eyebrow ? <p className="font-mono text-xs uppercase tracking-[0.2em] text-background/60">{heading.eyebrow}</p> : null}
+          {heading.eyebrow ? <p className="eyebrow text-background/60">{heading.eyebrow}</p> : null}
           <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-balance sm:text-5xl">{heading.title}</h2>
           {heading.body ? <p className="mt-4 max-w-md text-base leading-relaxed text-background/70">{heading.body}</p> : null}
         </Reveal>
