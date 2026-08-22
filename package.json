@@ -14,7 +14,9 @@
     "ship": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ship.mjs",
     "up": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/update-deps.mjs",
     "ui": "shadcn@latest add",
-    "verify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-build.mjs"
+    "verify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-build.mjs",
+    "deploy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/deploy.mjs",
+    "guard": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/guard.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.0",

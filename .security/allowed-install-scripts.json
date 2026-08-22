@@ -1,0 +1,6 @@
+{
+  "note": "Packages permitted to run install scripts. Adding one means you reviewed it. Regenerate with: npm run guard -- --allow-install-scripts",
+  "approved": [
+    "unrs-resolver"
+  ]
+}

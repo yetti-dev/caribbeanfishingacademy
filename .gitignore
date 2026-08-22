@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files. .env* is ignored, but the TEMPLATE must be tracked or a fresh
+# clone of the factory has nothing to copy from.
 .env*
+!.env.example
 
 # vercel
 .vercel

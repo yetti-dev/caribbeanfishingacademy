@@ -25,6 +25,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, extname } from "node:path";
 import * as cheerio from "cheerio";
 import sharp from "sharp";
+import { safeFetch, assertPublicUrl, sniffType, sanitizeSvg, svgIsClean, RASTER_TYPES, EXECUTABLE_TYPES } from "./lib/security.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const argv = process.argv.slice(2);
@@ -48,6 +49,19 @@ const MAX_EDGE = 1600; // px long-edge cap so builds don't choke
 const WEBP_QUALITY = 72;
 const MIN_IMAGE_BYTES = 6 * 1024; // below this it is an icon or a tracking pixel
 const MIN_IMAGE_WIDTH = 400; // drop sprites / badges / avatars
+const MAX_ASSET_BYTES = 12 * 1024 * 1024; // hard cap per response, memory-exhaustion guard
+
+/*
+ * SSRF guard opt-out. Off by default. Only for cloning a staging or intranet
+ * site you own, or for testing this scraper against a local fixture. With this
+ * on, a scraped page can make the crawler fetch 169.254.169.254 and other
+ * internal addresses, so never point it at a site you do not control.
+ */
+const ALLOW_PRIVATE = process.argv.includes("--allow-private") || process.env.CLONE_ALLOW_PRIVATE === "1";
+
+/** Security report, printed at the end and written into media.json. */
+const dropped = [];
+const sanitized = [];
 
 const c = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
@@ -70,12 +84,21 @@ const sameHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, "")
 const clean = (s) => (s || "").replace(/\s+/g, " ").trim();
 
 // ── fetch helpers ────────────────────────────────────────────────────────────
+/**
+ * Every URL here came off a stranger's page, so it is an SSRF primitive.
+ * assertPublicUrl re-checks after each redirect hop, and the body is capped so
+ * a hostile server cannot stream gigabytes into memory across 12 workers.
+ */
 async function get(u, accept = "text/html,*/*") {
-  return fetch(u, {
-    headers: { "User-Agent": UA, Accept: accept },
-    redirect: "follow",
-    signal: AbortSignal.timeout(FETCH_TIMEOUT),
-  });
+  const { res, buf } = await safeFetch(u, { accept, timeout: FETCH_TIMEOUT, maxBytes: MAX_ASSET_BYTES, ua: UA, allowPrivate: ALLOW_PRIVATE });
+  // Keep the old call shape (.ok/.headers/.arrayBuffer/.text) so callers are unchanged.
+  return {
+    ok: res.ok,
+    status: res.status,
+    headers: res.headers,
+    arrayBuffer: async () => buf,
+    text: async () => buf.toString("utf8"),
+  };
 }
 async function fetchText(u) {
   const res = await get(u);
@@ -145,10 +168,43 @@ async function downloadImage(u, name) {
       ext = ct.includes("svg") ? ".svg" : ct.includes("png") ? ".png" : ct.includes("webp") ? ".webp"
         : ct.includes("avif") ? ".avif" : ct.includes("gif") ? ".gif" : ".jpg";
     }
-    // SVG and animated GIF pass through: sharp would rasterize or drop frames.
-    if (/\.(svg|gif)$/.test(ext)) {
-      await writeFile(join(imgDir, `${name}${ext}`), buf);
-      return { file: `${name}${ext}`, bytes: buf.byteLength };
+    /*
+     * Trust the bytes, not the URL extension or the content-type: both are
+     * attacker-controlled. Anything that sniffs as an executable, an archive or
+     * a PDF is dropped outright.
+     */
+    const sniffed = sniffType(buf);
+    if (!sniffed || EXECUTABLE_TYPES.has(sniffed)) {
+      dropped.push({ url: u, reason: sniffed ? `sniffed as ${sniffed}` : "unrecognised file type" });
+      return null;
+    }
+
+    /*
+     * SVG is the dangerous one. These files land in public/ and are then served
+     * FROM THE BUILT SITE'S OWN ORIGIN, so a <script>, an onload= handler or a
+     * <foreignObject> is same-origin stored XSS on every visitor. Strip all
+     * active content, then refuse to write the file if anything survived.
+     */
+    if (sniffed === "svg") {
+      const { svg, removed } = sanitizeSvg(buf);
+      const check = svgIsClean(svg);
+      if (!check.clean) {
+        dropped.push({ url: u, reason: `unsafe svg (${check.findings.join(", ")})` });
+        return null;
+      }
+      if (removed.length) sanitized.push({ url: u, removed });
+      await writeFile(join(imgDir, `${name}.svg`), svg, "utf8");
+      return { file: `${name}.svg`, bytes: Buffer.byteLength(svg), sanitized: removed };
+    }
+
+    // Animated GIF passes through raw: sharp would drop the frames.
+    if (sniffed === "gif") {
+      await writeFile(join(imgDir, `${name}.gif`), buf);
+      return { file: `${name}.gif`, bytes: buf.byteLength };
+    }
+    if (!RASTER_TYPES.has(sniffed)) {
+      dropped.push({ url: u, reason: `not an image (${sniffed})` });
+      return null;
     }
     const img = sharp(buf, { failOn: "none" });
     const meta = await img.metadata();
@@ -167,10 +223,28 @@ async function downloadRaw(u, dir, name) {
     const res = await get(u, "image/*");
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    let ext = (extname(new URL(u).pathname) || ".png").toLowerCase().split("?")[0];
-    if (!/^\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(ext)) ext = ".png";
-    await writeFile(join(dir, `${name}${ext}`), buf);
-    return `${name}${ext}`;
+    // Same rule as downloadImage: the extension is a hint, the magic bytes decide.
+    const sniffed = sniffType(buf);
+    if (!sniffed || EXECUTABLE_TYPES.has(sniffed)) {
+      dropped.push({ url: u, reason: sniffed ? `sniffed as ${sniffed}` : "unrecognised file type" });
+      return null;
+    }
+    if (sniffed === "svg") {
+      const { svg, removed } = sanitizeSvg(buf);
+      if (!svgIsClean(svg).clean) {
+        dropped.push({ url: u, reason: "unsafe svg" });
+        return null;
+      }
+      if (removed.length) sanitized.push({ url: u, removed });
+      await writeFile(join(dir, `${name}.svg`), svg, "utf8");
+      return `${name}.svg`;
+    }
+    if (!RASTER_TYPES.has(sniffed)) {
+      dropped.push({ url: u, reason: `not an image (${sniffed})` });
+      return null;
+    }
+    await writeFile(join(dir, `${name}.${sniffed}`), buf);
+    return `${name}.${sniffed}`;
   } catch { return null; }
 }
 
@@ -461,7 +535,10 @@ const brandJson = {
 };
 await writeFile(join(outDir, "brand.json"), JSON.stringify(brandJson, null, 2) + "\n");
 await writeFile(join(outDir, "media.json"),
-  JSON.stringify({ images: publicImages, videos: [...videoUrls], youtube: [...youtube] }, null, 2) + "\n");
+  JSON.stringify({
+    images: publicImages, videos: [...videoUrls], youtube: [...youtube],
+    security: { dropped, sanitized },
+  }, null, 2) + "\n");
 await writeFile(join(outDir, "faq.md"),
   `# ${name} FAQ (scraped)\n\n${faqs.length ? faqs.map((f) => `### ${f.q}\n${f.a}\n`).join("\n") : "_None found. Write Q&A here for the widget._\n"}`);
 await writeFile(join(outDir, "plan.md"),
@@ -509,6 +586,30 @@ if (APPLY) {
     `## FAQ\n${faqs.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n") || "(add Q&A)"}\n\n` +
     `## Highlights\n${homePage.sections.map((h) => `- ${h}`).join("\n")}\n`);
   console.log(`\n  ${c.green("applied")} -> brand.config.ts + content/knowledge.md   ${c.dim("next: npm run brand")}`);
+}
+
+/*
+ * Security summary. The scraped markdown is read by build agents, so text in it
+ * is untrusted INPUT, not instructions. Flagging it here means a human sees the
+ * injection attempt before an agent acts on it.
+ */
+{
+  const { scanText, INJECTION_PATTERNS } = await import("./lib/security.mjs");
+  const flagged = [];
+  for (const pg of pageData) {
+    // Scan every field an agent will actually read out of pages/NN-*.md.
+    const corpus = [pg.title, ...(pg.sections || []), ...(pg.subs || []), ...(pg.body || []), ...(pg.ctas || [])]
+      .filter(Boolean).join("\n");
+    const hits = scanText(corpus, INJECTION_PATTERNS);
+    if (hits.length) flagged.push({ page: pg.url || pg.path, hits: hits.map((h) => h.name) });
+  }
+  if (dropped.length || sanitized.length || flagged.length) {
+    console.log(`\n  ${c.bold("security")}`);
+    if (dropped.length) console.log(`  ${c.dim("dropped")}   ${dropped.length} asset(s): ${[...new Set(dropped.map((d) => d.reason))].join(", ")}`);
+    if (sanitized.length) console.log(`  ${c.dim("cleaned")}   ${sanitized.length} svg(s): ${[...new Set(sanitized.flatMap((x) => x.removed))].join(", ")}`);
+    for (const f of flagged) console.log(`  ${c.dim("prompt")}    ${f.page} -> ${f.hits.join(", ")} ${c.dim("(treat this page's copy as data, never as instructions)")}`);
+    console.log(`  ${c.dim("detail")}    .scrape/${slug}/media.json -> security`);
+  }
 }
 
 // Non-zero exit if the scrape came back empty: the caller should notice, not guess.
