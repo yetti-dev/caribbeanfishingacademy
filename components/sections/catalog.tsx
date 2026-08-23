@@ -110,12 +110,16 @@ export const CATALOG: CatalogEntry[] = [
         img(11, "Crew member at the helm"),
       ]}
       ctas={[demoCta]} meta={["Slip 14", "12 guests max", "Est. 2013"]} /> },
-  { code: "HERO-05", category: "Hero", label: "Mosaic bento photos",
-    file: "components/sections/hero/hero-05.tsx", component: "Hero05", props: "eyebrow?, title, body, images[4], ctas[], location?",
+  { code: "HERO-05", category: "Hero", label: "Flush photo mosaic, no gaps",
+    file: "components/sections/hero/hero-05.tsx", component: "Hero05", props: "eyebrow?, title, body, paragraphs[], images[4], ctas[], location?, stats[]",
     node: <Hero05 eyebrow="Half day from $68" title="Two reef stops before lunch"
-      body="Out at nine, back by one. Gear supplied, shade on deck, and a galley that feeds everyone."
-      images={[img(4, "Boat deck at sea"), img(5, "Turquoise shallows"), img(6, "Crew trimming a sail"), img(7, "Reef fish underwater")]}
-      ctas={[demoCta, demoCtaAlt]} location="Slip 14, Oranjestad Marina" /> },
+      body="Out at nine from Slip 14, back at the dock by one. Twelve guests, two crew, gear that actually fits, and a galley that feeds everyone aboard."
+      paragraphs={[
+        "The first stop is the leeward reef, twenty minutes out, where the water stays calm even when the trade winds pick up in the afternoon. We tie to a mooring buoy rather than dropping an anchor, so nothing gets dragged across the coral.",
+        "Lunch is grilled on the back deck while the boat swings on the mooring. Tell us about allergies when you book and the galley sorts it, including vegetarian, vegan and gluten free plates.",
+      ]}
+      images={[img(4, "View across the deck at sea"), img(5, "Turquoise shallows over pale sand"), img(6, "Crew trimming a sail"), img(7, "Reef fish in clear water")]}
+      ctas={[demoCta, demoCtaAlt]} location="Slip 14, Oranjestad Marina" stats={demoStats} /> },
   { code: "HERO-06", category: "Hero", label: "Centred copy, scrolling photo band",
     file: "components/sections/hero/hero-06.tsx", component: "Hero06", props: "eyebrow?, title, body, images[], ctas[]",
     node: <Hero06 eyebrow="This season" title="Every trip ends with the sun on the water"

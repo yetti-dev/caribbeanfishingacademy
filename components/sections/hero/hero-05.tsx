@@ -1,23 +1,51 @@
 import { ArrowRight, MapPin } from "lucide-react";
-import { Reveal, RevealGroup } from "@/components/magic/reveal";
-import type { Cta, Img } from "@/content/types";
+import { Reveal } from "@/components/magic/reveal";
+import type { Cta, Img, Stat } from "@/content/types";
 
-/** Mosaic hero. Copy left, four-photo bento right. */
-export function Hero05({ eyebrow, title, body, images, ctas = [], location }: {
-  eyebrow?: string; title: string; body: string; images: Img[]; ctas?: Cta[]; location?: string;
+/**
+ * Mosaic hero. Copy left, a flush four-photo bento right.
+ *
+ * The mosaic has no gaps: the photos butt together inside one rounded, clipped
+ * container so it reads as a single composed block rather than four cards. Fixed
+ * column and row starts keep the arrangement stable instead of relying on
+ * auto-placement, which reflowed unpredictably when an image was missing.
+ *
+ * The block is tall, so the copy column takes more than one paragraph. A single
+ * short line beside a tall mosaic leaves an obvious hole.
+ */
+export function Hero05({ eyebrow, title, body, paragraphs = [], image, images, ctas = [], location, stats = [] }: {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  /** Additional paragraphs after `body`. The mosaic is tall; fill the column. */
+  paragraphs?: string[];
+  image?: Img;
+  images: Img[];
+  ctas?: Cta[];
+  location?: string;
+  stats?: Stat[];
 }) {
+  const [a, b, c, d] = images;
   return (
     <section className="bg-muted/40">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1fr_1.15fr] lg:py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1fr_1.05fr] lg:py-24">
         <Reveal>
           {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
           <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{body}</p>
+
+          <div className="mt-6 space-y-4">
+            <p className="text-lg leading-relaxed text-muted-foreground">{body}</p>
+            {paragraphs.map((para) => (
+              <p key={para.slice(0, 24)} className="text-base leading-relaxed text-muted-foreground">{para}</p>
+            ))}
+          </div>
+
           {location ? (
             <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
               <MapPin aria-hidden className="size-4 text-primary" /> {location}
             </p>
           ) : null}
+
           <div className="mt-8 flex flex-wrap gap-3">
             {ctas.map((cta, i) => (
               <a key={cta.label} href={cta.href} className={i === 0
@@ -28,14 +56,29 @@ export function Hero05({ eyebrow, title, body, images, ctas = [], location }: {
               </a>
             ))}
           </div>
+
+          {stats.length ? (
+            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-5 border-t border-border pt-7 sm:grid-cols-4 lg:grid-cols-2">
+              {stats.slice(0, 4).map((s) => (
+                <div key={s.label}>
+                  <dt className="font-display text-2xl font-bold tracking-tight text-foreground">{s.value}</dt>
+                  <dd className="mt-0.5 text-xs leading-snug text-muted-foreground">{s.label}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
         </Reveal>
 
-        <RevealGroup className="grid grid-cols-2 gap-3">
-          {images.slice(0, 4).map((im, i) => (
-            <img key={im.src} src={im.src} alt={im.alt} loading="lazy" decoding="async"
-              className={`w-full rounded-xl border border-border object-cover ${i === 0 ? "aspect-3/4 row-span-2" : "aspect-square"}`} />
-          ))}
-        </RevealGroup>
+        {/* Flush mosaic: no gap, one clipped container, explicit placement. */}
+        <Reveal delay={0.1}>
+          <div className="grid aspect-4/5 grid-cols-2 grid-rows-3 overflow-hidden rounded-2xl border border-border sm:aspect-square lg:aspect-4/5">
+            {a ? <img src={a.src} alt={a.alt} loading="lazy" decoding="async" className="col-start-1 row-start-1 row-span-2 size-full object-cover" /> : null}
+            {b ? <img src={b.src} alt={b.alt} loading="lazy" decoding="async" className="col-start-2 row-start-1 size-full object-cover" /> : null}
+            {c ? <img src={c.src} alt={c.alt} loading="lazy" decoding="async" className="col-start-2 row-start-2 size-full object-cover" /> : null}
+            {d ? <img src={d.src} alt={d.alt} loading="lazy" decoding="async" className="col-span-2 row-start-3 size-full object-cover" /> : null}
+          </div>
+          {image?.caption ? <p className="mt-3 text-xs text-muted-foreground">{image.caption}</p> : null}
+        </Reveal>
       </div>
     </section>
   );
