@@ -87,6 +87,38 @@ export async function addSite(form: FormData): Promise<Result> {
   };
 }
 
+/** Queue the crawl for a site, then let the scrape worker walk it. */
+export async function startScrape(siteId: string): Promise<Result> {
+  try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }
+  const db = createAdminClient();
+  const { error } = await db.rpc("enqueue_scrape", { p_site_id: siteId });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  return { ok: true, message: "Crawl queued. Run the scrape worker to walk it." };
+}
+
+/** One tick of either worker. Named so the UI can drive both. */
+export async function runWorker(which: "provision" | "scrape"): Promise<Result> {
+  try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
+  const secret = process.env.TICK_SECRET ?? "";
+  if (!url) return { ok: false, error: "SUPABASE_URL is not configured." };
+  if (!secret) return { ok: false, error: "TICK_SECRET is not in this environment." };
+  const fn = which === "provision" ? "provision-tick" : "scrape-tick";
+  try {
+    const res = await fetch(`${url}/functions/v1/${fn}`, {
+      method: "POST", headers: { "x-tick-secret": secret }, signal: AbortSignal.timeout(90_000),
+    });
+    const body = (await res.json().catch(() => null)) as { claimed?: number; done?: Record<string, unknown>[]; error?: string } | null;
+    if (!res.ok) return { ok: false, error: body?.error ?? `worker returned ${res.status}` };
+    revalidatePath("/dashboard");
+    const summary = (body?.done ?? []).map((d) => `${d.step ?? d.url}:${d.status}`).join(", ");
+    return { ok: true, message: body?.claimed ? `${which}: ran ${body.claimed}. ${summary}` : `${which}: nothing due.` };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
 /**
  * Kick the worker by hand. Useful before pg_cron is wired, and for "run it now"
  * rather than waiting for the next minute. The secret stays server side.

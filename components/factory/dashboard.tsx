@@ -110,7 +110,8 @@ export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
             <LayoutList aria-hidden className="size-3.5" /> Section picker
           </Link>
-          <RunTickButton />
+          <RunTickButton which="provision" label="Provision" />
+          <RunTickButton which="scrape" label="Scrape" />
           <AddSiteForm />
           <span className="font-mono text-[11px] text-zinc-500">{email}</span>
         </nav>
@@ -156,7 +157,10 @@ export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview
                 {sites.map((s) => (
                   <tr key={s.id} className="transition-colors hover:bg-zinc-50 [&>td]:whitespace-nowrap [&>td]:px-3 [&>td]:py-2.5">
                     <td>
-                      <span className="font-medium text-zinc-900">{s.name}</span>
+                      <Link href={`/dashboard/${s.slug}`}
+                        className="cursor-pointer font-medium text-zinc-900 underline-offset-2 transition-colors hover:text-zinc-600 hover:underline focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
+                        {s.name}
+                      </Link>
                       <span className="block font-mono text-[10px] text-zinc-500">{s.slug}</span>
                     </td>
                     <td>
