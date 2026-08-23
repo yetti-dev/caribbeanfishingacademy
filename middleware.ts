@@ -16,7 +16,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_PREFIXES = ["/login", "/auth", "/shared"];
+const PUBLIC_PREFIXES = ["/login", "/auth", "/shared"];  // /auth covers callback, signout and reset
 const GUARDED_PREFIXES = ["/dashboard", "/sections"];
 
 export async function middleware(request: NextRequest) {
