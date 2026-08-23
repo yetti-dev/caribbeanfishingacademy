@@ -50,11 +50,26 @@ export async function addSite(form: FormData): Promise<Result> {
     return { ok: false, error: "That source URL does not parse." };
   }
 
-  const slug = slugify(slugRaw || host.split(".")[0]);
+  /*
+   * The slug is the source site's own name, so caribbeanfishingacademy.com
+   * becomes caribbeanfishingacademy: the repo, the Vercel project and the
+   * subdomain all end up carrying the client's name rather than an invented one.
+   */
+  const slug = slugify(slugRaw || host.replace(/\.[a-z.]+$/, ""));
   const name = nameRaw || host.split(".")[0].replace(/^./, (c) => c.toUpperCase());
-  // Empty means "provision without a domain", which makes the DNS steps skip
-  // rather than fail. That is the safe first run.
-  const domain = domainRaw ? domainRaw.replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase() : null;
+
+  /*
+   * Default the domain to <slug>.<FACTORY_DOMAIN>. Leaving it blank used to mean
+   * "skip DNS", which was the right default while the DNS steps were unproven.
+   * They are proven now, so the useful default is the real subdomain, and
+   * "none" stays available for a deliberate dry run.
+   */
+  const zone = process.env.FACTORY_DOMAIN ?? "getyetti.com";
+  const domain = domainRaw.toLowerCase() === "none"
+    ? null
+    : domainRaw
+      ? domainRaw.replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase()
+      : `${slug}.${zone}`;
 
   const db = createAdminClient();
 

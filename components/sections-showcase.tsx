@@ -24,24 +24,26 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft, ChevronRight, Eye, FileJson, LayoutList, Palette, PanelRightClose,
-  PanelRightOpen, Terminal,
+  PanelRightOpen, Save, Terminal,
 } from "lucide-react";
 import { CATALOG, type CatalogEntry } from "@/components/sections/catalog";
 import { SectionsPanel } from "@/components/sections/sidebar/sections-panel";
 import { ThemePanel } from "@/components/sections/sidebar/theme-panel";
 import { JsonPanel } from "@/components/sections/sidebar/json-panel";
 import { PromptPanel } from "@/components/sections/sidebar/prompt-panel";
+import { SavePanel } from "@/components/sections/sidebar/save-panel";
 import { DEFAULT_THEME, themeVars, type Theme } from "@/components/sections/theme";
 import { showcaseFontClass } from "@/lib/showcase-fonts";
 import { cn } from "@/lib/utils";
 
 const STORE = "section-picker-v2";
 type View = "browse" | "split" | "preview";
-type Tool = "sections" | "theme" | "json" | "prompt";
+type Tool = "sections" | "theme" | "save" | "json" | "prompt";
 
 const TOOLS: { id: Tool; label: string; icon: React.ReactNode }[] = [
   { id: "sections", label: "Sections", icon: <LayoutList aria-hidden className="size-4" /> },
   { id: "theme", label: "Theme", icon: <Palette aria-hidden className="size-4" /> },
+  { id: "save", label: "Save", icon: <Save aria-hidden className="size-4" /> },
   { id: "json", label: "JSON", icon: <FileJson aria-hidden className="size-4" /> },
   { id: "prompt", label: "Prompt", icon: <Terminal aria-hidden className="size-4" /> },
 ];
@@ -153,6 +155,7 @@ export function SectionsShowcase() {
                 <SectionsPanel picked={picked} onToggle={toggle} onMove={move} onClear={() => setPicked([])} />
               ) : null}
               {tool === "theme" ? <ThemePanel theme={theme} onChange={setTheme} /> : null}
+              {tool === "save" ? <SavePanel theme={theme} sections={picked} /> : null}
               {tool === "json" ? (
                 <JsonPanel theme={theme} picked={picked}
                   onApply={(t, s) => { setTheme(t); setPicked(s); setView("preview"); }} />

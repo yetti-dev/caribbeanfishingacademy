@@ -54,7 +54,7 @@ export function AddSiteForm() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="slug" className={label}>Slug (repo and project name)</label>
-              <input id="slug" name="slug" placeholder="from the URL if blank" className={`mt-1 ${field}`} />
+              <input id="slug" name="slug" placeholder="from the source domain" className={`mt-1 ${field}`} />
             </div>
             <div>
               <label htmlFor="name" className={label}>Display name</label>
@@ -62,11 +62,12 @@ export function AddSiteForm() {
             </div>
           </div>
           <div>
-            <label htmlFor="domain" className={label}>Domain (optional)</label>
-            <input id="domain" name="domain" placeholder="sycorax.getyetti.com" className={`mt-1 ${field}`} />
+            <label htmlFor="domain" className={label}>Domain</label>
+            <input id="domain" name="domain" placeholder="defaults to <slug>.getyetti.com" className={`mt-1 ${field}`} />
             <p className="mt-1 text-[10px] leading-snug text-zinc-500">
-              Leave blank and the domain, DNS and smoke steps skip instead of failing. That is the safe first
-              run: filling it in writes a real record at your registrar.
+              Blank uses <span className="font-mono">&lt;slug&gt;.getyetti.com</span>, derived from the source
+              site. Type <span className="font-mono">none</span> to provision without a domain, which skips the
+              DNS and smoke steps instead of writing a real record at your registrar.
             </p>
           </div>
           <div>

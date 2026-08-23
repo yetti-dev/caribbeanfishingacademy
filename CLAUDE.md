@@ -1,30 +1,67 @@
 # CLAUDE.md — how to build in this repo
 
-This repo is a **website factory**. Someone gives an idea, a reference URL, and a project
-name. We clone that site's branding, copy and media, build a **stunning, unique** site
-around it with an AI FAQ widget, then push it to a GitHub repo they created.
+This repo is a **website factory** with two halves that must not be confused.
 
-Five commands, in order:
+**The factory** (`app/(factory)`, `scripts/`, `supabase/`) provisions and tracks
+sites. It runs on your machine and on one internal Vercel project. It is
+**stripped from every client export** and must never reach a client repo.
 
-- **`/check`** — sub-second preflight.
-- **`/update`** — bring Next.js and every dependency to latest, prove the build passes.
-  **Run this first on a fresh clone.**
-- **`/build`** — idea + URL + project name, and the whole repo becomes their site.
-- **`/run`** — build, fix every error until green, start the dev server.
-- **`/ship`** — force-push a clean export to the GitHub repo URL they give you.
+**The template** (`app/(site)`, `components/sections`, `content/`) is what a
+client actually receives.
 
-**No tokens anywhere.** No GitHub API, no Vercel API, no `GITHUB_TOKEN`, no `VERCEL_TOKEN`.
-The user creates the repo, pastes the URL, and imports it into Vercel by hand. The only key
-in `.env` is `OPENAI_API_KEY` for the FAQ widget.
+---
 
-**The starter ships blank.** `app/page.tsx` is an empty canvas, `components/sections/` does
-not exist, `brand.config.ts` holds neutral placeholders, `content/*.ts` is empty scaffolding.
-`/build` authors all of it. The blank starter is the reset, there is no clean command.
+## The pipeline, and who does what
 
-**`/build` is agentic.** It orchestrates `.claude/agents/`: `site-scraper` ->
-`design-director` -> parallel (`section-smith` + `widget-smith` + one `page-smith` per inner
-page) -> `build-fixer`. Fan out independent work in one message. Agents return
-caveman-compressed output. Keep responses lean.
+**Ten deterministic steps run server side in a Supabase Edge Function. No Claude.**
+You add a site on the dashboard and it does all of this on its own:
+
+| # | step | what it does |
+|---|---|---|
+| 1 | `repo` | generates the repo from the GitHub template, one API call |
+| 2 | `strip` | deletes the factory from the client repo |
+| 3 | `holding` | commits a coming soon page, `noindex` |
+| 4 | `vercel_project` | creates the project **linked to the repo**, so later pushes auto-deploy |
+| 5 | `deploy` | triggers production |
+| 6 | `deploy_wait` | polls until `READY` |
+| 7 | `domain` | attaches `<slug>.getyetti.com` |
+| 8 | `dns` | writes the record at the registrar |
+| 9 | `dns_verify` | checks **both** Vercel gates, writing the `_vercel` TXT if needed |
+| 10 | `smoke` | GETs the domain and requires 200, so it is never a 404 |
+
+The slug comes from the source site, so `caribbeanfishingacademy.com` becomes
+repo `caribbeanfishingacademy` on `caribbeanfishingacademy.getyetti.com`.
+
+**Claude starts after that**, and only for the parts that need judgement: layout,
+copy and images.
+
+```
+npm run pull -- <github url or slug>   fetch what the factory already knows
+# read .scrape/<slug>/plan.md, compose the site
+npm run go                             build and serve locally
+git push                               Vercel redeploys, the link is already made
+```
+
+### Never re-scrape a site the factory already crawled
+
+`npm run pull` is the entry point, **not** `npm run clone`. The crawl already ran
+server side, so the pages, copy, colours, fonts, contact details and assets are in
+Supabase. Scraping again hammers the source for data we hold and produces a
+second, slightly different answer.
+
+`pull` refuses rather than guessing: no row in Supabase, or no completed crawl,
+and it stops and tells you what to do. It writes the same shapes `clone` does, so
+nothing downstream needs a special case, and it resizes the stored originals to
+<=1600px WebP, since `sharp` has no Deno Edge equivalent and the Edge Function
+therefore stores originals.
+
+Use `npm run clone` only for a site the factory has never seen.
+
+### The layout handoff
+
+Pick sections at `/sections`, then **Save** against the site. That marks it the
+current layout, shows it on the dashboard, and `npm run pull` brings the codes
+down in `brand.json`. The JSON export stays as an offline fallback.
 
 ---
 
@@ -237,23 +274,30 @@ the whole dependency tree to September 2022.
 
 ## Commands
 
-`npm run clone -- <url> --slug <s>` (scrape brand + copy + images) · `npm run brand` (sync
-theme/fonts) · `npm run up` (latest deps) · `npm run check` (preflight) ·
-`npm run ui -- <c>` (add shadcn) · `npm run dev` / `npm run build` ·
-`npm run guard` (supply-chain + malware scan) ·
-`npm run deploy -- --domain <d>` (repo + push + Vercel + domain + DNS, one shot) ·
-`npm run ship -- <repo-url>` (push clean export, token-free fallback).
+**Start here for a site the factory already has:**
+`npm run pull -- <github url or slug>` (fetch pages, copy, layout and assets from
+Supabase, no re-scrape) · `npm run go` (deps, brand, guard, build, dev server).
+
+Everything else: `npm run clone -- <url> --slug <s>` (scrape a site the factory has
+never seen) · `npm run brand` (sync theme/fonts) · `npm run guard` (supply-chain and
+malware scan) · `npm run db check|apply|seed` · `npm run blocks` /
+`blocks:prune` / `blocks:curate` · `npm run deploy -- --domain <d>` (local one-shot
+ship, superseded by the dashboard for new sites) · `npm run up` · `npm run check` ·
+`npm run ui -- <c>` · `npm run dev` / `npm run build`.
 
 ## Layout
 
 ```
-app/           layout.tsx, page.tsx (blank), globals.css (tokens), api/chat (FAQ)
+app/(site)/    layout.tsx, page.tsx (blank), api/chat (FAQ)  <- the client gets THIS
+app/(factory)/ sections picker, dashboard, auth              <- stripped on export
+app/globals.css  design tokens, shared by both root layouts
 components/    magic/ (Reveal, ImageCard, Gallery, Carousel, AutoSlider, Marquee, BorderBeam)
                ui/ (shadcn) · widget/ (faq, whatsapp) · sections/ (yours to author)
 content/       types.ts · site.ts · home.ts · <page>.ts · knowledge.md
 lib/           fonts.ts (generated by npm run brand) · utils.ts
-scripts/       clone.mjs · apply-brand.mjs · check.mjs · ship.mjs · update-deps.mjs
-               deploy.mjs (one-shot ship) · guard.mjs (security scan)
+scripts/       pull.mjs (fetch from Supabase) · clone.mjs (scrape) · apply-brand.mjs
+               go.mjs · guard.mjs · deploy.mjs · db.mjs · blocks-*.mjs · check.mjs
+supabase/      migrations/ · functions/provision-tick · functions/scrape-tick
 scripts/lib/   security.mjs (SSRF, magic bytes, SVG sanitiser, patterns)
                env.mjs · github.mjs · vercel.mjs · dns.mjs · export.mjs
 .security/     allowed-install-scripts.json

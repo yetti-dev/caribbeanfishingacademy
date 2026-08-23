@@ -12,6 +12,20 @@ import { RunTickButton } from "@/components/factory/run-tick-button";
 import { SiteActions } from "@/components/factory/site-actions";
 import { cn } from "@/lib/utils";
 
+/** Raw step names are for the queue; these are for humans reading a table. */
+const STEP_LABEL: Record<string, string> = {
+  repo: "Creating repo",
+  strip: "Stripping factory",
+  holding: "Holding page",
+  vercel_project: "Vercel project",
+  deploy: "Deploying",
+  deploy_wait: "Waiting on build",
+  domain: "Attaching domain",
+  dns: "Writing DNS",
+  dns_verify: "Verifying DNS",
+  smoke: "Checking it serves",
+};
+
 export type Progress = {
   site_id: string;
   steps_total: number;
@@ -79,8 +93,12 @@ function ProgressCell({ p }: { p?: Progress }) {
         </span>
         <span className="font-mono text-[10px] text-zinc-600">{p.steps_done}/{p.steps_total}</span>
       </span>
-      <span className="mt-0.5 block truncate font-mono text-[10px] text-zinc-500" title={p.last_error ?? undefined}>
-        {p.steps_failed ? `failed: ${p.current_step ?? "?"}` : p.current_step ? `running ${p.current_step}` : "complete"}
+      <span className="mt-0.5 block truncate text-[10px] text-zinc-500" title={p.last_error ?? undefined}>
+        {p.steps_failed
+          ? `Failed at ${STEP_LABEL[p.current_step ?? ""] ?? p.current_step ?? "?"}`
+          : p.current_step
+            ? STEP_LABEL[p.current_step] ?? p.current_step
+            : "Ready"}
       </span>
     </span>
   );
@@ -147,7 +165,7 @@ export function Dashboard({ sites: allSites, email, progress = [] }: { sites: Si
             <table className="w-full text-left text-sm">
               <thead className="border-b border-zinc-200 bg-zinc-50">
                 <tr className="[&>th]:whitespace-nowrap [&>th]:px-3 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px] [&>th]:uppercase [&>th]:tracking-[0.12em] [&>th]:text-zinc-500">
-                  <th>Site</th><th>Status</th><th>Provisioning</th><th>Run</th><th>Sections</th>
+                  <th>Site</th><th>Status</th><th>Provisioning</th><th>Layout</th><th>Run</th>
                   <th title="GitHub repo created">Repo</th>
                   <th title="Vercel project created">Vercel</th>
                   <th title="Domain attached">Domain</th>
@@ -174,6 +192,16 @@ export function Dashboard({ sites: allSites, email, progress = [] }: { sites: Si
                     </td>
                     <td><ProgressCell p={byId.get(s.id)} /></td>
                     <td>
+                      {s.current_layout_code ? (
+                        <span className="flex flex-col">
+                          <span className="font-mono text-[10px] text-zinc-700">{s.current_layout_code}</span>
+                          <span className="text-[10px] text-zinc-500">{s.current_layout_sections} sections</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-zinc-400">no layout</span>
+                      )}
+                    </td>
+                    <td>
                       <span className={cn("inline-flex items-center gap-1 font-mono text-[11px]", s.within_budget === false ? "text-red-700" : "text-zinc-700")}>
                         <Clock aria-hidden className="size-3" />
                         {fmtSeconds(s.latest_run_seconds)}
@@ -182,7 +210,7 @@ export function Dashboard({ sites: allSites, email, progress = [] }: { sites: Si
                         <XCircle aria-hidden className="ml-1 inline size-3 text-red-600" />
                       ) : null}
                     </td>
-                    <td className="font-mono text-[11px] text-zinc-600">{s.current_layout_sections || s.section_count}</td>
+
                     <td><Flag on={s.github_repo_created} label="Repo created" /></td>
                     <td><Flag on={s.vercel_project_created} label="Vercel project created" /></td>
                     <td><Flag on={s.domain_added} label="Domain attached" /></td>
