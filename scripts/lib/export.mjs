@@ -81,7 +81,12 @@ export function buildExport(root) {
       writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
     }
 
-    for (const required of ["package.json", "postcss.config.mjs", "app/globals.css", "app/layout.tsx", "next.config.ts"]) {
+    /*
+     * The client site's root layout now lives in the (site) route group, since
+     * app/layout.tsx was removed when the app was split. Without a root layout
+     * the export builds to a broken tree.
+     */
+    for (const required of ["package.json", "postcss.config.mjs", "app/globals.css", "app/(site)/layout.tsx", "app/(site)/page.tsx", "next.config.ts"]) {
       if (!existsSync(join(work, required))) throw new Error(`the export is missing ${required}. Is it committed and not gitignored?`);
     }
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
@@ -99,8 +104,8 @@ export function buildExport(root) {
         "either fails on unresolved @/ imports or ships with no CSS.",
       );
     }
-    if (!readFileSync(join(work, "app", "layout.tsx"), "utf8").includes("globals.css")) {
-      throw new Error("app/layout.tsx does not import ./globals.css, so the deployed site would have no stylesheet.");
+    if (!readFileSync(join(work, "app", "(site)", "layout.tsx"), "utf8").includes("globals.css")) {
+      throw new Error("app/(site)/layout.tsx does not import globals.css, so the deployed site would have no stylesheet.");
     }
     // Belt and braces: prove no secret rode along.
     for (const leak of [".env", ".env.local", ".env.production"]) {
