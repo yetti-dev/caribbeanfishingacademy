@@ -146,3 +146,109 @@ export const demoTeam: Member[] = [
 ];
 
 export const demoLogos = ["Marina Watch", "Coast Guard Certified", "Reef Alliance", "TripAdvisor", "Blue Flag", "PADI"];
+
+/* ---------------------------------------------------------------------------
+ * Additions for the expanded block library. Same rule as above: index into
+ * PHOTOS, never invent a photo id.
+ * ------------------------------------------------------------------------- */
+
+/** A pull quote, attributed. Used by the quote sections. */
+export type Quote = { text: string; author: string; role?: string; image?: Img };
+
+export const demoQuotes: Quote[] = [
+  { text: "The sea does not reward those who are too anxious, too greedy, or too impatient.", author: "Anne Morrow Lindbergh", role: "Gift from the Sea" },
+  { text: "We stopped counting trips after the hundredth. The water still looks different every morning.", author: "Capt. Ray Oduber", role: "Founder", image: img(11, "Captain at the helm") },
+  { text: "A small boat with a good crew beats a big boat with a schedule.", author: "Marcus Vrolijk", role: "Skipper and dive guide", image: img(13, "Diver preparing gear on deck") },
+];
+
+/** Contact details for the contact sections and maps. */
+export const demoContact = {
+  address: "Slip 14, Renaissance Marina, Oranjestad",
+  phone: "+297 588 1420",
+  whatsapp: "+297 588 1420",
+  email: "hello@bluewatersail.example",
+  hours: [
+    { day: "Monday to Friday", time: "07:00 to 19:00" },
+    { day: "Saturday", time: "07:00 to 20:00" },
+    { day: "Sunday", time: "08:00 to 17:00" },
+  ],
+  mapQuery: "Renaissance Marina, Oranjestad, Aruba",
+  socials: [
+    { label: "Instagram", href: "https://instagram.com", icon: "Instagram" },
+    { label: "Facebook", href: "https://facebook.com", icon: "Facebook" },
+    { label: "YouTube", href: "https://youtube.com", icon: "Youtube" },
+  ],
+};
+
+/** A bulk image set for the galleries. Plain lazy img, never next/image. */
+export const demoGallery: Img[] = Array.from({ length: 24 }, (_, i) =>
+  img(i, [
+    "Sailboat under an orange evening sky", "Snorkeller above a shallow coral reef",
+    "Wide open water seen from a boat deck", "Empty boat deck ready for guests",
+    "Calm sea at first light", "Small island seen across turquoise water",
+    "Sailboat heeling in steady wind", "Dry bag and towel on a boat bench",
+    "Close view of healthy coral", "Crew reading the water from the bow",
+    "Catamaran moored in clear water", "Captain at the helm",
+  ][i % 12]),
+);
+
+/** A boat in the fleet, for the fleet and vessel sections. */
+export type Boat = {
+  name: string;
+  type: string;
+  length: string;
+  guests: number;
+  year: string;
+  body: string;
+  image: Img;
+  specs: { label: string; value: string }[];
+};
+
+export const demoBoats: Boat[] = [
+  { name: "Marlin II", type: "Catamaran", length: "42 ft", guests: 12, year: "Rebuilt 2024",
+    body: "The boat guests ask for by name. Wide shaded deck, a swim ladder a child can climb, and a galley that actually cooks.",
+    image: img(10, "Catamaran moored in clear water"),
+    specs: [{ label: "Length", value: "42 ft" }, { label: "Beam", value: "22 ft" }, { label: "Guests", value: "12" }, { label: "Crew", value: "2" }] },
+  { name: "Trade Wind", type: "Monohull sloop", length: "38 ft", guests: 8, year: "2019",
+    body: "Built to sail rather than motor. Heels over, holds a line, and gets quiet the moment the engine goes off.",
+    image: img(6, "Sailboat heeling in steady wind"),
+    specs: [{ label: "Length", value: "38 ft" }, { label: "Draft", value: "6 ft" }, { label: "Guests", value: "8" }, { label: "Crew", value: "2" }] },
+  { name: "Coral Skiff", type: "Day tender", length: "24 ft", guests: 6, year: "2022",
+    body: "Shallow draft for the inside reef, where the big hulls cannot follow. Best boat we own for a morning dolphin run.",
+    image: img(4, "Calm sea at first light"),
+    specs: [{ label: "Length", value: "24 ft" }, { label: "Draft", value: "2 ft" }, { label: "Guests", value: "6" }, { label: "Crew", value: "1" }] },
+  { name: "Lighthouse", type: "Motor yacht", length: "50 ft", guests: 16, year: "2021",
+    body: "For groups and flat calm evenings. Air conditioned saloon below, and the only boat with a proper bar.",
+    image: img(3, "Empty boat deck ready for guests"),
+    specs: [{ label: "Length", value: "50 ft" }, { label: "Cabins", value: "3" }, { label: "Guests", value: "16" }, { label: "Crew", value: "3" }] },
+];
+
+/** Catalogue filter facets for the listing page templates. */
+export const demoFacets = [
+  { label: "Trip length", options: ["Under 2 hours", "Half day", "Full day", "Multi day"] },
+  { label: "Departs", options: ["Morning", "Midday", "Sunset"] },
+  { label: "Good for", options: ["Families", "Couples", "Divers", "Groups"] },
+  { label: "Price", options: ["Under $60", "$60 to $100", "$100 to $200", "$200 plus"] },
+];
+
+/** Body copy for the single blog post template, as ordered blocks. */
+export type PostBlock =
+  | { kind: "p"; text: string }
+  | { kind: "h2"; text: string }
+  | { kind: "quote"; text: string; author?: string }
+  | { kind: "img"; image: Img }
+  | { kind: "list"; items: string[] };
+
+export const demoPostBody: PostBlock[] = [
+  { kind: "p", text: "Twelve seasons of logbooks say the same thing every year: the coast has three moods, and the calendar tells you which one you are booking into." },
+  { kind: "h2", text: "January to March, the windy quarter" },
+  { kind: "p", text: "The trades run hard and steady. Sailors love it, snorkellers less so, because the leeward reefs stir up by mid morning. Book the early departure and you get glass water for the first two hours." },
+  { kind: "img", image: img(6, "Sailboat heeling in steady wind") },
+  { kind: "list", items: ["Wind 18 to 25 knots most afternoons", "Water clarity best before 10:00", "Fewest cancellations of any season"] },
+  { kind: "quote", text: "If you want to actually sail rather than motor with a sail up, come in February.", author: "Capt. Ray Oduber" },
+  { kind: "h2", text: "April to August, the clear quarter" },
+  { kind: "p", text: "The wind eases and the water goes to fifteen metres of visibility. This is when the underwater photos people put on their walls get taken." },
+  { kind: "img", image: img(8, "Close view of healthy coral") },
+  { kind: "h2", text: "September to December, the quiet quarter" },
+  { kind: "p", text: "Fewer boats, lower prices, and the only months where a private charter costs about what a shared trip does in March. Watch the forecast, take the rebooking promise seriously, and you will have the reef to yourself." },
+];

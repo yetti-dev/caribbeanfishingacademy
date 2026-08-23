@@ -35,34 +35,24 @@ import { Feature02 } from "@/components/sections/features/feature-02";
 import { Feature03 } from "@/components/sections/features/feature-03";
 import { Feature04 } from "@/components/sections/features/feature-04";
 import { Feature05 } from "@/components/sections/features/feature-05";
+import { NAV_ENTRIES } from "@/components/sections/nav/entries";
+import { FOOTER_ENTRIES } from "@/components/sections/footer/entries";
+import { TESTIMONIAL_ENTRIES } from "@/components/sections/testimonials/entries";
+import { MEDIA_ENTRIES } from "@/components/sections/media/entries";
+import { GALLERY_ENTRIES } from "@/components/sections/gallery/entries";
+import { FAQ_ENTRIES } from "@/components/sections/faq/entries";
+import { CTA_ENTRIES } from "@/components/sections/cta/entries";
+import { TOUR_ENTRIES } from "@/components/sections/tours/entries";
+import { ABOUT_ENTRIES } from "@/components/sections/about/entries";
+import { BLOG_ENTRIES } from "@/components/sections/blog/entries";
+import { CONTACT_ENTRIES } from "@/components/sections/contact/entries";
+import { QUOTE_ENTRIES } from "@/components/sections/quote/entries";
+import { FLEET_ENTRIES } from "@/components/sections/fleet/entries";
+import { TEMPLATE_ENTRIES } from "@/components/templates/entries";
 import { demoCta, demoCtaAlt, demoFeatures, demoNav, demoStats, img } from "@/content/demo";
 
-export type CatalogEntry = {
-  /** Stable handle used in the copied prompt. */
-  code: string;
-  category: string;
-  label: string;
-  /** Import path a build agent should use. */
-  file: string;
-  /** Exported component name. */
-  component: string;
-  /** One line on the props it expects, for the prompt. */
-  props: string;
-  /** Sticky chrome should not be re-stuck inside a preview column. */
-  sticky?: boolean;
-  /**
-   * Floats over the section beneath it and consumes no layout height, so the
-   * next section needs its own top clearance.
-   */
-  overlay?: boolean;
-  /**
-   * Opens with a full-bleed photo rather than padded text. An overlay nav can
-   * sit straight on top of it, and adding clearance would insert a blank gap
-   * for the bar to float over instead.
-   */
-  leadsWithMedia?: boolean;
-  node: React.ReactNode;
-};
+export type { CatalogEntry } from "@/components/sections/catalog-types";
+import type { CatalogEntry } from "@/components/sections/catalog-types";
 
 const withImages = demoFeatures.map((f, i) => ({ ...f, image: img(20 + i, f.title) }));
 
@@ -239,6 +229,21 @@ export const CATALOG: CatalogEntry[] = [
         { icon: "Compass", tab: "Coast run", title: "Full day run to the sand bar", meta: "6 hours, departs 09:30", body: "Down the leeward coast with three swim stops and a beach landing before the run home.", image: img(16, "Catamaran under full sail"), bullets: ["Three swim stops", "Beach landing and lunch ashore", "Towels and shade on deck"], cta: { label: "Book the full day", href: "#book" } },
         { icon: "Ship", tab: "Private charter", title: "The whole boat, your route", meta: "Flexible, up to 12 guests", body: "Pick the departure time and the route on the morning. The galley caters to order.", image: img(17, "Table set on a boat deck"), bullets: ["Up to twelve guests", "Catering and bar to order", "Bring your own playlist"], cta: { label: "Enquire about a charter", href: "#contact" } },
       ]} /> },
+
+  ...NAV_ENTRIES,
+  ...FOOTER_ENTRIES,
+  ...TESTIMONIAL_ENTRIES,
+  ...MEDIA_ENTRIES,
+  ...GALLERY_ENTRIES,
+  ...FAQ_ENTRIES,
+  ...CTA_ENTRIES,
+  ...TOUR_ENTRIES,
+  ...ABOUT_ENTRIES,
+  ...BLOG_ENTRIES,
+  ...CONTACT_ENTRIES,
+  ...QUOTE_ENTRIES,
+  ...FLEET_ENTRIES,
+  ...TEMPLATE_ENTRIES,
 ];
 
 export const CATEGORIES = [...new Set(CATALOG.map((c) => c.category))];

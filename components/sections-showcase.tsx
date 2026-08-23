@@ -186,6 +186,7 @@ export function SectionsShowcase() {
                 <div id={e.code} className={cn(
                   "isolate relative z-0 scroll-mt-20 bg-background ring-1 ring-zinc-200",
                   e.overlay && "min-h-56 bg-linear-to-b from-muted to-background",
+                  e.tallPreview && "min-h-screen",
                 )}>
                   {e.node}
                   {e.overlay ? (
