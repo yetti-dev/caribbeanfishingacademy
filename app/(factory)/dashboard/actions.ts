@@ -73,14 +73,30 @@ export async function addSite(form: FormData): Promise<Result> {
 
   const db = createAdminClient();
 
-  const { data: clash } = await db.from("sites").select("id").eq("slug", slug).maybeSingle();
-  if (clash) return { ok: false, error: `A site with slug "${slug}" already exists.` };
+  /*
+   * Never refuse on a name clash. Two clients can legitimately share a base name,
+   * and telling the operator "already exists" leaves them to invent a suffix by
+   * hand. Step to <base>-N instead. The repo step does the same check against
+   * GitHub, Vercel and DNS, so this only has to settle the database.
+   */
+  const base = slug.replace(/-\d+$/, "");
+  let unique = base;
+  for (let n = 0; n <= 30; n++) {
+    const candidate = n === 0 ? base : `${base}-${n}`;
+    const { data: clash } = await db.from("sites").select("id").eq("slug", candidate).maybeSingle();
+    if (!clash) { unique = candidate; break; }
+    if (n === 30) return { ok: false, error: `no free slug after 30 attempts from "${base}"` };
+  }
+  const renamed = unique !== slug;
 
   const { data: site, error } = await db
     .from("sites")
     .insert({
-      slug, name, source_url: sourceUrl.startsWith("http") ? sourceUrl : `https://${sourceUrl}`,
-      domain, brief, created_by: email,
+      slug: unique, name,
+      source_url: sourceUrl.startsWith("http") ? sourceUrl : `https://${sourceUrl}`,
+      // The domain follows the slug when it was generated from it.
+      domain: renamed && domain === `${slug}.${zone}` ? `${unique}.${zone}` : domain,
+      brief, created_by: email,
     })
     .select("id, slug")
     .single();
@@ -96,9 +112,10 @@ export async function addSite(form: FormData): Promise<Result> {
   revalidatePath("/dashboard");
   return {
     ok: true,
-    message: provision
-      ? `${site.slug} created and 10 provisioning steps queued.`
-      : `${site.slug} created. Provisioning not queued.`,
+    message: [
+      renamed ? `"${slug}" was taken, using "${site.slug}".` : null,
+      provision ? `${site.slug} created and 10 provisioning steps queued.` : `${site.slug} created. Provisioning not queued.`,
+    ].filter(Boolean).join(" "),
   };
 }
 

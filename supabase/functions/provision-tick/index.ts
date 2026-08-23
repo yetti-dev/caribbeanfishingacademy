@@ -30,20 +30,76 @@ type StepResult = { result?: Record<string, unknown>; site?: Record<string, unkn
 /* ── step handlers ────────────────────────────────────────────────────────── */
 
 const handlers: Record<string, (ctx: Ctx) => Promise<StepResult>> = {
-  async repo({ site, gh }) {
+  /**
+   * Generate the repo, renaming past a collision rather than getting stuck.
+   *
+   * The subtlety: an existing repo is ALSO what makes a retry idempotent, so we
+   * cannot simply append -1 whenever the name is taken. A transport hiccup after
+   * the repo was created would then produce slug-1, slug-2, slug-3 on successive
+   * attempts. The first resolved name is therefore recorded in job.result, and a
+   * retry reuses it instead of resolving again.
+   *
+   * A free name has to be free EVERYWHERE, not just on GitHub: the Vercel project
+   * and the subdomain are both derived from the slug, so a name that is free on
+   * GitHub but taken on Vercel would fail three steps later. When the slug moves,
+   * the site row moves with it, and the default domain is recomputed so all four
+   * stay in agreement.
+   */
+  async repo({ site, gh, vercel, job, db }) {
     const owner = env("GITHUB_OWNER", "yetti-dev");
+    const templateOwner = env("TEMPLATE_OWNER", "yetti-dev");
+    const templateRepo = env("TEMPLATE_REPO", "Claude-starter-pack");
+    const zone = env("DNS_ZONE") || env("FACTORY_DOMAIN") || "getyetti.com";
+
+    // A previous attempt already resolved a name: reuse it, do not re-resolve.
+    const settled = typeof job.result.slug === "string" ? (job.result.slug as string) : null;
+    let slug = settled ?? site.slug;
+
+    if (!settled) {
+      const base = site.slug.replace(/-\d+$/, "");
+      const provider = pickProvider();
+      let found: string | null = null;
+
+      for (let n = 0; n <= 20; n++) {
+        const candidate = n === 0 ? base : `${base}-${n}`;
+        // The site's own row must not count as a clash with itself.
+        const { data: clash } = await db.from("sites")
+          .select("id").eq("slug", candidate).neq("id", site.id).maybeSingle();
+        if (clash) continue;
+        if (await gh.getRepo(owner, candidate)) continue;
+        if (await vercel.getProject(candidate)) continue;
+        if (provider) {
+          try {
+            const existing = await provider.read({ zone, name: candidate, type: "CNAME" });
+            if (existing.length) continue;
+          } catch { /* unreadable zone is not proof of a clash */ }
+        }
+        found = candidate;
+        break;
+      }
+      if (!found) throw new Error(`no free name after 20 attempts from "${base}"`);
+
+      if (found !== site.slug) {
+        // Only rewrite a domain we generated. An explicitly chosen one is the
+        // operator's decision and must survive the rename.
+        const wasDefault = site.domain === `${site.slug}.${zone}`;
+        await db.from("sites").update({
+          slug: found,
+          ...(wasDefault ? { domain: `${found}.${zone}` } : {}),
+        }).eq("id", site.id);
+        slug = found;
+      }
+    }
+
     const { repo, created } = await gh.generateFromTemplate({
-      templateOwner: env("TEMPLATE_OWNER", "yetti-dev"),
-      templateRepo: env("TEMPLATE_REPO", "Claude-starter-pack"),
-      owner,
-      name: site.slug,
-      private: true,
-      description: `${site.name} website`,
+      templateOwner, templateRepo, owner, name: slug,
+      private: true, description: `${site.name} website`,
     });
     // A generated repo reports a branch before the tree exists.
-    await gh.waitForTree(owner, site.slug, repo.default_branch);
+    await gh.waitForTree(owner, slug, repo.default_branch);
     return {
-      result: { repo: repo.full_name, created, branch: repo.default_branch },
+      // slug is recorded so a retry short-circuits the search above.
+      result: { slug, repo: repo.full_name, created, branch: repo.default_branch, renamed: slug !== site.slug },
       site: { github_repo_url: repo.html_url, github_repo_created: true },
     };
   },
@@ -197,12 +253,50 @@ export default function ComingSoon() {
    * exactly how a domain ends up serving a 404: it resolves to a project with no
    * production deployment.
    */
-  async domain({ site, vercel }) {
+  /**
+   * Attach the domain, stepping to <name>-N if the subdomain is already claimed.
+   *
+   * The repo step already picked a name whose CNAME was free, but a subdomain can
+   * be attached to another Vercel project with no DNS record behind it, so the
+   * clash can still surface here. Same idempotency rule as the repo step: the
+   * resolved domain is recorded in job.result, and a retry reuses it rather than
+   * walking further up the suffixes.
+   */
+  async domain({ site, vercel, job, db }) {
     if (!site.domain) return { skipped: true, result: { reason: "no domain set" } };
     const project = await vercel.getProject(site.slug);
     if (!project) throw new Error("vercel project missing");
-    const added = await vercel.addDomain(project.id, site.domain);
-    return { result: { domain: site.domain, added }, site: { domain_added: true } };
+
+    const settled = typeof job.result.domain === "string" ? (job.result.domain as string) : null;
+    if (settled) {
+      const added = await vercel.addDomain(project.id, settled);
+      return { result: { domain: settled, added }, site: { domain: settled, domain_added: true } };
+    }
+
+    const zone = env("DNS_ZONE") || env("FACTORY_DOMAIN") || "getyetti.com";
+    const isSubOfZone = site.domain.endsWith(`.${zone}`);
+    const label = isSubOfZone ? site.domain.slice(0, -(zone.length + 1)) : null;
+    const base = label ? label.replace(/-\d+$/, "") : null;
+
+    for (let n = 0; n <= 20; n++) {
+      const candidate = !base ? site.domain : n === 0 ? `${base}.${zone}` : `${base}-${n}.${zone}`;
+      try {
+        const added = await vercel.addDomain(project.id, candidate);
+        if (candidate !== site.domain) await db.from("sites").update({ domain: candidate }).eq("id", site.id);
+        return {
+          result: { domain: candidate, added, renamed: candidate !== site.domain },
+          site: { domain: candidate, domain_added: true },
+        };
+      } catch (e) {
+        const msg = e instanceof HttpError ? e.message : String(e);
+        // Only a clash is worth stepping past. Anything else is a real failure and
+        // must not be hidden by trying twenty more names.
+        const clash = /already in use|domain_already_in_use|conflict/i.test(msg);
+        // A custom domain outside our zone cannot be renamed, so surface it.
+        if (!clash || !base) throw e;
+      }
+    }
+    throw new Error(`no free subdomain after 20 attempts from "${base}.${zone}"`);
   },
 
   async dns({ site, vercel }) {
@@ -275,7 +369,7 @@ export default function ComingSoon() {
   },
 };
 
-type Ctx = { site: Site; job: Job; gh: GitHub; vercel: Vercel };
+type Ctx = { site: Site; job: Job; gh: GitHub; vercel: Vercel; db: ReturnType<typeof adminDb> };
 
 /* ── dispatcher ───────────────────────────────────────────────────────────── */
 
@@ -317,7 +411,7 @@ Deno.serve(async (req) => {
     }
 
     try {
-      const out = await handler({ site: site as Site, job, gh, vercel });
+      const out = await handler({ site: site as Site, job, gh, vercel, db });
       await db.from("provision_jobs").update({
         status: out.skipped ? "skipped" : "done",
         result: { ...job.result, ...(out.result ?? {}) },
