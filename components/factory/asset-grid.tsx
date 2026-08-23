@@ -12,6 +12,7 @@ export type AssetRow = {
   id: string; source_url: string; storage_path: string | null; kind: string;
   status: string; width: number | null; height: number | null; bytes: number | null;
   skip_reason: string | null; alt: string | null; signedUrl?: string | null;
+  duplicate_of?: string | null;
 };
 
 /**
@@ -22,16 +23,21 @@ export type AssetRow = {
  * client's scraped imagery on a guessable path.
  */
 export function AssetGrid({ assets, siteId }: { assets: AssetRow[]; siteId: string }) {
-  const [tab, setTab] = useState<"stored" | "skipped">("stored");
+  const [tab, setTab] = useState<"stored" | "duplicate" | "skipped">("stored");
   const stored = assets.filter((a) => a.status === "stored");
-  const other = assets.filter((a) => a.status !== "stored");
-  const shown = tab === "stored" ? stored : other;
+  const dupes = assets.filter((a) => a.status === "duplicate");
+  const other = assets.filter((a) => !["stored", "duplicate"].includes(a.status));
+  const shown = tab === "stored" ? stored : tab === "duplicate" ? dupes : other;
 
   return (
     <div>
       <AssetTools siteId={siteId} />
       <div className="flex gap-1 border-b border-zinc-200 px-4 py-2">
-        {([["stored", `Stored (${stored.length})`], ["skipped", `Skipped and failed (${other.length})`]] as const).map(([k, label]) => (
+        {([
+          ["stored", `Stored (${stored.length})`],
+          ["duplicate", `Duplicates (${dupes.length})`],
+          ["skipped", `Skipped and failed (${other.length})`],
+        ] as const).map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)} aria-pressed={tab === k}
             className={cn(
               "cursor-pointer rounded-md px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none",

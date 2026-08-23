@@ -263,6 +263,25 @@ async function storeAssets(
       const name = `${sha.slice(0, 16)}.${s.type === "jpg" ? "jpg" : s.type}`;
       const path = `${slug}/${name}`;
 
+      /*
+       * Content dedup. The URL was already normalised for comparison, but that
+       * cannot catch the same photo re-uploaded under a different path, which is
+       * common on WordPress. Point the repeat at the original and mark it, rather
+       * than storing a second row for one object.
+       */
+      const { data: twin } = await db.from("assets")
+        .select("id, storage_path").eq("site_id", siteId).eq("sha256", sha)
+        .eq("status", "stored").neq("id", a.id).maybeSingle();
+      if (twin) {
+        await db.from("assets").update({
+          status: "duplicate", duplicate_of: twin.id,
+          storage_path: twin.storage_path, sha256: sha,
+          bytes: payload.byteLength, width: s.width ?? null, height: s.height ?? null,
+          skip_reason: "identical bytes to an asset already stored",
+        }).eq("id", a.id);
+        continue;
+      }
+
       const { error: upErr } = await db.storage.from(BUCKET)
         .upload(path, payload, { contentType: mime, upsert: true });
       if (upErr) throw new Error(`upload: ${upErr.message}`);

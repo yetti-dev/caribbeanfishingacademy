@@ -68,6 +68,15 @@ export async function uploadAssets(form: FormData): Promise<Result> {
     }
 
     const digest = sha16(bytes);
+
+    /*
+     * Content dedup on upload too. Dragging the same photo in twice, or uploading
+     * one the crawl already found, should not produce a second card.
+     */
+    const { data: twin } = await db.from("assets")
+      .select("id, source_url").eq("site_id", siteId).eq("sha256", digest).eq("status", "stored").maybeSingle();
+    if (twin) { refused.push(`${file.name}: already stored, identical to ${twin.source_url.slice(0, 40)}`); continue; }
+
     const path = `${site.slug}/${digest}.${s.type === "jpg" ? "jpg" : s.type}`;
     const { error: upErr } = await db.storage.from(BUCKET).upload(path, bytes, { contentType: mime, upsert: true });
     if (upErr) { refused.push(`${file.name}: ${upErr.message}`); continue; }
