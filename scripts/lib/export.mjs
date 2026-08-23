@@ -29,6 +29,11 @@ export const STRIP = [
   // The factory route group: picker, dashboard and everything talking to
   // Supabase. This is the whole reason the app is split into route groups.
   "app/(factory)",
+  // Guards the factory routes and refreshes Supabase sessions. Useless in a
+  // client export and it imports @supabase/ssr, which the leak check rejects.
+  "middleware.ts",
+  "components/factory",
+  "lib/supabase",
   "components/sections/sidebar",
   "components/sections-showcase.tsx",
   "components/sections/catalog.tsx",
@@ -43,7 +48,7 @@ export const FACTORY_SCRIPTS = ["brand", "check", "clone", "guard", "deploy", "g
  * weight in every client install, and @supabase/supabase-js in particular would
  * invite someone to wire a client site straight to the factory database.
  */
-export const FACTORY_DEPS = ["@supabase/supabase-js"];
+export const FACTORY_DEPS = ["@supabase/supabase-js", "@supabase/ssr"];
 
 const git = (args, cwd) => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }).trim();
 
