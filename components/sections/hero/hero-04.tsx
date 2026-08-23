@@ -1,7 +1,11 @@
 import { Reveal, RevealGroup } from "@/components/magic/reveal";
 import type { Cta, Img } from "@/content/types";
 
-/** Editorial hero. Hairline rules, wide tracking, three-photo strip. */
+/**
+ * Editorial hero. Hairline rules, wide tracking, and a five-photo strip laid out
+ * over two rows: a wide lead with a tall companion, then an even three-up.
+ * Pass five images; fewer degrades gracefully, more are ignored.
+ */
 export function Hero04({ eyebrow, title, body, images, ctas = [], meta = [] }: {
   eyebrow?: string; title: string; body: string; images: Img[]; ctas?: Cta[]; meta?: string[];
 }) {
@@ -30,10 +34,31 @@ export function Hero04({ eyebrow, title, body, images, ctas = [], meta = [] }: {
           </div>
         </Reveal>
 
+        {/*
+          Two rows on purpose. The top row is a wide lead image plus a tall
+          companion, the second row is an even three-up. Five images give the
+          strip a rhythm; a single row of equal thirds reads as a stock grid.
+        */}
         <RevealGroup className="mt-12 grid gap-4 sm:grid-cols-3">
-          {images.slice(0, 3).map((im, i) => (
+          {images.slice(0, 2).map((im, i) => (
             <figure key={im.src} className={i === 0 ? "sm:col-span-2" : ""}>
-              <img src={im.src} alt={im.alt} loading="lazy" decoding="async" className={`w-full rounded-xl border border-border object-cover ${i === 0 ? "aspect-16/9" : "aspect-3/4 sm:aspect-auto sm:h-full"}`} />
+              <img
+                src={im.src} alt={im.alt} loading="lazy" decoding="async"
+                className={`w-full rounded-xl border border-border object-cover ${i === 0 ? "aspect-16/9" : "aspect-3/4 sm:aspect-auto sm:h-full"}`}
+              />
+              {im.caption ? <figcaption className="mt-2 text-xs text-muted-foreground">{im.caption}</figcaption> : null}
+            </figure>
+          ))}
+        </RevealGroup>
+
+        <RevealGroup className="mt-4 grid gap-4 sm:grid-cols-3">
+          {images.slice(2, 5).map((im) => (
+            <figure key={im.src}>
+              <img
+                src={im.src} alt={im.alt} loading="lazy" decoding="async"
+                className="aspect-4/3 w-full rounded-xl border border-border object-cover"
+              />
+              {im.caption ? <figcaption className="mt-2 text-xs text-muted-foreground">{im.caption}</figcaption> : null}
             </figure>
           ))}
         </RevealGroup>

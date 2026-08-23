@@ -98,11 +98,17 @@ export const CATALOG: CatalogEntry[] = [
     node: <Hero03 eyebrow="Daily departures" title="Book the boat, not a seat on it."
       body="Private charters for up to twelve, your route and your playlist. The crew handles the rest."
       ctas={[demoCta, demoCtaAlt]} footnote="Free rebooking if the captain calls it off for weather." /> },
-  { code: "HERO-04", category: "Hero", label: "Editorial with photo strip",
-    file: "components/sections/hero/hero-04.tsx", component: "Hero04", props: "eyebrow?, title, body, images[], ctas[], meta[]",
+  { code: "HERO-04", category: "Hero", label: "Editorial with a two-row photo strip",
+    file: "components/sections/hero/hero-04.tsx", component: "Hero04", props: "eyebrow?, title, body, images[5], ctas[], meta[]",
     node: <Hero04 eyebrow="Marlin Charters" title="Sail the leeward coast the way the crew would on a day off"
       body="Three snorkel stops, a beach landing, and lunch off the back deck."
-      images={[img(1, "Catamaran at anchor"), img(2, "Snorkeller over coral"), img(3, "Beach seen from the water")]}
+      images={[
+        img(1, "Catamaran at anchor in clear water"),
+        img(2, "Snorkeller above a shallow reef"),
+        img(3, "Beach seen from the water"),
+        img(19, "Guests boarding at the dock"),
+        img(11, "Crew member at the helm"),
+      ]}
       ctas={[demoCta]} meta={["Slip 14", "12 guests max", "Est. 2013"]} /> },
   { code: "HERO-05", category: "Hero", label: "Mosaic bento photos",
     file: "components/sections/hero/hero-05.tsx", component: "Hero05", props: "eyebrow?, title, body, images[4], ctas[], location?",
