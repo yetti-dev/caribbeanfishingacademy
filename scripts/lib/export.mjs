@@ -34,6 +34,7 @@ export const STRIP = [
   "middleware.ts",
   "components/factory",
   "lib/supabase",
+  "lib/factory",
   "components/sections/sidebar",
   "components/sections-showcase.tsx",
   "components/sections/catalog.tsx",

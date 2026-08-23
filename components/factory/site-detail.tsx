@@ -253,7 +253,7 @@ export function SiteDetail({ site, jobs, events, pages, assets, layouts = [], co
 
         {tab === "images" ? (
           <Section title="Assets" count={`${assets.filter((a) => a.status === "stored").length} stored of ${assets.length}`}>
-            <AssetGrid assets={assets} />
+            <AssetGrid assets={assets} siteId={site.id} />
           </Section>
         ) : null}
 

@@ -44,11 +44,53 @@ Deno.serve(async (req) => {
   const db = adminDb();
   await db.rpc("reap_stale_scrape_pages");
 
+  /*
+   * Self-starting. A site that finished provisioning and has a source URL should
+   * be crawled without anyone queueing it: leaving that to a button meant a
+   * deployed site could sit with no content while everyone assumed the scheduler
+   * had it. enqueue_scrape is idempotent, so seeding an already-seeded site is a
+   * no-op.
+   */
+  const seeded: string[] = [];
+  const { data: unseeded } = await db
+    .from("sites")
+    .select("id, slug, source_url, status")
+    .not("source_url", "is", null)
+    .neq("status", "archived")
+    .limit(20);
+  for (const site of unseeded ?? []) {
+    const { count } = await db.from("scrape_pages")
+      .select("id", { count: "exact", head: true }).eq("site_id", site.id);
+    if (count && count > 0) continue;
+    const { error: e } = await db.rpc("enqueue_scrape", { p_site_id: site.id });
+    if (!e) seeded.push(site.slug);
+  }
+
   const { data: pages, error } = await db.rpc("claim_scrape_pages", {
     worker: WORKER, batch: 3, lease_seconds: 120,
   });
   if (error) return json({ error: error.message }, 500);
-  if (!pages?.length) return json({ worker: WORKER, claimed: 0 });
+
+  /*
+   * No pages due does NOT mean nothing to do. Assets are normally stored while a
+   * page is being scraped, so once a crawl finished, an asset the operator forced
+   * from the dashboard would never be picked up. Sweep pending assets here too.
+   */
+  if (!pages?.length) {
+    const { data: waiting } = await db
+      .from("assets")
+      .select("site_id")
+      .eq("status", "discovered")
+      .limit(60);
+    const bySite = [...new Set((waiting ?? []).map((a) => a.site_id))];
+    const swept: Record<string, number> = {};
+    for (const siteId of bySite.slice(0, 4)) {
+      const { data: site } = await db.from("sites").select("slug").eq("id", siteId).single();
+      if (!site) continue;
+      swept[site.slug] = await storeAssets(db, siteId, site.slug, 8);
+    }
+    return json({ worker: WORKER, claimed: 0, seeded, assetsStored: swept });
+  }
 
   const done: unknown[] = [];
 
@@ -149,7 +191,7 @@ Deno.serve(async (req) => {
     if (!left) await db.from("sites").update({ status: "built" }).eq("id", siteId);
   }
 
-  return json({ worker: WORKER, claimed: pages.length, done });
+  return json({ worker: WORKER, claimed: pages.length, seeded, done });
 });
 
 /* ── asset storage ────────────────────────────────────────────────────────── */
