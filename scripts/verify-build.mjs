@@ -33,7 +33,7 @@ const cssDir = join(root, ".next", "static", "css");
 if (!existsSync(join(root, ".next"))) fail("no .next directory", "run npm run build first");
 if (!existsSync(cssDir)) {
   fail("the build emitted NO stylesheet at all",
-    "check that app/globals.css is imported in app/layout.tsx and that postcss.config.mjs and @tailwindcss/postcss are installed");
+    "check that app/globals.css is imported in app/(site)/layout.tsx and that postcss.config.mjs and @tailwindcss/postcss are installed");
 }
 
 const files = readdirSync(cssDir).filter((f) => f.endsWith(".css"));
