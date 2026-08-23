@@ -35,16 +35,52 @@ const ACCENT_SIZES: Record<AccentSize, { size: string; tracking: string }> = {
   md: { size: "0.875rem", tracking: "0.14em" },
 };
 
-/** Resolve a theme into the CSS variables the sections read. */
+/**
+ * Resolve a theme into the CSS variables the sections read.
+ *
+ * IMPORTANT: every hue-derived token has to be emitted, not just --primary.
+ * globals.css writes them as `oklch(L C var(--brand-hue))` inside :root, which
+ * COMPUTES ONCE THERE. Children inherit the resulting colour, not the
+ * expression, so overriding --brand-hue on a nested wrapper leaves --accent,
+ * --muted, --secondary, --ring and the rest sitting at the original hue. That is
+ * what made hover tints stay blue while the buttons changed colour.
+ *
+ * The lightness and chroma below mirror app/globals.css; only the hue moves,
+ * except --primary and --border which come from the contrast solver.
+ */
 export function themeVars(t: Theme): React.CSSProperties {
   const p: Primary = primaryFromHex(t.hex) ?? primaryFromHex(DEFAULT_THEME.hex)!;
+  const h = p.hue;
   const accent = ACCENT_SIZES[t.accentSize];
+  const ok = (L: number, C: number, hue: number = h) => `oklch(${L} ${C} ${hue})`;
+
   return {
-    "--brand-hue": String(p.hue),
-    "--primary": `oklch(${p.L} ${p.C} ${p.hue})`,
-    "--primary-foreground": `oklch(${p.fgL} ${p.fgC} ${p.hue})`,
-    "--border": `oklch(${p.borderL} 0.01 ${p.hue})`,
-    "--input": `oklch(${p.borderL} 0.01 ${p.hue})`,
+    "--brand-hue": String(h),
+
+    /* surfaces */
+    "--background": ok(0.99, 0.004),
+    "--foreground": ok(0.12, 0.01),
+    "--card-foreground": ok(0.12, 0.01),
+    "--popover-foreground": ok(0.12, 0.01),
+
+    /* brand */
+    "--primary": ok(p.L, p.C),
+    "--primary-foreground": ok(p.fgL, p.fgC),
+    "--ring": ok(p.L, p.C),
+
+    /* supporting surfaces, these drive hover and active tints */
+    "--secondary": ok(0.96, 0.01),
+    "--secondary-foreground": ok(0.25, 0.03),
+    "--muted": ok(0.96, 0.008),
+    "--muted-foreground": ok(0.42, 0.015),
+    "--accent": ok(0.95, 0.03),
+    "--accent-foreground": ok(0.25, 0.05),
+
+    /* outlines */
+    "--border": ok(p.borderL, 0.01),
+    "--input": ok(p.borderL, 0.01),
+
+    /* type */
     "--font-display": fontById(DISPLAY_FONTS, t.displayFont).stack,
     "--font-sans": fontById(BODY_FONTS, t.bodyFont).stack,
     "--accent-font": fontById(ACCENT_FONTS, t.accentFont).stack,

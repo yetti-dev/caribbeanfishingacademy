@@ -219,9 +219,16 @@ export const CATALOG: CatalogEntry[] = [
   { code: "FEAT-04", category: "Features", label: "Numbered list on a dark panel",
     file: "components/sections/features/feature-04.tsx", component: "Feature04", props: "heading, features[]",
     node: <Feature04 heading={{ eyebrow: "Included", title: "Everything in the price", body: "No fuel surcharge, no gear rental, no tipping expected." }} features={demoFeatures} /> },
-  { code: "FEAT-05", category: "Features", label: "Tabbed with swapping photo",
-    file: "components/sections/features/feature-05.tsx", component: "Feature05", props: "heading, features[] (images optional)",
-    node: <Feature05 heading={{ eyebrow: "Choose a trip", title: "Four ways to spend a day on the water" }} features={withImages} /> },
+  { code: "FEAT-05", category: "Features", label: "Tabbed panel, keyboard operable, crossfading photo",
+    file: "components/sections/features/feature-05.tsx", component: "Feature05", props: "heading, features: TabItem[] (tab?, bullets[], meta?, cta?), autoAdvance?",
+    node: <Feature05 autoAdvance={7000}
+      heading={{ eyebrow: "Choose a trip", title: "Four ways to spend a day on the water", body: "Every trip leaves from Slip 14 with twelve guests maximum and two crew aboard." }}
+      features={[
+        { icon: "Sunset", tab: "Sunset cruise", title: "Sunset cruise with dinner aboard", meta: "3 hours, departs 17:30", body: "Leave at golden hour, anchor off the lighthouse, and eat while the sky goes orange.", image: img(15, "Sailboat silhouetted against a sunset"), bullets: ["Grilled catch cooked on board", "Beer, wine and soft drinks", "Back at the dock by 20:30"], cta: { label: "Book the sunset cruise", href: "#book" } },
+        { icon: "Waves", tab: "Snorkel and sail", title: "Snorkel and sail, half day", meta: "3.5 hours, departs 09:00", body: "Two reef stops in water calm enough for a four year old, with the crew in the water alongside you.", image: img(2, "Snorkeller above a shallow reef"), bullets: ["Masks and fins in every size", "Mooring buoys, never an anchor", "Reef safe sunscreen supplied"], cta: { label: "Book the half day", href: "#book" } },
+        { icon: "Compass", tab: "Coast run", title: "Full day run to the sand bar", meta: "6 hours, departs 09:30", body: "Down the leeward coast with three swim stops and a beach landing before the run home.", image: img(16, "Catamaran under full sail"), bullets: ["Three swim stops", "Beach landing and lunch ashore", "Towels and shade on deck"], cta: { label: "Book the full day", href: "#book" } },
+        { icon: "Ship", tab: "Private charter", title: "The whole boat, your route", meta: "Flexible, up to 12 guests", body: "Pick the departure time and the route on the morning. The galley caters to order.", image: img(17, "Table set on a boat deck"), bullets: ["Up to twelve guests", "Catering and bar to order", "Bring your own playlist"], cta: { label: "Enquire about a charter", href: "#contact" } },
+      ]} /> },
 ];
 
 export const CATEGORIES = [...new Set(CATALOG.map((c) => c.category))];
