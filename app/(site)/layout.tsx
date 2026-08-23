@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../globals.css";
 import { brand } from "@/brand.config";
 import { fontVariables } from "@/lib/fonts";
 import { ThemeScript } from "@/components/theme-provider";

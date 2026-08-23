@@ -8,12 +8,42 @@
  * serves an unstyled or broken site.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
-export const STRIP = [".claude", ".scrape", ".factory", ".security", "CLAUDE.md", "AGENTS.md", "scripts", "ideas", ".env.example", ".npmrc"];
-export const FACTORY_SCRIPTS = ["brand", "check", "clone", "guard", "deploy", "go", "up", "verify"];
+/** Every file in the export, so the leak checks can read all of them. */
+function walkFiles(dir, out = []) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.name === "node_modules" || e.name === ".git" || e.name === ".next") continue;
+    const p = join(dir, e.name);
+    if (e.isDirectory()) walkFiles(p, out);
+    else out.push(p);
+  }
+  return out;
+}
+
+export const STRIP = [
+  ".claude", ".scrape", ".factory", ".security", "supabase",
+  "CLAUDE.md", "AGENTS.md", "scripts", "ideas", ".env.example", ".npmrc",
+  // The factory route group: picker, dashboard and everything talking to
+  // Supabase. This is the whole reason the app is split into route groups.
+  "app/(factory)",
+  "components/sections/sidebar",
+  "components/sections-showcase.tsx",
+  "components/sections/catalog.tsx",
+  "components/sections/theme.ts",
+  "components/sections/font-select.tsx",
+  "lib/showcase-fonts.ts",
+  "content/demo.ts",
+];
+export const FACTORY_SCRIPTS = ["brand", "check", "clone", "guard", "deploy", "go", "up", "verify", "db", "blocks", "blocks:prune", "blocks:curate"];
+/**
+ * Dependencies that exist only for the factory. Left in place they are dead
+ * weight in every client install, and @supabase/supabase-js in particular would
+ * invite someone to wire a client site straight to the factory database.
+ */
+export const FACTORY_DEPS = ["@supabase/supabase-js"];
 
 const git = (args, cwd) => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }).trim();
 
@@ -55,6 +85,12 @@ export function buildExport(root) {
       if (!existsSync(join(work, required))) throw new Error(`the export is missing ${required}. Is it committed and not gitignored?`);
     }
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+    for (const d of FACTORY_DEPS) {
+      delete pkg.dependencies?.[d];
+      delete pkg.devDependencies?.[d];
+    }
+    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+
     const misplaced = ["tailwindcss", "@tailwindcss/postcss", "typescript"].filter((d) => !pkg.dependencies?.[d]);
     if (misplaced.length) {
       throw new Error(
@@ -69,6 +105,37 @@ export function buildExport(root) {
     // Belt and braces: prove no secret rode along.
     for (const leak of [".env", ".env.local", ".env.production"]) {
       if (existsSync(join(work, leak))) throw new Error(`${leak} is inside the export. Remove it from git and add it to .gitignore before deploying.`);
+    }
+
+    /*
+     * Factory leak assertions. Stripping by path is only half the job: a single
+     * surviving import would ship the dashboard, or worse, a reference to the
+     * service role key, to a client repo. These checks fail the deploy rather
+     * than let that happen quietly.
+     */
+    for (const p of STRIP) {
+      if (existsSync(join(work, p))) throw new Error(`"${p}" survived the strip and is still in the export.`);
+    }
+    const offenders = [];
+    for (const file of walkFiles(work)) {
+      const rel = relative(work, file);
+      if (!/\.(tsx?|jsx?|mjs|cjs)$/.test(rel)) continue;
+      const src = readFileSync(file, "utf8");
+      if (/@\/app\/\(factory\)|components\/sections\/(?:sidebar|catalog|theme|font-select)|sections-showcase|showcase-fonts|content\/demo/.test(src)) {
+        offenders.push(`${rel} imports factory-only code`);
+      }
+      if (/SERVICE_ROLE_KEY|service_role/.test(src)) {
+        offenders.push(`${rel} references the Supabase service role key`);
+      }
+      if (/@supabase\/supabase-js/.test(src)) {
+        offenders.push(`${rel} imports the Supabase client`);
+      }
+    }
+    if (offenders.length) {
+      throw new Error(
+        `the export still references factory-only code:\n  ${offenders.slice(0, 8).join("\n  ")}\n` +
+        "Move that code under app/(factory) or a stripped path before deploying.",
+      );
     }
     return work;
   } catch (err) {
