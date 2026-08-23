@@ -1,5 +1,7 @@
 # New Site
 
+
+
 A website factory. Give it a reference URL and an idea. It clones that site's branding,
 copy, images and media, then builds a **stunning, unique** site around them with an AI FAQ
 widget, and pushes it to a GitHub repo you created.
