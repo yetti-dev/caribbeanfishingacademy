@@ -158,6 +158,20 @@ export async function deleteSite(siteId: string, confirmSlug: string): Promise<R
   };
 }
 
+/**
+ * Ask the worker to try one asset again. `force` skips the SIZE filter only:
+ * magic-byte sniffing, executable refusal and SVG sanitising still run, because
+ * those protect the client's visitors rather than expressing a preference.
+ */
+export async function retryAsset(assetId: string, force: boolean): Promise<Result> {
+  try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }
+  const db = createAdminClient();
+  const { error } = await db.rpc("retry_asset", { p_asset_id: assetId, p_force: force });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  return { ok: true, message: force ? "Queued, forcing past the size filter." : "Queued for another attempt." };
+}
+
 /** Queue the crawl for a site, then let the scrape worker walk it. */
 export async function startScrape(siteId: string): Promise<Result> {
   try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }

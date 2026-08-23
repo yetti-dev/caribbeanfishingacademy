@@ -163,7 +163,7 @@ async function storeAssets(
 ): Promise<number> {
   if (limit <= 0) return 0;
   const { data: pending } = await db.from("assets")
-    .select("id, source_url, kind").eq("site_id", siteId).eq("status", "discovered").limit(limit);
+    .select("id, source_url, kind, force").eq("site_id", siteId).eq("status", "discovered").limit(limit);
   if (!pending?.length) return 0;
 
   let stored = 0;
@@ -205,7 +205,9 @@ async function storeAssets(
        * being large, usable images. Area keeps wide banners; a minimum dimension
        * still rejects hairlines and spacer strips.
        */
-      if (a.kind === "image" && s.width && s.height) {
+      // force means the operator looked at it and wants it regardless of size.
+      // It does NOT bypass the safety checks above, which are not preferences.
+      if (!a.force && a.kind === "image" && s.width && s.height) {
         const area = s.width * s.height;
         const shortest = Math.min(s.width, s.height);
         if (area < 20_000 || shortest < 60) {
