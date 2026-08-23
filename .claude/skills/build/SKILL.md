@@ -17,6 +17,20 @@ Need three things, ask only for what is missing:
    important input.
 3. **The idea** -> one paragraph: what we are building and the vibe.
 
+## Step 0.5 — claim the site, so nobody doubles up
+
+```
+npm run site -- start <slug>
+```
+
+Marks `status=building` in Supabase and emails the team. If the slug has no row
+it creates one, so a bare clone still lands on the dashboard. If provisioning
+already put the domain online with no pages on it, the email says exactly that,
+which is the case a colleague cannot otherwise tell apart from an abandoned site.
+
+Re-run `npm run site -- sync <slug>` whenever a page lands, so the dashboard
+counters move while you work rather than all at once at the end.
+
 ## Step 1 — clone the source (fast, one command)
 
 ```
@@ -71,6 +85,20 @@ Reskinning halfway through is the biggest time sink there is.
 Components import the typed object and render it. A component with a hardcoded headline
 is a bug. Sharpen the scraped copy, do not paste it verbatim, and no em or en dashes.
 
+## Step 3.5 — when the brief is thin, design rather than stall
+
+No saved layout, no `sectionOrder`, a thin scrape: build it anyway, never stop to
+ask. Read the source pages, pick the chronology yourself, and compose from the
+139 blocks in `components/sections/**` plus the six page templates in
+`components/templates/`. Say which order you chose in the handoff.
+
+The library is the floor. Author at least one section that exists only for this
+client, and give any scraped thing the library does not cover its own component
+(a tide table, a dive-site map, a seasonal calendar, a price matrix by group
+size) rather than flattening it into another three-column card grid. New
+components go in `components/sections/<category>/` so the next build inherits
+them.
+
 ## Step 4 — build the site
 
 Author `app/page.tsx` + `components/sections/*` (the starter ships no sections, they are
@@ -104,11 +132,22 @@ one `page-smith` agent per route, all in a single message, each given only its o
 
 ## Step 6 — hand off
 
-Run `/run` to clear build errors and boot the dev server. Tell the colleague what you
-built and that `/ship` is next.
+Run `/run` to clear build errors and boot the dev server, then:
+
+```
+npm run site -- done <slug>
+```
+
+which writes the final page, section and image counts to Supabase, flips
+`status=built`, and emails the team that the site is finished. If you are
+abandoning instead, `npm run site -- fail <slug> "why"` so nobody inherits a
+half-built site silently.
+
+Tell the colleague what you built and that `/ship` is next.
 
 ## Checklist
 
+- [ ] `npm run site -- start <slug>` run before any writing
 - [ ] `npm run clone` done, `plan.md` read, `npm run brand` run
 - [ ] `ui-ux-pro-max --design-system` queried, its palette/fonts/style drive the build
 - [ ] All copy in `content/*.ts`, nothing hardcoded in components
@@ -122,4 +161,7 @@ built and that `/ship` is next.
 - [ ] No em or en dashes anywhere in copy, headings, buttons, alt text, metadata
 - [ ] WhatsApp widget shows when a number exists, map section when an address exists
 - [ ] `content/knowledge.md` reflects the brand
+- [ ] At least one section authored for this client alone, not stock library
+- [ ] Anything the source has that no block covers got its own component
 - [ ] `/run` passes and the dev server boots
+- [ ] `npm run site -- done <slug>` run: counts in Supabase, team emailed

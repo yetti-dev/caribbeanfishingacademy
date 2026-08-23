@@ -21,7 +21,8 @@
     "blocks:prune": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-prune.mjs",
     "blocks:curate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blocks-curate.mjs",
     "db": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/db.mjs",
-    "pull": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pull.mjs"
+    "pull": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pull.mjs",
+    "site": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/site-state.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",
