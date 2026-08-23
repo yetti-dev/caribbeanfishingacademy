@@ -221,13 +221,44 @@ export default function ComingSoon() {
     };
   },
 
+  /**
+   * Vercel has TWO independent gates and passing one is not enough:
+   *
+   *   1. /v6/domains/<d>/config  -> misconfigured:false  means DNS points here
+   *   2. project domain          -> verified:true        means the project may serve it
+   *
+   * The first version of this step only checked (1), so it reported success while
+   * the domain still returned 404 and had no certificate. Gate (2) needs a TXT
+   * record at _vercel.<zone> whenever the apex is claimed by another Vercel team,
+   * which is exactly the case here.
+   */
   async dns_verify({ site, vercel }) {
     if (!site.domain) return { skipped: true, result: { reason: "no domain set" } };
+
     const config = await vercel.domainConfig(site.domain);
-    if (config.misconfigured === false) {
-      return { result: { verified: true }, site: { dns_verified: true } };
+    if (config.misconfigured !== false) throw new Error("DNS not propagated yet, retrying");
+
+    const project = await vercel.getProject(site.slug);
+    if (!project) throw new Error("vercel project missing");
+
+    let attempt = await vercel.verifyProjectDomain(project.id, site.domain);
+    if (attempt.verified) {
+      return { result: { verified: true, txtWritten: false }, site: { dns_verified: true } };
     }
-    throw new Error("domain still misconfigured, waiting for propagation");
+
+    if (attempt.challenge) {
+      const provider = pickProvider();
+      if (!provider) throw new Error(`needs TXT ${attempt.challenge} at _vercel, but no DNS provider is configured`);
+      const zone = env("DNS_ZONE") || site.domain.split(".").slice(-2).join(".");
+      // upsert MERGES for TXT, which matters: this record holds one entry per
+      // subdomain and replacing it would break every other site on the zone.
+      await provider.upsert({ zone, name: "_vercel", type: "TXT", value: attempt.challenge, ttl: 600 });
+      attempt = await vercel.verifyProjectDomain(project.id, site.domain);
+      if (attempt.verified) {
+        return { result: { verified: true, txtWritten: true, challenge: attempt.challenge }, site: { dns_verified: true } };
+      }
+    }
+    throw new Error("domain not verified on the project yet, retrying");
   },
 
   /** The "never a 404" guarantee, enforced rather than assumed. */

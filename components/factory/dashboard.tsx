@@ -9,6 +9,7 @@ import { GitHubIcon } from "@/components/icons";
 import type { SiteOverview } from "@/lib/supabase/types";
 import { AddSiteForm } from "@/components/factory/add-site-form";
 import { RunTickButton } from "@/components/factory/run-tick-button";
+import { SiteActions } from "@/components/factory/site-actions";
 import { cn } from "@/lib/utils";
 
 export type Progress = {
@@ -85,8 +86,11 @@ function ProgressCell({ p }: { p?: Progress }) {
   );
 }
 
-export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview[]; email: string; progress?: Progress[] }) {
+export function Dashboard({ sites: allSites, email, progress = [] }: { sites: SiteOverview[]; email: string; progress?: Progress[] }) {
   const byId = new Map(progress.map((p) => [p.site_id, p]));
+  // Archived rows are noise on a working board; kept reachable, not shown.
+  const archived = allSites.filter((s) => s.status === "archived");
+  const sites = allSites.filter((s) => s.status !== "archived");
   const live = sites.filter((s) => s.status === "live").length;
   const failed = sites.filter((s) => s.status === "failed").length;
   const timed = sites.filter((s) => s.latest_run_seconds != null);
@@ -150,7 +154,7 @@ export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview
                   <th title="DNS record written">DNS</th>
                   <th title="DNS verified by Vercel">Verified</th>
                   <th title="Factory tooling stripped from the export">Stripped</th>
-                  <th>Links</th><th>Updated</th>
+                  <th>Links</th><th>Updated</th><th></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -208,11 +212,31 @@ export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview
                       </span>
                     </td>
                     <td className="font-mono text-[10px] text-zinc-500">{fmtDate(s.updated_at)}</td>
+                    <td><SiteActions siteId={s.id} slug={s.slug} archived={false} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {archived.length ? (
+            <details className="border-t border-zinc-200">
+              <summary className="cursor-pointer px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:bg-zinc-50">
+                Archived ({archived.length})
+              </summary>
+              <ul className="divide-y divide-zinc-100 border-t border-zinc-100">
+                {archived.map((s) => (
+                  <li key={s.id} className="flex items-center gap-3 px-4 py-2">
+                    <Link href={`/dashboard/${s.slug}`} className="cursor-pointer text-sm text-zinc-700 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
+                      {s.name}
+                    </Link>
+                    <span className="font-mono text-[10px] text-zinc-400">{s.slug}</span>
+                    <span className="ml-auto"><SiteActions siteId={s.id} slug={s.slug} archived /></span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
 
           {!sites.length ? (
             <div className="p-12 text-center">

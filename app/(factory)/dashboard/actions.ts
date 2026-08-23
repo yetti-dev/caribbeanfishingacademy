@@ -87,6 +87,62 @@ export async function addSite(form: FormData): Promise<Result> {
   };
 }
 
+/**
+ * Archive a site: keeps every row, drops it out of the default dashboard view.
+ * Reversible, which is what you want for "this one is finished" or "this one was
+ * a test".
+ */
+export async function setArchived(siteId: string, archived: boolean): Promise<Result> {
+  try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }
+  const db = createAdminClient();
+  const { data: site } = await db.from("sites").select("slug, status").eq("id", siteId).maybeSingle();
+  if (!site) return { ok: false, error: "site not found" };
+  // Unarchiving cannot know the old status, so it returns to draft rather than
+  // guessing something that might claim the site is live when it is not.
+  const { error } = await db.from("sites")
+    .update({ status: archived ? "archived" : "draft" }).eq("id", siteId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  return { ok: true, message: archived ? `${site.slug} archived.` : `${site.slug} restored to draft.` };
+}
+
+/**
+ * Delete a site and everything recorded about it. IRREVERSIBLE.
+ *
+ * The caller must retype the slug, because the buttons sit in a dense table and a
+ * misclick would otherwise erase a real client's whole history.
+ *
+ * Scope: database only. The GitHub repo and the Vercel project are NOT touched,
+ * partly because deleting a repo needs a scope this token does not have, and
+ * partly because a deployed client site should not vanish from a dashboard
+ * click. The message says so rather than leaving it to be discovered.
+ */
+export async function deleteSite(siteId: string, confirmSlug: string): Promise<Result> {
+  try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }
+  const db = createAdminClient();
+  const { data: site } = await db.from("sites")
+    .select("slug, github_repo_url, vercel_project, is_deployed").eq("id", siteId).maybeSingle();
+  if (!site) return { ok: false, error: "site not found" };
+  if (confirmSlug.trim() !== site.slug) {
+    return { ok: false, error: `Type "${site.slug}" exactly to confirm.` };
+  }
+  // Every child table is ON DELETE CASCADE, so this removes jobs, events, pages,
+  // assets, deploys and domains with it.
+  const { error } = await db.from("sites").delete().eq("id", siteId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  const leftovers = [
+    site.github_repo_url ? "the GitHub repo" : null,
+    site.vercel_project ? "the Vercel project" : null,
+  ].filter(Boolean);
+  return {
+    ok: true,
+    message: leftovers.length
+      ? `${site.slug} deleted from the database. ${leftovers.join(" and ")} still exist and must be removed by hand.`
+      : `${site.slug} deleted.`,
+  };
+}
+
 /** Queue the crawl for a site, then let the scrape worker walk it. */
 export async function startScrape(siteId: string): Promise<Result> {
   try { await requireMember(); } catch (e) { return { ok: false, error: (e as Error).message }; }

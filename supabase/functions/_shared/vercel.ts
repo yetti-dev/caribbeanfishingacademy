@@ -103,6 +103,27 @@ export class Vercel {
     }
   }
 
+  /** Project level domain record, which carries the `verified` flag. */
+  projectDomain = (projectId: string, domain: string) =>
+    this.call<{ name: string; verified: boolean; verification?: { type: string; domain: string; value: string }[] }>(
+      "GET", `/v9/projects/${projectId}/domains/${encodeURIComponent(domain)}`);
+
+  /**
+   * Ask Vercel to verify the domain on the project. Returns the challenge when it
+   * cannot, which is the TXT record that has to exist first.
+   */
+  async verifyProjectDomain(projectId: string, domain: string) {
+    try {
+      const r = await this.call<{ verified: boolean }>(
+        "POST", `/v9/projects/${projectId}/domains/${encodeURIComponent(domain)}/verify`);
+      return { verified: Boolean(r.verified), challenge: null as string | null };
+    } catch (e) {
+      const msg = e instanceof HttpError ? e.message : String(e);
+      const value = msg.match(/vc-domain-verify=([^"\s]+)/)?.[1];
+      return { verified: false, challenge: value ? `vc-domain-verify=${value}` : null };
+    }
+  }
+
   /**
    * Ask Vercel what DNS record THIS domain needs. Newer projects get anycast IPs
    * like 216.198.79.1 and per-project CNAMEs like xyz.vercel-dns-016.com, so

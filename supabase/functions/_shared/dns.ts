@@ -24,16 +24,33 @@ export const godaddy: DnsProvider = {
   name: "godaddy",
   ready: () => Boolean(get("GODADDY_TOKEN") || (get("GODADDY_API_KEY") && get("GODADDY_API_SECRET"))),
   async upsert({ zone, name, type, value, ttl = 600 }) {
-    // PUT replaces every record of this (type, name), so writing twice is
-    // identical to writing once. That is what makes the step safe to retry.
-    await request(
-      `https://api.godaddy.com/v1/domains/${encodeURIComponent(zone)}/records/${type}/${encodeURIComponent(name)}`,
-      {
-        method: "PUT",
-        headers: authHeaders(),
-        body: JSON.stringify([{ data: value, ttl: Math.max(ttl, 600) }]),
-      },
-    );
+    const url = `https://api.godaddy.com/v1/domains/${encodeURIComponent(zone)}/records/${type}/${encodeURIComponent(name)}`;
+
+    /*
+     * TXT records MUST be merged, never replaced.
+     *
+     * GoDaddy's PUT overwrites every record of a (type, name) pair. For A and
+     * CNAME that is what we want, and it makes a retry a no-op. For TXT it is
+     * destructive: _vercel.<zone> holds one vc-domain-verify record per
+     * subdomain, and this zone already had THIRTEEN. A blind PUT would have
+     * deleted the verification for thirteen live sites.
+     */
+    if (type === "TXT") {
+      let existing: { data: string; ttl?: number }[] = [];
+      try {
+        existing = await request<{ data: string; ttl?: number }[]>(url, { headers: authHeaders() });
+      } catch { existing = []; }
+      const merged = existing.map((x) => ({ data: x.data, ttl: Math.max(x.ttl ?? 600, 600) }));
+      if (!merged.some((x) => x.data === value)) merged.push({ data: value, ttl: Math.max(ttl, 600) });
+      await request(url, { method: "PUT", headers: authHeaders(), body: JSON.stringify(merged) });
+      return;
+    }
+
+    await request(url, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify([{ data: value, ttl: Math.max(ttl, 600) }]),
+    });
   },
   async read({ zone, name, type }) {
     return await request(

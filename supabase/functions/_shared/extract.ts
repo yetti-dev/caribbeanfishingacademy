@@ -53,10 +53,69 @@ export function extract(html: string, pageUrl: string): Extracted {
   const meta = (sel: string, attr = "content") => clean(doc.querySelector(sel)?.getAttribute(attr) ?? "") || null;
   const all = <T extends Element>(sel: string) => Array.from(doc.querySelectorAll(sel)) as unknown as T[];
 
-  /* headings, in DOM order: this is the section chronology to mirror */
-  const headings = all<Element>("h1, h2, h3")
+  /*
+   * Headings, in DOM order: this is the section chronology to mirror.
+   *
+   * Real h1-h3 first. Many site builders (GoDaddy, Wix, Squarespace) emit styled
+   * divs instead, so a strict selector returned zero headings on pages that
+   * clearly had them. The fallback accepts explicit ARIA headings and the class
+   * naming those builders use, which is imperfect but far better than treating
+   * the page as heading-less.
+   */
+  const semantic = all<Element>("h1, h2, h3")
     .map((el) => ({ level: Number(el.tagName.slice(1)), text: clean(el.textContent) }))
-    .filter((h) => h.text.length > 1 && h.text.length < 200)
+    .filter((h) => h.text.length > 1 && h.text.length < 200);
+
+  /*
+   * Typographic fallback, for builders that ship no heading tags at all.
+   *
+   * Measured on a GoDaddy built site: zero h1-h4, no role="heading", no
+   * aria-level. Headings were <p> and <span> inside .wsb-element-text carrying an
+   * inline font-size. A class-name heuristic finds nothing there, so infer from
+   * type size instead: collect every inline font-size, take the median as the body
+   * size, and treat short text at 1.35x or more as a heading. Level comes from how
+   * far above the median it sits.
+   *
+   * This is a heuristic and says so. It beats reporting a page as heading-less
+   * when a human can plainly see the headings.
+   */
+  const sized: { px: number; text: string }[] = [];
+  for (const el of all<Element>("[style*='font-size']")) {
+    const px = Number((el.getAttribute("style") ?? "").match(/font-size:\s*([\d.]+)px/i)?.[1]);
+    if (!px) continue;
+    const text = clean(el.textContent);
+    if (text.length < 3 || text.length > 120) continue;
+    sized.push({ px, text });
+  }
+  const median = (() => {
+    if (!sized.length) return 0;
+    const xs = sized.map((x) => x.px).sort((a, b) => a - b);
+    return xs[Math.floor(xs.length / 2)];
+  })();
+  const typographic = median
+    ? sized
+        .filter((x) => x.px >= median * 1.35)
+        .map((x) => ({
+          level: x.px >= median * 2 ? 1 : x.px >= median * 1.6 ? 2 : 3,
+          text: x.text,
+        }))
+    : [];
+
+  const ariaOrClassy = all<Element>('[role="heading"]')
+    .map((el) => ({
+      level: Number(el.getAttribute("aria-level") ?? "") || 2,
+      text: clean(el.textContent),
+    }))
+    .filter((h) => h.text.length > 2 && h.text.length < 120);
+
+  const seenHeading = new Set<string>();
+  const headings = [...semantic, ...(semantic.length ? [] : [...ariaOrClassy, ...typographic])]
+    .filter((h) => {
+      const k = h.text.toLowerCase();
+      if (seenHeading.has(k)) return false;
+      seenHeading.add(k);
+      return true;
+    })
     .slice(0, 60);
 
   const paragraphs = all<Element>("p, li")
@@ -116,14 +175,27 @@ export function extract(html: string, pageUrl: string): Extracted {
     if (!u) return;
     let n: URL;
     try { n = new URL(u); } catch { return; }
-    // WordPress and Shopify resize params make one photo look like twenty.
-    n.search = ""; n.hash = "";
-    const key = n.href.replace(/-\d{2,4}x\d{2,4}(?=\.[a-z]{3,4}$)/i, "");
-    if (seenImg.has(key) || JUNK.test(key)) return;
     if (n.protocol === "data:") return;
+
+    /*
+     * The dedup KEY and the fetch URL are not the same thing, and conflating them
+     * cost us every image on a GoDaddy built site.
+     *
+     * Stripping the query is right for WordPress and Shopify, where ?w=300&h=200
+     * makes one photo look like twenty. It is wrong for CDNs where the query IS
+     * the image: nebula.wsimg.com/<hash> without its params returns a few hundred
+     * bytes, so all 26 assets were skipped as tracking pixels.
+     *
+     * So normalise for comparison, but always keep the original URL to fetch.
+     */
+    const keyUrl = new URL(n.href);
+    keyUrl.search = ""; keyUrl.hash = "";
+    const key = keyUrl.href.replace(/-\d{2,4}x\d{2,4}(?=\.[a-z]{3,4}$)/i, "");
+    if (seenImg.has(key) || JUNK.test(key)) return;
     seenImg.add(key);
     images.push({
-      url: key, alt: alt ? clean(alt) : null,
+      url: n.href,                     // fetch this
+      alt: alt ? clean(alt) : null,
       width: w ? Number(w) || undefined : undefined,
       height: h ? Number(h) || undefined : undefined,
     });

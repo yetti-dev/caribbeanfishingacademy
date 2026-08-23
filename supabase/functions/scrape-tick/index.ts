@@ -197,10 +197,21 @@ async function storeAssets(
         mime = "image/svg+xml";
       }
 
-      // Icons and tiny sprites are not worth a row in a photo library.
-      if (s.width && s.height && (s.width < 320 || s.height < 200) && a.kind === "image") {
-        await skip(db, a.id, `too small (${s.width}x${s.height})`);
-        continue;
+      /*
+       * Size filter by AREA, not by both dimensions.
+       *
+       * Requiring 320x200 threw away real content on the first live crawl: a
+       * 1208x92 banner and a 965x74 strip both failed the height test despite
+       * being large, usable images. Area keeps wide banners; a minimum dimension
+       * still rejects hairlines and spacer strips.
+       */
+      if (a.kind === "image" && s.width && s.height) {
+        const area = s.width * s.height;
+        const shortest = Math.min(s.width, s.height);
+        if (area < 20_000 || shortest < 60) {
+          await skip(db, a.id, `too small (${s.width}x${s.height}, area ${area})`);
+          continue;
+        }
       }
 
       const digest = await crypto.subtle.digest("SHA-256", payload);
