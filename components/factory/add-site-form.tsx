@@ -30,8 +30,9 @@ export function AddSiteForm() {
           <div>
             <h2 className="font-display text-lg font-bold tracking-tight text-zinc-900">Add a site</h2>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
-              Provisioning generates the repo from the template, strips the factory, commits a holding page,
-              creates the Vercel project and deploys.
+              Creates the repo from the template, strips the factory, commits a holding page, creates the
+              Vercel project, deploys, attaches the domain and writes DNS. The crawl is queued at the same
+              time. A scheduler runs both, so this is the last button you press.
             </p>
           </div>
           <button type="button" onClick={() => { setOpen(false); setMsg(null); }} aria-label="Close"
@@ -78,7 +79,7 @@ export function AddSiteForm() {
           <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-xs text-zinc-700">
             <input type="checkbox" name="provision" defaultChecked
               className="size-4 cursor-pointer rounded border-zinc-400 accent-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none" />
-            Queue provisioning now
+            Queue provisioning and the crawl now
           </label>
 
           <button type="submit" disabled={pending}

@@ -98,15 +98,31 @@ export async function addSite(form: FormData): Promise<Result> {
       domain: renamed && domain === `${slug}.${zone}` ? `${unique}.${zone}` : domain,
       brief, created_by: email,
     })
-    .select("id, slug")
+    .select("id, slug, source_url")
     .single();
   if (error || !site) return { ok: false, error: error?.message ?? "insert failed" };
 
   await db.from("runs").insert({ site_id: site.id, trigger: "dashboard", created_by: email });
 
+  /*
+   * Queue BOTH pipelines here. They are independent, and leaving the crawl to a
+   * second button meant a site could sit provisioned with no content while
+   * everyone assumed the scheduler had it. Adding a site should be the last
+   * manual action.
+   */
+  const queued: string[] = [];
   if (provision) {
     const { error: qErr } = await db.rpc("enqueue_provisioning", { p_site_id: site.id });
-    if (qErr) return { ok: false, error: `site created but queueing failed: ${qErr.message}` };
+    if (qErr) return { ok: false, error: `site created but provisioning could not be queued: ${qErr.message}` };
+    queued.push("10 provisioning steps");
+
+    if (site.source_url) {
+      const { error: sErr } = await db.rpc("enqueue_scrape", { p_site_id: site.id });
+      // A crawl that cannot be queued is worth reporting, but the site and its
+      // provisioning are already real, so this must not read as total failure.
+      if (sErr) queued.push(`crawl NOT queued (${sErr.message})`);
+      else queued.push("the crawl");
+    }
   }
 
   revalidatePath("/dashboard");
@@ -114,7 +130,9 @@ export async function addSite(form: FormData): Promise<Result> {
     ok: true,
     message: [
       renamed ? `"${slug}" was taken, using "${site.slug}".` : null,
-      provision ? `${site.slug} created and 10 provisioning steps queued.` : `${site.slug} created. Provisioning not queued.`,
+      queued.length
+        ? `${site.slug} created. Queued ${queued.join(" and ")}. The scheduler takes it from here, no clicking.`
+        : `${site.slug} created. Nothing queued.`,
     ].filter(Boolean).join(" "),
   };
 }
@@ -187,6 +205,15 @@ export async function retryAsset(assetId: string, force: boolean): Promise<Resul
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard");
   return { ok: true, message: force ? "Queued, forcing past the size filter." : "Queued for another attempt." };
+}
+
+/** Is the scheduler alive? Read only, and it never returns secret values. */
+export async function schedulerStatus(): Promise<Record<string, unknown>> {
+  try { await requireMember(); } catch { return { error: "not a member" }; }
+  const db = createAdminClient();
+  const { data, error } = await db.rpc("factory_scheduler_status");
+  if (error) return { error: error.message };
+  return (data ?? {}) as Record<string, unknown>;
 }
 
 /** Queue the crawl for a site, then let the scrape worker walk it. */

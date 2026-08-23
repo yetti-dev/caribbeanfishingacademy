@@ -52,6 +52,20 @@ const ms = (n: number | null) => (n == null ? "-" : n < 1000 ? `${n}ms` : `${(n 
 const time = (iso: string | null) =>
   iso ? new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "-";
 
+/**
+ * A job row carries two facts: its status and how many attempts it has had. A
+ * pending job with zero attempts has not started; a pending job with attempts is
+ * retrying. Collapsing both to "pending" hid the difference that matters.
+ */
+function stepState(status: string, attempts: number): { label: string; tone: string } {
+  if (status === "done") return { label: "Complete", tone: "text-emerald-700 bg-emerald-50 ring-emerald-200" };
+  if (status === "skipped") return { label: "Skipped", tone: "text-zinc-500 bg-zinc-100 ring-zinc-200" };
+  if (status === "failed") return { label: "Failed", tone: "text-red-700 bg-red-50 ring-red-200" };
+  if (status === "running") return { label: "Running", tone: "text-sky-700 bg-sky-50 ring-sky-200" };
+  if (attempts > 0) return { label: "Retrying", tone: "text-amber-700 bg-amber-50 ring-amber-200" };
+  return { label: "Not started", tone: "text-zinc-400 bg-zinc-50 ring-zinc-200" };
+}
+
 /** One icon per outcome, so scanning the list needs no colour vocabulary. */
 function StatusIcon({ status }: { status: string }) {
   if (status === "done" || status === "ok") return <CheckCircle2 aria-hidden className="size-4 text-emerald-600" />;

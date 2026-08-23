@@ -10,6 +10,7 @@ import type { SiteOverview } from "@/lib/supabase/types";
 import { AddSiteForm } from "@/components/factory/add-site-form";
 import { RunTickButton } from "@/components/factory/run-tick-button";
 import { SiteActions } from "@/components/factory/site-actions";
+import { SchedulerBadge } from "@/components/factory/scheduler-badge";
 import { cn } from "@/lib/utils";
 
 /** Raw step names are for the queue; these are for humans reading a table. */
@@ -128,6 +129,7 @@ export function Dashboard({ sites: allSites, email, progress = [] }: { sites: Si
           {sites.length} site{sites.length === 1 ? "" : "s"}
         </span>
         <nav className="ml-auto flex items-center gap-2">
+          <SchedulerBadge />
           <Link href="/sections"
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
             <LayoutList aria-hidden className="size-3.5" /> Section picker
