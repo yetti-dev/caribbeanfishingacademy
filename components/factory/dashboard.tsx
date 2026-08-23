@@ -7,7 +7,19 @@ import {
 // glyphs in components/icons.tsx, which is where CLAUDE.md says they belong.
 import { GitHubIcon } from "@/components/icons";
 import type { SiteOverview } from "@/lib/supabase/types";
+import { AddSiteForm } from "@/components/factory/add-site-form";
+import { RunTickButton } from "@/components/factory/run-tick-button";
 import { cn } from "@/lib/utils";
+
+export type Progress = {
+  site_id: string;
+  steps_total: number;
+  steps_done: number;
+  steps_failed: number;
+  current_step: string | null;
+  last_error: string | null;
+  total_ms: number | null;
+};
 
 const fmtSeconds = (s: number | null) => {
   if (s == null) return "-";
@@ -53,7 +65,28 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   );
 }
 
-export function Dashboard({ sites, email }: { sites: SiteOverview[]; email: string }) {
+/** Steps done out of total, with the step currently in flight named. */
+function ProgressCell({ p }: { p?: Progress }) {
+  if (!p || !p.steps_total) return <span className="font-mono text-[10px] text-zinc-400">not queued</span>;
+  const pct = Math.round((p.steps_done / p.steps_total) * 100);
+  const tone = p.steps_failed ? "bg-red-500" : pct === 100 ? "bg-emerald-500" : "bg-amber-500";
+  return (
+    <span className="block min-w-32">
+      <span className="flex items-center gap-1.5">
+        <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200">
+          <span className={cn("block h-full rounded-full transition-[width] duration-500", tone)} style={{ width: `${pct}%` }} />
+        </span>
+        <span className="font-mono text-[10px] text-zinc-600">{p.steps_done}/{p.steps_total}</span>
+      </span>
+      <span className="mt-0.5 block truncate font-mono text-[10px] text-zinc-500" title={p.last_error ?? undefined}>
+        {p.steps_failed ? `failed: ${p.current_step ?? "?"}` : p.current_step ? `running ${p.current_step}` : "complete"}
+      </span>
+    </span>
+  );
+}
+
+export function Dashboard({ sites, email, progress = [] }: { sites: SiteOverview[]; email: string; progress?: Progress[] }) {
+  const byId = new Map(progress.map((p) => [p.site_id, p]));
   const live = sites.filter((s) => s.status === "live").length;
   const failed = sites.filter((s) => s.status === "failed").length;
   const timed = sites.filter((s) => s.latest_run_seconds != null);
@@ -77,6 +110,8 @@ export function Dashboard({ sites, email }: { sites: SiteOverview[]; email: stri
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none">
             <LayoutList aria-hidden className="size-3.5" /> Section picker
           </Link>
+          <RunTickButton />
+          <AddSiteForm />
           <span className="font-mono text-[11px] text-zinc-500">{email}</span>
         </nav>
       </header>
@@ -107,7 +142,7 @@ export function Dashboard({ sites, email }: { sites: SiteOverview[]; email: stri
             <table className="w-full text-left text-sm">
               <thead className="border-b border-zinc-200 bg-zinc-50">
                 <tr className="[&>th]:whitespace-nowrap [&>th]:px-3 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px] [&>th]:uppercase [&>th]:tracking-[0.12em] [&>th]:text-zinc-500">
-                  <th>Site</th><th>Status</th><th>Run</th><th>Sections</th>
+                  <th>Site</th><th>Status</th><th>Provisioning</th><th>Run</th><th>Sections</th>
                   <th title="GitHub repo created">Repo</th>
                   <th title="Vercel project created">Vercel</th>
                   <th title="Domain attached">Domain</th>
@@ -129,6 +164,7 @@ export function Dashboard({ sites, email }: { sites: SiteOverview[]; email: stri
                         {s.status}
                       </span>
                     </td>
+                    <td><ProgressCell p={byId.get(s.id)} /></td>
                     <td>
                       <span className={cn("inline-flex items-center gap-1 font-mono text-[11px]", s.within_budget === false ? "text-red-700" : "text-zinc-700")}>
                         <Clock aria-hidden className="size-3" />

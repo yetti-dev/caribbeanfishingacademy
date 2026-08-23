@@ -172,7 +172,18 @@ export default function ComingSoon() {
     const latest = await vercel.latestProduction(project.id);
     if (!latest) throw new Error("no production deployment yet");
     if (latest.state === "READY") {
-      return { result: { state: latest.state, url: latest.url }, site: { is_deployed: true, preview_url: `https://${latest.url}` } };
+      /*
+       * Store the CLEAN production alias, not the deployment specific URL.
+       * Projects here run with ssoProtection all_except_custom_domains, so
+       * sycorax-rn6u6uujl-team.vercel.app sits behind Vercel's login wall while
+       * sycorax.vercel.app does not. Saving the protected URL means anyone who
+       * clicks it from the dashboard gets a Vercel login instead of the site.
+       */
+      const alias = `https://${site.slug}.vercel.app`;
+      return {
+        result: { state: latest.state, deploymentUrl: latest.url, alias },
+        site: { is_deployed: true, preview_url: alias },
+      };
     }
     if (latest.state === "ERROR" || latest.state === "CANCELED") {
       throw new Error(`deployment ${latest.state}`);

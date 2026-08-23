@@ -26,10 +26,16 @@ const c = {
 };
 const die = (m) => { console.error(`\n${c.red("db failed:")} ${m}\n`); process.exit(1); };
 
-const URL_ = env.SUPABASE_URL;
-// Accept either name: SERVICE_ROLE_KEY is what this project already had.
+/*
+ * Accept every spelling that has existed in this .env. The NEXT_PUBLIC_ pair is
+ * what the app needs (Next only exposes those to the browser), so it is often
+ * the only copy present.
+ */
+const URL_ = env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE = env.SUPABASE_SERVICE_ROLE_KEY || env.SERVICE_ROLE_KEY;
-if (!URL_ || !SERVICE) die("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SERVICE_ROLE_KEY) must be in .env");
+if (!URL_ || !SERVICE) {
+  die("need SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL, plus SUPABASE_SERVICE_ROLE_KEY, in .env");
+}
 
 const rest = async (path, init = {}) => {
   const r = await fetch(`${URL_}/rest/v1/${path}`, {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/env";
-import { Dashboard } from "@/components/factory/dashboard";
+import { Dashboard, type Progress } from "@/components/factory/dashboard";
 import type { SiteOverview } from "@/lib/supabase/types";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -77,5 +77,15 @@ export default async function DashboardPage() {
     );
   }
 
-  return <Dashboard sites={(sites ?? []) as SiteOverview[]} email={email} />;
+  // Separate query rather than joining into the view: provisioning progress is
+  // an aggregate over a different table and changes far more often than a site row.
+  const { data: progress } = await supabase.from("provision_progress").select("*");
+
+  return (
+    <Dashboard
+      sites={(sites ?? []) as SiteOverview[]}
+      email={email}
+      progress={(progress ?? []) as Progress[]}
+    />
+  );
 }
