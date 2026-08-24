@@ -12,7 +12,7 @@ export function Hero06({ eyebrow, title, body, images, ctas = [] }: {
       <div className="mx-auto max-w-4xl px-6 pt-20 pb-12 text-center">
         <Reveal>
           {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-          <h1 className="mt-5 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
+          <h1 className="mt-5 font-display text-6xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-8xl">{title}</h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{body}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {ctas.map((cta, i) => (

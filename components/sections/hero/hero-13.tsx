@@ -15,7 +15,7 @@ export function Hero13({ eyebrow, title, body, image, ctas = [], bullets = [] }:
         <Reveal className="flex items-center px-6 py-16 sm:px-10 lg:py-24 lg:pl-[max(1.5rem,calc((100vw-80rem)/2))]">
           <div className="max-w-xl">
             {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-            <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{body}</p>
             {bullets.length ? (
               <ul className="mt-7 space-y-2.5">

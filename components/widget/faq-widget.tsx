@@ -4,6 +4,7 @@ import * as React from "react";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import { brand } from "@/brand.config";
 import { Button } from "@/components/ui/button";
+import { renderChatContent } from "@/components/widget/book-button";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -19,7 +20,7 @@ export function FaqWidget() {
   const [messages, setMessages] = React.useState<Msg[]>([
     {
       role: "assistant",
-      content: `Hi! I'm the ${brand.name} assistant. Ask me anything about what we do.`,
+      content: `Ahoy! I'm the Caribbean Fishing Academy Charters assistant. Ask me about trips, pricing, or our youth program.`,
     },
   ]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -61,7 +62,7 @@ export function FaqWidget() {
         setMessages((m) => updateLast(m, acc));
       }
     } catch {
-      setMessages((m) => updateLast(m, "Network error — please try again."));
+      setMessages((m) => updateLast(m, "Network error, please try again."));
     } finally {
       setBusy(false);
     }
@@ -100,8 +101,8 @@ export function FaqWidget() {
             <Sparkles className="size-4" />
           </span>
           <div className="leading-tight">
-            <p className="text-sm font-semibold">{brand.name} assistant</p>
-            <p className="text-xs text-muted-foreground">Answers from our FAQ</p>
+            <p className="text-sm font-semibold">Ask the Crew</p>
+            <p className="text-xs text-muted-foreground">Caribbean Fishing Academy Charters</p>
           </div>
         </header>
 
@@ -119,7 +120,13 @@ export function FaqWidget() {
                     : "rounded-bl-sm bg-muted text-foreground"
                 )}
               >
-                {m.content || (busy && i === messages.length - 1 ? <Dots /> : null)}
+                {m.content
+                  ? m.role === "assistant"
+                    ? renderChatContent(m.content)
+                    : m.content
+                  : busy && i === messages.length - 1
+                    ? <Dots />
+                    : null}
               </div>
             </div>
           ))}
@@ -129,7 +136,7 @@ export function FaqWidget() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question…"
+            placeholder="Ask about trips, pricing, or CFA..."
             aria-label="Message"
             className="h-10 flex-1 rounded-lg border border-input bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
           />

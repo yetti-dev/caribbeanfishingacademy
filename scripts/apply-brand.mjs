@@ -11,11 +11,11 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import { pickPrimary, pickBorder } from "./lib/color.mjs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const { brand } = await import(join(root, "brand.config.ts"));
+const { brand } = await import(pathToFileURL(join(root, "brand.config.ts")).href);
 
 const slug = (s) =>
   s
@@ -26,7 +26,7 @@ const slug = (s) =>
 
 const fontImport = (name) => name.replace(/[\s-]+/g, "_");
 
-const radiusFor = { sharp: "0.3rem", rounded: "0.75rem", pill: "1.5rem" };
+const radiusFor = { sharp: "0.3rem", rounded: "1rem", pill: "1.5rem" };
 
 const log = (label, value) =>
   console.log(`  \x1b[2m·\x1b[0m ${label.padEnd(16)} \x1b[36m${value}\x1b[0m`);

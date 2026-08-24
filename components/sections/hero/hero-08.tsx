@@ -12,7 +12,7 @@ export function Hero08({ eyebrow, title, body, image, price, period, duration, r
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-end">
           <Reveal>
             {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-            <h1 className="mt-4 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.92] tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">{title}</h1>
           </Reveal>
           <Reveal delay={0.1}>
             <p className="text-lg leading-relaxed text-muted-foreground">{body}</p>

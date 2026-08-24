@@ -15,7 +15,7 @@ export function Hero14({ eyebrow, title, body, image, ctas = [], stats = [], rat
         <Reveal className="flex items-center px-6 py-16 sm:px-10 lg:order-2 lg:py-24 lg:pr-[max(1.5rem,calc((100vw-80rem)/2))]">
           <div className="max-w-xl">
             {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-            <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
+            <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{body}</p>
             {rating ? (
               <p className="mt-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">

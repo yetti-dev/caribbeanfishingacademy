@@ -60,8 +60,13 @@ export function Nav10({
 
   const active = items.find((i) => i.label === panel && i.children);
 
+  /* Phone alone does not earn the two-row utility bar, it moves inline next to
+     the CTA instead, that's what keeps this "minimal" rather than two decks. */
+  const hasUtilityBar = Boolean(hours || socials?.length);
+
   return (
     <header className="sticky top-0 z-50 bg-background" onMouseLeave={() => setPanel(null)}>
+      {hasUtilityBar ? (
       <div
         className={cn(
           "overflow-hidden bg-foreground text-background transition-[max-height,opacity] duration-300 ease-out motion-reduce:transition-none",
@@ -102,6 +107,7 @@ export function Nav10({
           ) : null}
         </div>
       </div>
+      ) : null}
 
       <nav
         aria-label="Primary"
@@ -161,7 +167,16 @@ export function Nav10({
             ))}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {phone && !hasUtilityBar ? (
+              <a
+                href={`tel:${phone.replace(/\s/g, "")}`}
+                className="hidden cursor-pointer items-center gap-1.5 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none lg:flex"
+              >
+                <Phone aria-hidden className="size-3.5" />
+                {phone}
+              </a>
+            ) : null}
             {cta ? (
               <a
                 href={cta.href}
@@ -185,7 +200,7 @@ export function Nav10({
 
       {active ? (
         <div className="hidden border-b border-border bg-card shadow-xl lg:block">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-8 lg:grid-cols-[1.4fr_1fr]">
+          <div className={cn("mx-auto grid max-w-7xl gap-10 px-6 py-8", featured ? "lg:grid-cols-[1.4fr_1fr]" : "max-w-md")}>
             <div>
               <p className="eyebrow text-muted-foreground">{active.label}</p>
               <ul className="mt-4 grid gap-x-8 sm:grid-cols-2">

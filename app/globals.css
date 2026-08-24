@@ -25,11 +25,11 @@
 
 :root {
   /* brand:hue:start */
-  --brand-hue: 265; /* set by brand.config.ts */
+  --brand-hue: 48; /* set by brand.config.ts */
 /* brand:hue:end */
 
   /* radius — brand:corners controls this via `npm run brand` */
-  --radius: 0.75rem;
+  --radius: 1rem;
 
   /* Neutrals tuned with a hint of brand hue (cool, not dead gray) */
   --background: oklch(0.99 0.004 var(--brand-hue));
@@ -64,6 +64,15 @@
   --aurora-1: oklch(0.7 0.2 var(--brand-hue));
   --aurora-2: oklch(0.72 0.18 calc(var(--brand-hue) + 60));
   --aurora-3: oklch(0.75 0.16 calc(var(--brand-hue) - 50));
+
+  /*
+   * Navy — the second real colour in the CFA logo (the ring around "CFA"),
+   * sampled directly from the source mark. Used deliberately, not derived
+   * from --brand-hue, so the site carries both true logo colours instead of
+   * just tints of the orange.
+   */
+  --navy: oklch(0.32 0.11 258);
+  --navy-foreground: oklch(0.97 0.01 258);
 }
 
 /* Map tokens → Tailwind theme so you can use bg-primary, text-muted-foreground… */
@@ -90,6 +99,8 @@
   --color-aurora-1: var(--aurora-1);
   --color-aurora-2: var(--aurora-2);
   --color-aurora-3: var(--aurora-3);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

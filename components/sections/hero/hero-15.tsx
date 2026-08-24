@@ -18,7 +18,7 @@ export function Hero15({ eyebrow, title, body, image, ctas = [], note }: {
             <span className="inline-flex items-center gap-2 eyebrow opacity-85">
               <Anchor aria-hidden className="size-3.5" /> {eyebrow}
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[0.94] tracking-tight text-balance sm:text-6xl">{title}</h1>
+            <h1 className="mt-5 font-display text-5xl font-bold leading-[0.94] tracking-tight text-balance sm:text-7xl">{title}</h1>
             <p className="mt-5 text-lg leading-relaxed opacity-90">{body}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               {ctas.map((cta, i) => (

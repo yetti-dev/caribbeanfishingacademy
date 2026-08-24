@@ -24,7 +24,7 @@ export function Hero16({ eyebrow, title, image, ctas = [], facts = [] }: {
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
               <div>
                 {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-                <h1 className="mt-3 font-display text-3xl font-bold leading-[1] tracking-tight text-balance text-foreground sm:text-5xl">{title}</h1>
+                <h1 className="mt-3 font-display text-4xl font-bold leading-[1] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
               </div>
               <div className="flex flex-wrap gap-3 lg:justify-end">
                 {ctas.map((cta, i) => (

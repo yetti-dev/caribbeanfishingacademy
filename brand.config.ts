@@ -13,21 +13,21 @@
 
 export const brand = {
   /** Company name. Nav, hero, footer, <title>, OG tags. `/build` sets it. */
-  name: "New Site",
+  name: "Caribbean Fishing Academy Charters",
 
   /** One-line value prop. Hero sub-headline + meta description. `/build` sets it. */
-  tagline: "",
+  tagline: "Top fishing charter of San Juan, Puerto Rico. Inshore, offshore and reef fishing, sunset bay cruises and boat sightseeing.",
 
   /** Longer SEO / Open Graph description, ~150 chars. `/build` sets it. */
-  description: "",
+  description: "The top professional fishing captains and charter operation in San Juan, Puerto Rico. Fish for tarpon, snapper, mahi mahi, wahoo, tuna and blue marlin, or cruise Old San Juan Bay at sunset. Fishing with purpose: every trip supports our youth angling outreach program.",
 
   /** Production domain, no protocol. Only used for metadataBase + canonical URLs. */
-  domain: "example.com",
+  domain: "caribbeanfishingacademy.getyetti.com",
 
   /** Theme. Run `npm run brand` after editing. */
   theme: {
     /** Brand hue in OKLCH degrees (0-360). This one number re-skins the site. */
-    hue: 265,
+    hue: 48,
     /** Corner style. "sharp" = editorial, "rounded" = friendly, "pill" = playful. */
     corners: "rounded" as "sharp" | "rounded" | "pill",
     /** Light only. Dark mode is not supported. */
@@ -37,9 +37,9 @@ export const brand = {
   /** Any Google Font name works. Run `npm run brand` after editing. */
   fonts: {
     /** Headlines. Pick a face with personality, this is what breaks the AI look. */
-    display: "Space Grotesk",
+    display: "Bricolage Grotesque",
     /** Body / UI. Clean and readable. */
-    sans: "Geist",
+    sans: "Plus Jakarta Sans",
     /** Code / labels / eyebrows. */
     mono: "JetBrains Mono",
   },
@@ -47,11 +47,11 @@ export const brand = {
   /** Footer links. Empty strings are skipped. */
   social: {
     instagram: "",
-    facebook: "",
+    facebook: "https://www.facebook.com/CFA-Caribbean-Fishing-Academy-708696695823502/",
     linkedin: "",
     x: "",
     github: "",
-    email: "",
+    email: "caribbeanfishingacademy@gmail.com",
   },
 
   /**
@@ -62,10 +62,10 @@ export const brand = {
    */
   contact: {
     whatsapp: "",
-    phone: "",
-    email: "",
-    address: "",
-    mapQuery: "",
+    phone: "+1 (787) 405-4100",
+    email: "caribbeanfishingacademy@gmail.com",
+    address: "Centro Pesquero, Parque Central, San Juan, PR 00907",
+    mapQuery: "Caribbean Fishing Academy Charters, Centro Pesquero, Parque Central, San Juan, PR 00907",
   },
 } as const;
 

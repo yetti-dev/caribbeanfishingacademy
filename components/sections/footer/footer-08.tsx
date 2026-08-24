@@ -1,6 +1,6 @@
 import { ArrowUpRight, Mail, MessageCircle, Phone } from "lucide-react";
 import { SocialIcon } from "@/components/sections/footer/social-icon";
-import type { Link } from "@/content/types";
+import type { Img, Link } from "@/content/types";
 
 type FooterColumn = { title: string; links: Link[] };
 type FooterContact = { address?: string; phone?: string; email?: string; whatsapp?: string };
@@ -8,6 +8,7 @@ type FooterContact = { address?: string; phone?: string; email?: string; whatsap
 /** Split down the middle: navigation on a card half, contact on a saturated brand half. */
 export function Footer08({
   brandName,
+  logo,
   tagline,
   columns = [],
   contact,
@@ -15,6 +16,7 @@ export function Footer08({
   copyright,
 }: {
   brandName: string;
+  logo?: Img;
   tagline?: string;
   columns?: FooterColumn[];
   contact?: FooterContact;
@@ -25,7 +27,10 @@ export function Footer08({
     <footer className="grid border-t border-border lg:grid-cols-2">
       <div className="bg-card px-6 py-16 lg:px-14">
         <div className="ml-auto max-w-lg lg:mr-10">
-          <p className="font-display text-2xl font-bold tracking-tight text-card-foreground">{brandName}</p>
+          {logo ? (
+            <img src={logo.src} alt={logo.alt} loading="lazy" decoding="async" className="h-12 w-auto object-contain" />
+          ) : null}
+          <p className="mt-3 font-display text-2xl font-bold tracking-tight text-card-foreground">{brandName}</p>
           {tagline ? <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tagline}</p> : null}
 
           <div className="mt-10 grid gap-8 sm:grid-cols-2">
