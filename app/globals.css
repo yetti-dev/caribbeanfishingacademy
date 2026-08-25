@@ -43,12 +43,12 @@
   /*
    * Brand primary scale, all derived from --brand-hue. Lightened from the
    * solver's default (a dark ocean blue at L=0.52 with white text) to a
-   * genuinely light sky blue, then pushed brighter and more saturated
-   * (L=0.63, C=0.15) for a punchier bright-blue brand colour. Dark label
-   * checked at 5.78:1, and the colour itself still clears 3:1 against the
-   * page background at 3.16:1, so it stays legible as a link or heading.
+   * genuinely light sky blue, then pushed brighter and more vivid again
+   * (L=0.62, C=0.20) for a bright, saturated light-blue brand colour. Dark
+   * label checked at 5.92:1, and the colour itself still clears 3:1 against
+   * the page background at 3.08:1, so it stays legible as a link or heading.
    */
-  --primary: oklch(0.63 0.15 var(--brand-hue));
+  --primary: oklch(0.62 0.2 var(--brand-hue));
   --primary-foreground: oklch(0.18 0.02 var(--brand-hue));
 
   --secondary: oklch(0.96 0.01 var(--brand-hue));
@@ -65,7 +65,7 @@
 
   --border: oklch(0.87 0.01 var(--brand-hue));
   --input: oklch(0.87 0.01 var(--brand-hue));
-  --ring: oklch(0.63 0.15 var(--brand-hue));
+  --ring: oklch(0.62 0.2 var(--brand-hue));
 
   /* Decorative gradient stops for hero/aurora effects */
   --aurora-1: oklch(0.7 0.2 var(--brand-hue));

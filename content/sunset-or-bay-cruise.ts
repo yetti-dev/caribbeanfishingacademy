@@ -34,7 +34,11 @@ export const sunsetOrBayCruise = {
     ] as Cta[],
   },
 
-  priceNote: "1 to 6 guests. Free appetizers and local drinks on every 3 hour trip.",
+  quickFacts: [
+    { icon: "Users", label: "1 to 6 guests" },
+    { icon: "Wine", label: "Free appetizers and local drinks" },
+    { icon: "Clock", label: "Every 3 hour trip" },
+  ] as { icon: string; label: string }[],
 
   experience: {
     heading: {
