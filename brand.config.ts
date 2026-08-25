@@ -27,7 +27,7 @@ export const brand = {
   /** Theme. Run `npm run brand` after editing. */
   theme: {
     /** Brand hue in OKLCH degrees (0-360). This one number re-skins the site. */
-    hue: 48,
+    hue: 225,
     /** Corner style. "sharp" = editorial, "rounded" = friendly, "pill" = playful. */
     corners: "rounded" as "sharp" | "rounded" | "pill",
     /** Light only. Dark mode is not supported. */
@@ -37,7 +37,7 @@ export const brand = {
   /** Any Google Font name works. Run `npm run brand` after editing. */
   fonts: {
     /** Headlines. Pick a face with personality, this is what breaks the AI look. */
-    display: "Bricolage Grotesque",
+    display: "Fraunces",
     /** Body / UI. Clean and readable. */
     sans: "Plus Jakarta Sans",
     /** Code / labels / eyebrows. */

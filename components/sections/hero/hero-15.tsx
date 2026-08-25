@@ -18,12 +18,12 @@ export function Hero15({ eyebrow, title, body, image, ctas = [], note }: {
             <span className="inline-flex items-center gap-2 eyebrow opacity-85">
               <Anchor aria-hidden className="size-3.5" /> {eyebrow}
             </span>
-            <h1 className="mt-5 font-display text-5xl font-bold leading-[0.94] tracking-tight text-balance sm:text-7xl">{title}</h1>
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl">{title}</h1>
             <p className="mt-5 text-lg leading-relaxed opacity-90">{body}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               {ctas.map((cta, i) => (
-                <a key={cta.label} href={cta.href} className={i === 0
-                  ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary-foreground px-6 py-3.5 text-sm font-semibold text-primary transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary focus-visible:outline-none"
+                <a key={cta.label} href={cta.href} data-yetti-activity={cta.activityId} className={i === 0
+                  ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary focus-visible:outline-none"
                   : "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-primary-foreground/50 px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-primary-foreground/10 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:outline-none"}>
                   {cta.label}
                   {i === 0 ? <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" /> : null}

@@ -11,12 +11,12 @@ export function Hero01({ eyebrow, title, body, image, ctas = [], stats = [], rat
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
         <Reveal>
           {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-          <h1 className="mt-4 font-display text-6xl font-bold leading-[0.95] tracking-tight text-balance text-foreground sm:text-7xl">{title}</h1>
+          <h1 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight text-balance text-foreground sm:text-5xl">{title}</h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">{body}</p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             {ctas.map((cta, i) => (
-              <a key={cta.label} href={cta.href} className={i === 0
-                ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+              <a key={cta.label} href={cta.href} data-yetti-activity={cta.activityId} className={i === 0
+                ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
                 : "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-6 py-3.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"}>
                 {cta.label}
                 {i === 0 ? <ArrowRight aria-hidden className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" /> : null}

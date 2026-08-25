@@ -4,13 +4,13 @@ import {
   Check,
   Fish,
   Info,
-  MessageCircle,
-  Phone,
   ShieldCheck,
   Sun,
+  Tag,
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero08 } from "@/components/sections/hero/hero-08";
+import { Hero18 } from "@/components/sections/hero/hero-18";
+import { CtaPhoto } from "@/components/sections/cta/cta-photo";
 import { ImageCard } from "@/components/magic/image-card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/magic/reveal";
 import { BookButton } from "@/components/widget/book-button";
@@ -40,15 +40,24 @@ export default function FishingToursPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero08
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
-          image={hero.image}
-          price={hero.price}
-          period={hero.period}
-          duration={hero.duration}
+          images={hero.images}
           ctas={hero.ctas}
+          compact
+          badge={
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 py-1.5 pr-5 pl-2">
+              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white/15 text-white">
+                <Tag aria-hidden className="size-3.5" />
+              </span>
+              <p className="text-sm font-semibold text-white">
+                From {hero.price}
+                {hero.period ? <span className="ml-1 font-normal text-white/75">/ {hero.period}</span> : null}
+              </p>
+            </div>
+          }
         />
 
         {/* Pricing */}
@@ -56,7 +65,7 @@ export default function FishingToursPage() {
           <div className="mx-auto max-w-6xl px-6">
             <Reveal className="max-w-2xl">
               <p className="eyebrow text-primary">{pricing.eyebrow}</p>
-              <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                 {pricing.title}
               </h2>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{pricing.body}</p>
@@ -68,17 +77,31 @@ export default function FishingToursPage() {
                   <article
                     className={
                       tier.featured
-                        ? "flex h-full flex-col rounded-3xl border-2 border-primary bg-card p-8 shadow-xl shadow-primary/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
-                        : "flex h-full flex-col rounded-3xl bg-card p-8 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-24px_rgba(0,0,0,0.28)]"
+                        ? "group flex h-full flex-col overflow-hidden rounded-3xl border-2 border-primary bg-card shadow-xl shadow-primary/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+                        : "group flex h-full flex-col overflow-hidden rounded-3xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-24px_rgba(0,0,0,0.28)]"
                     }
                   >
-                    {tier.featured ? (
-                      <span className="eyebrow inline-flex w-fit items-center rounded-full bg-primary px-3 py-1 text-primary-foreground">
-                        Most booked
-                      </span>
-                    ) : (
-                      <span className="eyebrow text-muted-foreground">Fishing charter</span>
-                    )}
+                    {tier.image ? (
+                      <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={tier.image.src}
+                          alt={tier.image.alt}
+                          loading="lazy"
+                          decoding="async"
+                          className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        />
+                        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                        {tier.featured ? (
+                          <span className="eyebrow absolute top-4 left-4 inline-flex w-fit items-center rounded-full bg-primary px-3 py-1 text-primary-foreground shadow-md">
+                            Most booked
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    <div className="flex flex-1 flex-col p-8">
+                    <span className="eyebrow text-muted-foreground">Fishing charter</span>
 
                     <h3 className="mt-4 font-display text-xl font-semibold tracking-tight text-foreground">
                       {tier.name}
@@ -111,13 +134,14 @@ export default function FishingToursPage() {
                         activityId={TIER_ACTIVITY[tier.name] ?? ""}
                         className={
                           tier.featured
-                            ? "mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            ? "mt-6 inline-flex items-center justify-center rounded-lg bg-brand-gradient px-5 py-3 text-sm font-semibold text-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             : "mt-6 inline-flex items-center justify-center rounded-lg border border-border bg-transparent px-5 py-3 text-sm font-semibold text-foreground transition-colors duration-200 ease-out hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         }
                       >
                         {tier.cta.label}
                       </BookButton>
                     ) : null}
+                    </div>
                   </article>
                 </RevealItem>
               ))}
@@ -131,7 +155,7 @@ export default function FishingToursPage() {
             <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
               <Reveal>
                 <p className="eyebrow text-primary">{vessel.eyebrow}</p>
-                <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                   {vessel.title}
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-muted-foreground">{vessel.body}</p>
@@ -225,36 +249,7 @@ export default function FishingToursPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="bg-navy py-20">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <Reveal>
-              <h2 className="font-display text-3xl font-bold tracking-tight text-balance text-navy-foreground sm:text-4xl">
-                {cta.title}
-              </h2>
-              <p className="mt-3 flex items-center justify-center gap-2 text-lg text-navy-foreground/80">
-                <Phone aria-hidden className="size-5" />
-                {cta.body}
-              </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                {cta.ctas.map((c, i) => (
-                  <a
-                    key={c.label}
-                    href={c.href}
-                    className={
-                      i === 0
-                        ? "inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
-                        : "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-navy-foreground/30 px-6 py-3.5 text-sm font-semibold text-navy-foreground transition-colors duration-200 ease-out hover:bg-navy-foreground/10 focus-visible:ring-2 focus-visible:ring-navy-foreground focus-visible:outline-none"
-                    }
-                  >
-                    {i === 0 ? <MessageCircle aria-hidden className="size-4" /> : null}
-                    {c.label}
-                  </a>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        <CtaPhoto image={cta.image} badge={cta.badge} title={cta.title} body={cta.body} ctas={cta.ctas} />
       </main>
       <SiteFooter />
     </>

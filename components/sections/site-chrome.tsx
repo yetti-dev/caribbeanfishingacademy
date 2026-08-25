@@ -1,5 +1,5 @@
-import { Nav10 } from "@/components/sections/nav/nav-10";
-import { Footer08 } from "@/components/sections/footer/footer-08";
+import { Nav11 } from "@/components/sections/nav/nav-11";
+import { Footer11 } from "@/components/sections/footer/footer-11";
 import { brand } from "@/brand.config";
 import { site } from "@/content/site";
 
@@ -7,25 +7,20 @@ import { site } from "@/content/site";
  * Shared chrome for every route. One navbar, one footer, wired once so the
  * real logo, the exact source nav order and the real contact details stay
  * consistent across all thirteen pages instead of being re-typed per page.
+ *
+ * Nav11 is `fixed`, floating translucent over whatever sits at the top of
+ * the page (a full-bleed hero, by design on every route), so it never
+ * pushes content down and never needs a solid "scrolled" state.
  */
 export function SiteHeader() {
-  return (
-    <Nav10
-      items={site.nav}
-      cta={site.navCta}
-      logo={{ src: "/brand/logo.png", alt: `${brand.name} logo` }}
-      brandName="Caribbean Fishing Academy"
-      phone={brand.contact.phone}
-    />
-  );
+  return <Nav11 items={site.nav} cta={site.navCta} logo={{ src: "/brand/logo.png", alt: `${brand.name} logo` }} />;
 }
 
 export function SiteFooter() {
   return (
-    <Footer08
-      brandName="Caribbean Fishing Academy"
+    <Footer11
       logo={{ src: "/brand/logo.png", alt: `${brand.name} logo` }}
-      tagline={site.footer.blurb}
+      blurb={site.footer.blurb}
       columns={site.footer.groups.map((g) => ({ title: g.title, links: [...g.links] }))}
       contact={{
         address: brand.contact.address,

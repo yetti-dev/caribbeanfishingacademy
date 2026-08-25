@@ -20,12 +20,12 @@ export const fishCookBeachDay = {
     title: "Building Fishtorical memories",
     body:
       "Catch it, then cook it, on the beach, with your group. All trips are private charters, which means they are all for you and yours to enjoy only. No hassle, easy process, instant confirmation. Free courtesy pick up in San Juan upon request.",
-    image: {
-      src: "/ingested/caribbeanfishingacademy/img-011.webp",
-      alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay",
-    } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay" },
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+    ] as Img[],
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" },
       { label: "See Fishing Tours", href: "/fishing-tours", variant: "secondary" },
     ] as Cta[],
   },
@@ -59,10 +59,12 @@ export const fishCookBeachDay = {
   },
 
   cta: {
+    badge: "Limited spots",
     title: "Text or call us for further assistance",
-    phone: "787-405-4100",
+    body: "787-405-4100",
+    image: { src: "https://images.pexels.com/photos/8671750/pexels-photo-8671750.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "A game fish breaking the surface on the line at sunset" } as Img,
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" },
       { label: "See Fishing Tours", href: "/fishing-tours", variant: "secondary" },
     ] as Cta[],
   },

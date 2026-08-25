@@ -3,7 +3,7 @@
  * package teaser, sunset cruise teaser, CFA moments gallery, sponsors,
  * fishing-with-purpose mission teaser, and the upcoming-event teaser.
  */
-import type { PageContent, Cta, Img, Stat } from "./types";
+import type { PageContent, Cta, Img } from "./types";
 
 export const home = {
   meta: {
@@ -14,21 +14,25 @@ export const home = {
   },
 
   hero: {
-    eyebrow: "No hassle. Immediate confirmation. Great location.",
-    title: "Fishing charters and bay cruises in San Juan, Puerto Rico",
+    eyebrow: "No hassle, immediate confirmation",
+    title: "Fishing charters and bay cruises in San Juan",
     body:
       "The best professional fishing captains and boat sightseeing in one place. Fish for tarpon, snapper, mahi mahi, wahoo, tuna and blue marlin, or cruise Old San Juan Bay at sunset aboard a tournament grade sport fishing boat.",
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
-      { label: "View Fishing Tours", href: "/fishing-tours", variant: "secondary" },
+      { label: "View Fishing Tours", href: "/fishing-tours", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "secondary", activityId: "" },
     ] as Cta[],
-    image: { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay" } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay" },
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+      { src: "https://images.pexels.com/photos/10418946/pexels-photo-10418946.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "Father and son fishing together from a small boat" },
+    ] as Img[],
     stats: [
-      { value: "2013", label: "Founded as a nonprofit academy" },
-      { value: "5,000+", label: "Kids reached through outreach" },
-      { value: "USCG", label: "Certified pro captains" },
-      { value: "$585", label: "Half day inshore, from" },
-    ] as Stat[],
+      { icon: "Sailboat", value: "2013", label: "Founded as a nonprofit academy" },
+      { icon: "Users", value: "5,000+", label: "Kids reached through outreach" },
+      { icon: "ShieldCheck", value: "USCG", label: "Certified pro captains" },
+      { icon: "Tag", value: "$585", label: "Half day inshore, from" },
+    ],
   },
 
   toursTeaser: {
@@ -40,6 +44,12 @@ export const home = {
     priceNote: "1 to 6 guests, half day inshore",
     image: { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest giving a thumbs up aboard the charter boat with El Morro fort in the background" } as Img,
     cta: { label: "See Fishing Tours", href: "/fishing-tours", variant: "primary" } as Cta,
+    highlights: [
+      { icon: "Fish", label: "Tarpon, snapper, mahi mahi, wahoo, tuna and blue marlin" },
+      { icon: "ShieldCheck", label: "USCG certified pro captain" },
+      { icon: "Utensils", label: "Tackle, bait, snacks and ice included" },
+      { icon: "Clock", label: "Half day, 3/4 day or full day trips" },
+    ],
   },
 
   sunsetTeaser: {
@@ -51,16 +61,29 @@ export const home = {
     priceNote: "1 to 6 guests, free tapas on 3 hour trips",
     image: { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Fishing boat cruising Old San Juan Bay past the historic fort" } as Img,
     cta: { label: "See Sunset & Bay Cruise", href: "/sunset-or-bay-cruise", variant: "primary" } as Cta,
+    highlights: [
+      { icon: "Landmark", label: "El Morro, La Fortaleza and the Bacardi Factory" },
+      { icon: "Sunset", label: "Day or sunset outing" },
+      { icon: "Wine", label: "Free appetizers and local drinks" },
+      { icon: "Users", label: "Up to 6 guests aboard" },
+    ],
   },
 
   momentsGallery: {
-    eyebrow: "Special CFA moments",
-    title: "Fishtorical memories",
+    eyebrow: "Real guests, real fun",
+    title: "This is what a day with us actually looks like",
+    body: "Every one of these is a real guest or a real moment from a Caribbean Fishing Academy charter.",
     images: [
-      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender fishing boat docked on San Juan Bay at dusk" },
       { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating a catch with El Morro fort behind her" },
+      { src: "https://images.pexels.com/photos/5046354/pexels-photo-5046354.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "Group celebrating a birthday charter on the water" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender fishing boat docked on San Juan Bay at dusk" },
+      { src: "https://images.pexels.com/photos/31206315/pexels-photo-31206315.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "A young angler holding a fish on the dock" },
+      { src: "https://images.pexels.com/photos/32134793/pexels-photo-32134793.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "Carrying the day's catch along the shoreline" },
       { src: "/ingested/caribbeanfishingacademy/founder-luis-burgos.webp", alt: "Captain Luis Burgos, founder of Caribbean Fishing Academy" },
-      { src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp", alt: "Flyer for the CFA kids fishing tournament at Puerto del Rey Marina" },
+      { src: "/ingested/caribbeanfishingacademy/founder-rich-brochue.webp", alt: "Captain Rich Brochue, co-founder and mentor of Caribbean Fishing Academy" },
+      { src: "https://images.pexels.com/photos/14236883/pexels-photo-14236883.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "Father and son fishing together in shallow turquoise water" },
+      { src: "https://images.pexels.com/photos/16477585/pexels-photo-16477585.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "Two anglers aboard a charter boat trolling in deep blue water" },
+      { src: "https://images.pexels.com/photos/8671750/pexels-photo-8671750.jpeg?auto=compress&cs=tinysrgb&w=1200", alt: "A game fish breaking the surface on the line at sunset" },
     ] as Img[],
   },
 
@@ -89,6 +112,11 @@ export const home = {
     title: "Torneo de Pesca Infantil",
     body:
       "Te invita Safe Harbor Puerto del Rey en colaboracion con CFA. Un torneo de pesca de muelle para los ninos en los muelles de la Marina Puerto del Rey, disenado para fomentar la union familiar.",
+    facts: [
+      { icon: "CalendarDays", label: "19 de octubre" },
+      { icon: "Clock", label: "8am a 12pm" },
+      { icon: "Users", label: "Edades 2 a 14" },
+    ],
     image: { src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp", alt: "Flyer for the Torneo de Pesca Infantil kids fishing tournament, October 19, 8am to 12pm" } as Img,
     cta: { label: "Inscripciones", href: "/proximo-evento", variant: "primary" } as Cta,
   },

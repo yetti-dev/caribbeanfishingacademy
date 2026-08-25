@@ -25,7 +25,7 @@
 
 :root {
   /* brand:hue:start */
-  --brand-hue: 48; /* set by brand.config.ts */
+  --brand-hue: 225; /* set by brand.config.ts */
 /* brand:hue:end */
 
   /* radius — brand:corners controls this via `npm run brand` */
@@ -40,9 +40,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0.01 var(--brand-hue));
 
-  /* Brand primary scale — all derived from --brand-hue */
-  --primary: oklch(0.57 0.2 var(--brand-hue));
-  --primary-foreground: oklch(0.99 0.01 var(--brand-hue));
+  /*
+   * Brand primary scale, all derived from --brand-hue. Lightened from the
+   * solver's default (a dark ocean blue at L=0.52 with white text) to a
+   * genuinely light sky blue at L=0.61 with dark text, checked at 5.2:1.
+   */
+  --primary: oklch(0.61 0.13 var(--brand-hue));
+  --primary-foreground: oklch(0.18 0.02 var(--brand-hue));
 
   --secondary: oklch(0.96 0.01 var(--brand-hue));
   --secondary-foreground: oklch(0.25 0.03 var(--brand-hue));
@@ -58,7 +62,7 @@
 
   --border: oklch(0.87 0.01 var(--brand-hue));
   --input: oklch(0.87 0.01 var(--brand-hue));
-  --ring: oklch(0.58 0.2 var(--brand-hue));
+  --ring: oklch(0.61 0.13 var(--brand-hue));
 
   /* Decorative gradient stops for hero/aurora effects */
   --aurora-1: oklch(0.7 0.2 var(--brand-hue));
@@ -66,13 +70,12 @@
   --aurora-3: oklch(0.75 0.16 calc(var(--brand-hue) - 50));
 
   /*
-   * Navy — the second real colour in the CFA logo (the ring around "CFA"),
-   * sampled directly from the source mark. Used deliberately, not derived
-   * from --brand-hue, so the site carries both true logo colours instead of
-   * just tints of the orange.
+   * Navy — the site's deep ocean-blue anchor colour for chrome (nav, footer).
+   * Same hue family as --primary (no orange, no indigo/purple undertone),
+   * just darker: a true ocean blue against the light sky-blue accent.
    */
-  --navy: oklch(0.32 0.11 258);
-  --navy-foreground: oklch(0.97 0.01 258);
+  --navy: oklch(0.32 0.1 var(--brand-hue));
+  --navy-foreground: oklch(0.97 0.01 var(--brand-hue));
 }
 
 /* Map tokens → Tailwind theme so you can use bg-primary, text-muted-foreground… */
@@ -188,13 +191,21 @@
   color: transparent;
 }
 
-/* Brand gradient fill — for buttons, borders, panels. */
+/* Same idea for text sitting on a dark hero panel: white fading into the
+   light brand blue, instead of dark-foreground fading into it. */
+@utility text-gradient-light {
+  background: linear-gradient(100deg, white, var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/*
+ * Brand gradient fill for buttons: light sky blue into deep ocean blue, the
+ * site's own two brand colours, not a third accent hue.
+ */
 @utility bg-brand-gradient {
-  background-image: linear-gradient(
-    120deg,
-    var(--color-primary),
-    color-mix(in oklch, var(--color-aurora-2) 80%, var(--color-primary))
-  );
+  background-image: linear-gradient(135deg, var(--color-primary), var(--navy));
 }
 
 /*

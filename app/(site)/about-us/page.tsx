@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, Users, Sailboat } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero09 } from "@/components/sections/hero/hero-09";
+import { Hero18 } from "@/components/sections/hero/hero-18";
 import { Team01 } from "@/components/sections/about/team-01";
 import { Cta03 } from "@/components/sections/cta/cta-03";
 import { Quote02 } from "@/components/sections/quote/quote-02";
@@ -22,14 +22,30 @@ export default function AboutUsPage() {
     <>
       <SiteHeader />
       <main>
-        <Hero09
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
           images={hero.images}
           ctas={hero.ctas}
-          highlights={hero.highlights}
+          compact
         />
+
+        {hero.highlights.length ? (
+          <section className="border-b border-border bg-background py-8">
+            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-6">
+              {hero.highlights.map((h, i) => {
+                const Icon = [Sailboat, ShieldCheck, Users][i] ?? ShieldCheck;
+                return (
+                  <span key={h} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm">
+                    <Icon aria-hidden className="size-4 text-primary" />
+                    {h}
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
 
         <Team01 heading={founders.heading} members={founders.members} />
 
@@ -71,7 +87,7 @@ export default function AboutUsPage() {
                 </div>
                 <a
                   href={programsTeaser.cta.href}
-                  className="group inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-navy focus-visible:outline-none"
+                  className="group inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-navy focus-visible:outline-none"
                 >
                   {programsTeaser.cta.label}
                   <ArrowRight aria-hidden className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-1" />

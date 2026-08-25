@@ -76,7 +76,7 @@ export function FaqWidget() {
         aria-label={open ? "Close assistant" : "Open FAQ assistant"}
         aria-expanded={open}
         className={cn(
-          "fixed bottom-5 right-5 z-50 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:transition-none",
+          "fixed bottom-5 right-5 z-50 grid size-14 cursor-pointer place-items-center rounded-full bg-brand-gradient text-white shadow-lg shadow-primary/30 transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:transition-none",
           open && "rotate-90"
         )}
       >

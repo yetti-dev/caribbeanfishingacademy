@@ -7,9 +7,9 @@
  * brand.config.ts → run `npm run brand`.  (Or just edit here directly.)
  */
 // brand:fonts:start
-import { Bricolage_Grotesque, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 
-export const fontDisplay = Bricolage_Grotesque({
+export const fontDisplay = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",

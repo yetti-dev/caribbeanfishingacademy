@@ -20,13 +20,12 @@ export const missionVision = {
       "Caribbean Fishing Academy is a nonprofit built on one belief: a rod in a kid's hand can change where their life goes. Here is the mission we run our trips to fund, and the vision we are working toward.",
     ctas: [
       { label: "Programs & Services", href: "/programs-services", variant: "primary" },
-      { label: "Book a Charter", href: "/contact-us", variant: "secondary" },
+      { label: "Book a Charter", href: "/contact-us", variant: "secondary", activityId: "" },
     ] as Cta[],
-    image: {
-      src: "/ingested/caribbeanfishingacademy/img-011.webp",
-      alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay",
-    } as Img,
-    note: "A nonprofit academy, funded by every charter and cruise we run.",
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay" },
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+    ] as Img[],
   },
 
   missionHeading: {
@@ -79,7 +78,7 @@ export const missionVision = {
         "Every charter and cruise we run funds the outreach behind this mission. Read about the programs it pays for, then come out on the water with us.",
     } as SectionHeading,
     primary: { label: "Programs & Services", href: "/programs-services", variant: "primary" } as Cta,
-    secondary: { label: "Book a Charter", href: "/contact-us", variant: "secondary" } as Cta,
+    secondary: { label: "Book a Charter", href: "/contact-us", variant: "secondary", activityId: "" } as Cta,
   },
 } satisfies PageContent & Record<string, unknown>;
 

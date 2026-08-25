@@ -17,12 +17,12 @@ export const whatIsCfa = {
     eyebrow: "What is CFA?",
     title: "What is Caribbean Fishing Academy?",
     body: "The nonprofit behind every charter you book with us.",
-    image: {
-      src: "/brand/welcome-banner.png",
-      alt: "Caribbean Fishing Academy welcome banner: the CFA oval crest with a San Juan fort turret, a sailfish and a tuna over the tagline It's Simply Fishtorical",
-    } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/founder-luis-burgos.webp", alt: "Captain Luis Burgos, founder of Caribbean Fishing Academy, on the water" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay" },
+    ] as Img[],
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" },
       { label: "Programs & Services", href: "/programs-services", variant: "secondary" },
     ] as Cta[],
   },
@@ -70,7 +70,7 @@ export const whatIsCfa = {
       title: "Every trip you book helps a kid who needs it",
       body: "Half day, full day or sunset cruise: every booking with Caribbean Fishing Academy Charters helps fund the outreach program above. Book a trip, or see the programs that money supports.",
     },
-    primary: { label: "Book Now", href: "/contact-us", variant: "primary" } as Cta,
+    primary: { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" } as Cta,
     secondary: { label: "See Programs & Services", href: "/programs-services", variant: "secondary" } as Cta,
   },
 } satisfies PageContent & Record<string, unknown>;

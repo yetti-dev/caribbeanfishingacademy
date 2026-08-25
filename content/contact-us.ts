@@ -18,10 +18,10 @@ export const contactUs = {
     title: "Get in touch",
     body:
       "Or get in contact with our fishing guide now. Call or text 787-405-4100.",
-    image: {
-      src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp",
-      alt: "Guest giving a thumbs up aboard the charter boat with El Morro fort in the background",
-    } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest giving a thumbs up aboard the charter boat with El Morro fort in the background" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay" },
+    ] as Img[],
     ctas: [
       { label: "Call 787-405-4100", href: "tel:+17874054100", variant: "primary" },
       { label: "Email Us", href: "mailto:caribbeanfishingacademy@gmail.com", variant: "secondary" },

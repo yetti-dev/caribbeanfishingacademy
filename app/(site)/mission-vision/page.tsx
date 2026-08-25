@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Quote as QuoteMark } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero15 } from "@/components/sections/hero/hero-15";
+import { Hero18 } from "@/components/sections/hero/hero-18";
 import { Feature01 } from "@/components/sections/features/feature-01";
 import { Cta01 } from "@/components/sections/cta/cta-01";
 import { Reveal } from "@/components/magic/reveal";
@@ -20,13 +20,13 @@ export default function MissionVisionPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero15
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
-          image={hero.image}
+          images={hero.images}
           ctas={hero.ctas}
-          note={hero.note}
+          compact
         />
 
         <Feature01 heading={missionHeading} features={missionPoints} />

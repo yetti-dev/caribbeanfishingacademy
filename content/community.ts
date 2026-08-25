@@ -20,9 +20,9 @@ export const community = {
       "Local communities and entities are coming together, shoulder to shoulder, through fishing. Thank you to all our sponsors and the different organizations that have joined this community outreach effort, with the hope of improving everyone's quality of life.",
     images: [
       { src: "/ingested/caribbeanfishingacademy/founder-luis-burgos.webp", alt: "Captain Luis Burgos, founder of Caribbean Fishing Academy, on the dock" },
-      { src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp", alt: "Flyer for the CFA kids fishing tournament at Puerto del Rey Marina" },
       { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender fishing boat docked near the historic fort ruins on San Juan Bay" },
       { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating a catch with El Morro fort in the background" },
+      { src: "https://images.pexels.com/photos/5046354/pexels-photo-5046354.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "Group celebrating a birthday charter on the water" },
     ] as Img[],
   },
 

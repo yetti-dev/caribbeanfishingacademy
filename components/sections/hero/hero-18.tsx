@@ -1,26 +1,25 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { Anchor, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Cta, Img } from "@/content/types";
 
 /**
- * Rotating photo background, copy centred, with arrows and a progress bar.
- *
- * Centred text cannot use the bottom-weighted gradient the other rotators use,
- * so the scrim is darkest through the MIDDLE band and clears at both edges. The
- * middle stop is foreground/88, which measures about 6.2:1 for white text even
- * over a blown-out sky; a flat 40% tint would only reach 1.6:1.
- *
- * The bar doubles as a timer, so the rotation is legible rather than surprising.
- * Under prefers-reduced-motion it stops and the bar is hidden.
+ * Rotating photo background, copy centred. Auto crossfades on a timer, no
+ * visible arrows or progress bar (matches arubaflagship.getyetti.com's own
+ * hero exactly: a plain background rotation, no chrome on top of it).
+ * Under prefers-reduced-motion it stops on the first image.
  */
-export function Hero18({ eyebrow, title, body, images, ctas = [], interval = 6000 }: {
+export function Hero18({ eyebrow, title, body, images, ctas = [], interval = 6000, badge, compact = false }: {
   eyebrow?: string; title: string; body: string; images: Img[]; ctas?: Cta[]; interval?: number;
+  /** Optional trust pill (rating badge, press mention) shown above the title. */
+  badge?: ReactNode;
+  /** Shorter, for an inner page hero rather than the home page flagship. */
+  compact?: boolean;
 }) {
   const [i, setI] = useState(0);
   const [motionOk, setMotionOk] = useState(true);
-  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -30,71 +29,68 @@ export function Hero18({ eyebrow, title, body, images, ctas = [], interval = 600
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  const go = useCallback((dir: 1 | -1) => {
-    setI((n) => (n + dir + images.length) % images.length);
-    setTick(0);
-  }, [images.length]);
-
   useEffect(() => {
     if (!motionOk || images.length < 2) return;
-    const step = 100;
-    const t = setInterval(() => {
-      setTick((p) => {
-        if (p + step >= interval) { setI((n) => (n + 1) % images.length); return 0; }
-        return p + step;
-      });
-    }, step);
+    const t = setInterval(() => setI((n) => (n + 1) % images.length), interval);
     return () => clearInterval(t);
   }, [motionOk, images.length, interval]);
 
   return (
-    <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden bg-foreground">
+    <section
+      className={cn(
+        "relative flex items-center overflow-hidden",
+        compact ? "min-h-[62vh] pt-28 sm:pt-32" : "min-h-[90vh] pt-24 sm:pt-28",
+      )}
+    >
       {images.map((im, idx) => (
         <img
           key={im.src} src={im.src} alt={idx === i ? im.alt : ""} aria-hidden={idx !== i}
           loading={idx === 0 ? "eager" : "lazy"} decoding="async"
           className={cn(
-            "absolute inset-0 z-0 size-full object-cover transition-opacity duration-[1200ms] ease-out",
+            "absolute inset-0 z-0 size-full object-cover transition-opacity duration-[1000ms] ease-in-out",
             idx === i ? "opacity-100" : "opacity-0",
           )}
         />
       ))}
-      {/* Dark through the middle where the copy sits, clear at both edges. */}
-      <div aria-hidden className="absolute inset-0 z-10 bg-linear-to-b from-foreground/35 via-foreground/88 to-foreground/45" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/60" />
 
-      <div className="relative z-20 mx-auto max-w-4xl px-6 py-24 text-center">
-        {eyebrow ? <p className="eyebrow text-background/85">{eyebrow}</p> : null}
-        <h1 className="mt-5 font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance text-background sm:text-7xl">{title}</h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-background/90">{body}</p>
-        <div className="mt-9 flex flex-wrap justify-center gap-3">
-          {ctas.map((cta, idx) => (
-            <a key={cta.label} href={cta.href} className={idx === 0
-              ? "group inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground focus-visible:outline-none"
-              : "inline-flex cursor-pointer items-center gap-2 rounded-full border border-background/45 px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:bg-background/10 focus-visible:ring-2 focus-visible:ring-background focus-visible:outline-none"}>
-              {cta.label}
-              {idx === 0 ? <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" /> : null}
-            </a>
-          ))}
+      <div className="container-px relative z-10 mx-auto w-full max-w-3xl py-24 sm:py-28">
+        {/* Glass card: the hero's whole message sits on its own frosted panel,
+            not floating raw over the image, so it reads as designed rather
+            than as text dropped on a photo. A soft navy-to-light-blue glow
+            sits behind it (unclipped, so it blooms past the edges), the
+            panel itself carries only a whisper of tint at very low opacity
+            so the photo reads through clearly, and a white sheen fakes the
+            highlight real glass catches up top. */}
+        <div className="relative">
+          <div aria-hidden className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-gradient-to-br from-primary/20 via-transparent to-navy/25 opacity-60 blur-3xl" />
+          <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-primary/6 to-navy/12 p-8 text-center text-white shadow-2xl shadow-black/40 ring-1 ring-white/10 backdrop-blur-2xl sm:p-12">
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 via-white/0 to-transparent" />
+          <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-40 w-3/4 -translate-x-1/2 rounded-full bg-white/8 blur-3xl" />
+          <div className="relative">
+          {eyebrow ? (
+            <span className="mx-auto inline-flex w-fit items-center justify-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium text-white">
+              <Anchor aria-hidden className="size-3.5" />
+              {eyebrow}
+            </span>
+          ) : null}
+          {badge ? <div className="mt-5 flex justify-center">{badge}</div> : null}
+          <h1 className="text-gradient-light mx-auto mt-6 max-w-2xl text-balance text-4xl font-bold leading-[1.05] sm:text-5xl md:text-6xl">{title}</h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-white/85">{body}</p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            {ctas.map((cta, idx) => (
+              <a key={cta.label} href={cta.href} data-yetti-activity={cta.activityId} className={idx === 0
+                ? "group inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand-gradient px-7 text-base font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/20 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none"
+                : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-7 text-base font-medium text-white transition-all hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"}>
+                {cta.label}
+                {idx === 0 ? <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" /> : null}
+              </a>
+            ))}
+          </div>
+          </div>
+          </div>
         </div>
       </div>
-
-      {images.length > 1 ? (
-        <>
-          <button type="button" onClick={() => go(-1)} aria-label="Previous photo"
-            className="absolute left-4 top-1/2 z-20 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-foreground/45 text-background backdrop-blur-sm transition-colors duration-200 hover:bg-foreground/70 focus-visible:ring-2 focus-visible:ring-background focus-visible:outline-none">
-            <ChevronLeft aria-hidden className="size-5" />
-          </button>
-          <button type="button" onClick={() => go(1)} aria-label="Next photo"
-            className="absolute right-4 top-1/2 z-20 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-foreground/45 text-background backdrop-blur-sm transition-colors duration-200 hover:bg-foreground/70 focus-visible:ring-2 focus-visible:ring-background focus-visible:outline-none">
-            <ChevronRight aria-hidden className="size-5" />
-          </button>
-          {motionOk ? (
-            <div aria-hidden className="absolute inset-x-0 bottom-0 z-20 h-1 bg-background/25">
-              <div className="h-full bg-primary transition-[width] duration-100 ease-linear" style={{ width: `${(tick / interval) * 100}%` }} />
-            </div>
-          ) : null}
-        </>
-      ) : null}
     </section>
   );
 }

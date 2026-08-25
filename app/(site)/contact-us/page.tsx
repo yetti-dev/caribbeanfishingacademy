@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero02 } from "@/components/sections/hero/hero-02";
+import { Hero18 } from "@/components/sections/hero/hero-18";
 import { Cta01 } from "@/components/sections/cta/cta-01";
 import { Reveal } from "@/components/magic/reveal";
 import { FacebookIcon } from "@/components/icons";
@@ -27,12 +27,13 @@ export default function ContactUsPage() {
     <>
       <SiteHeader />
       <main>
-        <Hero02
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
-          image={hero.image}
+          images={hero.images}
           ctas={hero.ctas}
+          compact
         />
 
         {/* Contact form + direct details, side by side. */}
@@ -40,7 +41,7 @@ export default function ContactUsPage() {
           <div className="mx-auto max-w-6xl px-6">
             <Reveal className="max-w-2xl">
               <p className="eyebrow text-primary">{form.eyebrow}</p>
-              <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                 {form.title}
               </h2>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{form.body}</p>
@@ -110,7 +111,7 @@ export default function ContactUsPage() {
                   <div className="sm:col-span-2">
                     <button
                       type="submit"
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
                       {form.submitLabel}
                       <Send aria-hidden className="size-4" />
@@ -185,7 +186,7 @@ export default function ContactUsPage() {
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
               <Reveal>
                 <p className="eyebrow text-primary">{location.eyebrow}</p>
-                <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                   {location.title}
                 </h2>
                 <p className="mt-5 flex items-start gap-3 text-base leading-relaxed text-foreground">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero02 } from "@/components/sections/hero/hero-02";
+import { Hero18 } from "@/components/sections/hero/hero-18";
 import { Faq02 } from "@/components/sections/faq/faq-02";
 import { Quote03 } from "@/components/sections/quote/quote-03";
 import { Cta01 } from "@/components/sections/cta/cta-01";
@@ -17,12 +17,13 @@ export default function WhatIsCfaPage() {
     <>
       <SiteHeader />
       <main>
-        <Hero02
+        <Hero18
           eyebrow={whatIsCfa.hero.eyebrow}
           title={whatIsCfa.hero.title}
           body={whatIsCfa.hero.body}
-          image={whatIsCfa.hero.image}
+          images={whatIsCfa.hero.images}
           ctas={whatIsCfa.hero.ctas}
+          compact
         />
 
         <Faq02 heading={whatIsCfa.faq.heading} items={whatIsCfa.faq.items} />

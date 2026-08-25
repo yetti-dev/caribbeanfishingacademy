@@ -19,15 +19,16 @@ export const fishingTours = {
     title: "Inshore, offshore and reef fishing charters",
     body:
       "Private charters out of San Juan Bay for tarpon, snapper, mahi mahi, wahoo, tuna and blue marlin, run by USCG certified pro captains. Pick your grounds, pick your hours, and we handle the rest.",
-    image: {
-      src: "/ingested/caribbeanfishingacademy/img-011.webp",
-      alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay",
-    } as Img,
+    images: [
+      { src: "https://images.pexels.com/photos/10418946/pexels-photo-10418946.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "Father and son fishing together from a small boat" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender center console fishing boat docked near the historic fort ruins on San Juan Bay" },
+      { src: "https://images.pexels.com/photos/31206315/pexels-photo-31206315.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "Young angler holding up a fish caught from the dock" },
+    ] as Img[],
     price: "$585",
     period: "half day",
     duration: "4 hours",
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" },
       { label: "See All Fares", href: "#fares", variant: "secondary" },
     ] as Cta[],
   },
@@ -47,6 +48,7 @@ export const fishingTours = {
           "Combine with inshore or offshore fishing for just $100 more",
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
+        image: { src: "https://images.pexels.com/photos/7892154/pexels-photo-7892154.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Angler holding up a fresh reef catch on the jetty" },
       },
       {
         name: "1/2 Day Inshore",
@@ -59,6 +61,7 @@ export const fishingTours = {
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
         featured: true,
+        image: { src: "https://images.pexels.com/photos/32494973/pexels-photo-32494973.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Silver tarpon brought boat side at the dock" },
       },
       {
         name: "1/2 Day Offshore",
@@ -69,6 +72,7 @@ export const fishingTours = {
           "Combine with inshore or reef fishing for just $100 more",
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
+        image: { src: "https://images.pexels.com/photos/16477585/pexels-photo-16477585.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Two anglers trolling a center console fishing boat in deep blue offshore water" },
       },
       {
         name: "3/4 Day Inshore",
@@ -80,6 +84,7 @@ export const fishingTours = {
           "Combine with reef fishing for just $100 more",
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
+        image: { src: "https://images.pexels.com/photos/14236883/pexels-photo-14236883.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Father and son fishing together in shallow turquoise water" },
       },
       {
         name: "3/4 Day Offshore",
@@ -91,6 +96,7 @@ export const fishingTours = {
           "Combine with inshore or reef fishing for just $100 more",
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
+        image: { src: "https://images.pexels.com/photos/13668504/pexels-photo-13668504.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Aerial view of a center console fishing boat trolling with outriggers in deep offshore water" },
       },
       {
         name: "Full Day Offshore",
@@ -102,6 +108,7 @@ export const fishingTours = {
           "Combine with reef or inshore fishing for just $100 more",
         ],
         cta: { label: "Book This Trip", href: "/contact-us", variant: "primary" },
+        image: { src: "https://images.pexels.com/photos/8671750/pexels-photo-8671750.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "A game fish breaking the surface on the line at sunset" },
       },
     ] as PriceTier[],
   },
@@ -148,10 +155,12 @@ export const fishingTours = {
   },
 
   cta: {
+    badge: "Book today",
     title: "No hassle, easy process, instant confirmation",
     body: "Text or call 787-405-4100.",
+    image: { src: "https://live.staticflickr.com/7513/15807098322_b06d3982df_b.jpg", alt: "Sailboat cruising near a tropical shoreline at sunset" } as Img,
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" },
       { label: "See Sunset & Bay Cruise", href: "/sunset-or-bay-cruise", variant: "secondary" },
     ] as Cta[],
   },

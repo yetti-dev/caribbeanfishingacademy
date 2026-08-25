@@ -23,10 +23,10 @@ export const programsServices = {
       { label: "Contact Us", href: "/contact-us", variant: "primary" },
       { label: "See Fishing Tours", href: "/fishing-tours", variant: "secondary" },
     ] as Cta[],
-    image: {
-      src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp",
-      alt: "Boy holding up a fish he caught at the CFA kids fishing tournament at Puerto del Rey Marina",
-    } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay" },
+    ] as Img[],
   },
 
   heading: {
@@ -85,17 +85,15 @@ export const programsServices = {
   } as SectionHeading,
 
   cta: {
-    heading: {
-      title: "Bring CFA to your next event",
-      body:
-        "Call us to book a tournament, a workshop, a birthday charter or a water tour, or to ask about the upcoming summer camp. We will help you plan a day on the water your group will remember.",
-    } as SectionHeading,
-    primary: { label: "Contact Us", href: "/contact-us", variant: "primary" } as Cta,
-    secondary: {
-      label: "See Sea Life Research Expeditions",
-      href: "/sea-life-research-expeditions",
-      variant: "secondary",
-    } as Cta,
+    badge: "Let's talk",
+    title: "Bring CFA to your next event",
+    body:
+      "Call or text 787-405-4100 to book a tournament, a workshop, a birthday charter or a water tour, or to ask about the upcoming summer camp. We will help you plan a day on the water your group will remember.",
+    image: { src: "/ingested/caribbeanfishingacademy/founder-luis-burgos.webp", alt: "Captain Luis Burgos, founder of Caribbean Fishing Academy, on the dock" } as Img,
+    ctas: [
+      { label: "Contact Us", href: "/contact-us", variant: "primary" },
+      { label: "See Sea Life Research Expeditions", href: "/sea-life-research-expeditions", variant: "secondary" },
+    ] as Cta[],
   },
 } satisfies PageContent & Record<string, unknown>;
 

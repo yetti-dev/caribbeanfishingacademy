@@ -27,7 +27,7 @@ export function Cta03({ heading, primary, secondary, image, points = [], footnot
               ) : null}
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 {primary ? (
-                  <a href={primary.href} className="group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none">
+                  <a href={primary.href} data-yetti-activity={primary.activityId} className="group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white shadow-md transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none">
                     {primary.label}
                     <ArrowRight aria-hidden className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-1" />
                   </a>

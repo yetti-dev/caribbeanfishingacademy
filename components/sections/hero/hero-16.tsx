@@ -24,12 +24,12 @@ export function Hero16({ eyebrow, title, image, ctas = [], facts = [] }: {
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
               <div>
                 {eyebrow ? <p className="eyebrow text-primary">{eyebrow}</p> : null}
-                <h1 className="mt-3 font-display text-4xl font-bold leading-[1] tracking-tight text-balance text-foreground sm:text-6xl">{title}</h1>
+                <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] tracking-tight text-balance text-foreground sm:text-4xl">{title}</h1>
               </div>
               <div className="flex flex-wrap gap-3 lg:justify-end">
                 {ctas.map((cta, i) => (
-                  <a key={cta.label} href={cta.href} className={i === 0
-                    ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+                  <a key={cta.label} href={cta.href} data-yetti-activity={cta.activityId} className={i === 0
+                    ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
                     : "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-6 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"}>
                     {cta.label}
                     {i === 0 ? <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" /> : null}

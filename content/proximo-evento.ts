@@ -18,10 +18,10 @@ export const proximoEvento = {
   hero: {
     eyebrow: "Proximo evento",
     title: "Torneo de Pesca Infantil",
-    image: {
-      src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp",
-      alt: "Volante del Torneo de Pesca Infantil con un nino sosteniendo un pez, los detalles del torneo y los logos de Suzuki Marine y Safe Harbor Puerto del Rey",
-    } as Img,
+    images: [
+      { src: "https://images.pexels.com/photos/31206315/pexels-photo-31206315.jpeg?auto=compress&cs=tinysrgb&w=1920", alt: "Young angler holding up a fish caught from the dock, the spirit of the Torneo de Pesca Infantil" },
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+    ] as Img[],
     ctas: [
       { label: "Inscripciones aqui", href: "/contact-us", variant: "primary" },
       { label: "Ver preguntas", href: "#preguntas", variant: "secondary" },
@@ -32,6 +32,11 @@ export const proximoEvento = {
       { icon: "users", label: "Edades", value: "2 a 14 anos" },
     ] as { icon: "clock" | "users" | "pin"; label: string; value: string }[],
   },
+
+  flyer: {
+    src: "/ingested/caribbeanfishingacademy/kids-tournament-flyer.webp",
+    alt: "Volante del Torneo de Pesca Infantil con un nino sosteniendo un pez, los detalles del torneo y los logos de Suzuki Marine y Safe Harbor Puerto del Rey",
+  } as Img,
 
   detailsHeading: {
     eyebrow: "Detalles del torneo",

@@ -6,6 +6,7 @@
  */
 import type { Boat } from "./demo";
 import type { Cta, Img, PageContent, SectionHeading } from "./types";
+import { ACTIVITIES } from "./activities";
 
 export const sunsetOrBayCruise = {
   meta: {
@@ -20,14 +21,15 @@ export const sunsetOrBayCruise = {
     title: "Sunset or bay cruise",
     body:
       "Private for you and yours. Cruise the stunning waters of Old San Juan Bay full of Caribbean flare, past El Morro Castle, La Fortaleza, the Bacardi Factory and more.",
-    image: {
-      src: "/ingested/caribbeanfishingacademy/img-011.webp",
-      alt: "Contender center console power boat cruising near the historic fort ruins on San Juan Bay at dusk",
-    } as Img,
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+      { src: "/ingested/caribbeanfishingacademy/img-011.webp", alt: "Contender center console power boat cruising near the historic fort ruins on San Juan Bay at dusk" },
+      { src: "https://live.staticflickr.com/7513/15807098322_b06d3982df_b.jpg", alt: "Sailboat cruising near a tropical shoreline at sunset" },
+    ] as Img[],
     price: "$595",
     duration: "3 hour trips",
     ctas: [
-      { label: "Book Now", href: "/contact-us", variant: "primary" },
+      { label: "Book Now", href: "/contact-us", variant: "primary", activityId: ACTIVITIES.sunsetCruise.id },
       { label: "View Fishing Tours", href: "/fishing-tours", variant: "secondary" },
     ] as Cta[],
   },
@@ -129,7 +131,7 @@ export const sunsetOrBayCruise = {
       "Free appetizers and local drinks on 3 hour trips",
       "Your choice of sailboat or power boat",
     ],
-    primary: { label: "Book Now", href: "/contact-us", variant: "primary" } as Cta,
+    primary: { label: "Book Now", href: "/contact-us", variant: "primary", activityId: ACTIVITIES.sunsetCruise.id } as Cta,
     footnote: "Gratuities are not included.",
   },
 
@@ -143,8 +145,9 @@ export const sunsetOrBayCruise = {
     eyebrow: "Ready when you are",
     title: "Reserve your sunset or bay cruise",
     body: "From $595 for up to 6 guests. Tell us your date and we will confirm your captain and vessel.",
-    primary: { label: "Book Now", href: "/contact-us", variant: "primary" } as Cta,
+    primary: { label: "Book Now", href: "/contact-us", variant: "primary", activityId: ACTIVITIES.sunsetCruise.id } as Cta,
     secondary: { label: "See Fishing Tours", href: "/fishing-tours", variant: "secondary" } as Cta,
+    footnote: "USCG certified pro captains. Immediate confirmation.",
   },
 } satisfies PageContent & Record<string, unknown>;
 

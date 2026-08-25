@@ -36,7 +36,7 @@ export const site = {
     { label: "Contact Us", href: "/contact-us" },
   ] as NavItem[],
 
-  navCta: { label: "Book Now", href: "/contact-us", variant: "primary" } as Cta,
+  navCta: { label: "Book Now", href: "/contact-us", variant: "primary", activityId: "" } as Cta,
 
   footer: {
     blurb:

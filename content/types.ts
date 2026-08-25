@@ -27,6 +27,13 @@ export type NavItem = Link & {
 /** A call to action. `variant` maps to the button styles. */
 export type Cta = Link & {
   variant?: "primary" | "secondary" | "ghost";
+  /**
+   * Set on a real "book now" CTA to open the Yetti booking modal instead of
+   * following `href`: a real activity ID for a page about one specific trip,
+   * or "" for a general booking CTA. Leave unset on CTAs that just navigate
+   * (page links, mailto/tel, external social), those keep using `href`.
+   */
+  activityId?: string;
 };
 
 /** An image with real alt text in the brand voice. */
@@ -80,6 +87,7 @@ export type PriceTier = {
   features: string[];
   cta?: Cta;
   featured?: boolean;
+  image?: Img;
 };
 
 export type FaqItem = {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { ArrowUpRight, Waves } from "lucide-react";
+import { Waves } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
+import { Hero18 } from "@/components/sections/hero/hero-18";
 import { Reveal } from "@/components/magic/reveal";
 import { Feature01 } from "@/components/sections/features/feature-01";
 import { Cta01 } from "@/components/sections/cta/cta-01";
@@ -19,43 +20,20 @@ export default function SeaLifeResearchExpeditionsPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        {/* Saturated navy colour block. No photograph: the source has almost no
-            visual material for this page, so the type carries the conviction. */}
-        <section className="bg-navy text-navy-foreground">
-          <div className="mx-auto max-w-7xl px-6 py-20 lg:py-32">
-            <Reveal>
-              <p className="eyebrow text-navy-foreground/70">{hero.eyebrow}</p>
-              <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[0.92] tracking-tight text-balance sm:text-7xl lg:text-8xl">
-                {hero.title}
-              </h1>
-              <div className="mt-10 grid gap-8 border-t border-navy-foreground/25 pt-8 lg:grid-cols-[1.4fr_1fr]">
-                <p className="max-w-2xl text-lg leading-relaxed text-navy-foreground/90">{hero.body}</p>
-                <div className="flex flex-col items-start gap-3">
-                  {hero.ctas.map((c, i) => (
-                    <a
-                      key={c.label}
-                      href={c.href}
-                      className={
-                        i === 0
-                          ? "group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-navy-foreground px-6 py-3.5 text-sm font-semibold text-navy transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-navy"
-                          : "group inline-flex cursor-pointer items-center gap-1.5 border-b border-navy-foreground/50 pb-0.5 text-sm font-medium transition-colors hover:border-navy-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-foreground"
-                      }
-                    >
-                      {c.label}
-                      <ArrowUpRight
-                        aria-hidden
-                        className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </a>
-                  ))}
-                  {hero.footnote ? (
-                    <p className="mt-1 text-xs text-navy-foreground/70">{hero.footnote}</p>
-                  ) : null}
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        <Hero18
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          body={hero.body}
+          images={hero.images}
+          ctas={hero.ctas}
+          compact
+        />
+
+        {hero.footnote ? (
+          <section className="border-b border-border bg-navy py-4 text-center text-navy-foreground">
+            <p className="text-xs">{hero.footnote}</p>
+          </section>
+        ) : null}
 
         {/* Honest mission tie in: a photo of real diving/research work alongside
             the one paragraph of mission copy that genuinely supports this page. */}
@@ -76,7 +54,7 @@ export default function SeaLifeResearchExpeditionsPage() {
               </Reveal>
               <Reveal delay={0.1}>
                 <p className="eyebrow text-primary">{connection.eyebrow}</p>
-                <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                   {connection.title}
                 </h2>
                 <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">{connection.body}</p>

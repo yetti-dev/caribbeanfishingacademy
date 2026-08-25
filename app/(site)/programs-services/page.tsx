@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { ArrowRight, Handshake, MessageCircle, Phone } from "lucide-react";
+import { Handshake } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero13 } from "@/components/sections/hero/hero-13";
+import { Hero18 } from "@/components/sections/hero/hero-18";
+import { CtaPhoto } from "@/components/sections/cta/cta-photo";
 import { Icon } from "@/components/sections/icon";
 import { Reveal } from "@/components/magic/reveal";
-import { brand } from "@/brand.config";
 import { programsServices } from "@/content/programs-services";
 
 export const metadata: Metadata = {
@@ -20,12 +20,13 @@ export default function ProgramsServicesPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero13
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
-          image={hero.image!}
+          images={hero.images}
           ctas={hero.ctas}
+          compact
         />
 
         {/* Four programs, alternating image and text rows */}
@@ -33,7 +34,7 @@ export default function ProgramsServicesPage() {
           <div className="mx-auto max-w-6xl px-6">
             <Reveal className="mx-auto max-w-2xl text-center">
               {heading.eyebrow ? <p className="eyebrow text-primary">{heading.eyebrow}</p> : null}
-              <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                 {heading.title}
               </h2>
             </Reveal>
@@ -88,41 +89,7 @@ export default function ProgramsServicesPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="bg-navy py-20">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <Reveal>
-              <h2 className="font-display text-3xl font-bold tracking-tight text-balance text-navy-foreground sm:text-4xl">
-                {cta.heading.title}
-              </h2>
-              {cta.heading.body ? (
-                <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-navy-foreground/80">
-                  {cta.heading.body}
-                </p>
-              ) : null}
-              <p className="mt-3 flex items-center justify-center gap-2 text-base text-navy-foreground/80">
-                <Phone aria-hidden className="size-4" />
-                {brand.contact.phone}
-              </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                <a
-                  href={cta.primary.href}
-                  className="group inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  <MessageCircle aria-hidden className="size-4" />
-                  {cta.primary.label}
-                  <ArrowRight aria-hidden className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
-                </a>
-                <a
-                  href={cta.secondary.href}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-navy-foreground/30 px-6 py-3.5 text-sm font-semibold text-navy-foreground transition-colors duration-200 ease-out hover:bg-navy-foreground/10 focus-visible:ring-2 focus-visible:ring-navy-foreground focus-visible:outline-none"
-                >
-                  {cta.secondary.label}
-                </a>
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        <CtaPhoto image={cta.image} badge={cta.badge} title={cta.title} body={cta.body} ctas={cta.ctas} />
       </main>
       <SiteFooter />
     </>

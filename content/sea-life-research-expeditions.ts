@@ -29,6 +29,10 @@ export const seaLifeResearchExpeditions = {
       { label: "Contact Us", href: "/contact-us", variant: "secondary" },
     ] as Cta[],
     footnote: "Spaces are limited to keep each expedition small and hands on.",
+    images: [
+      { src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=80", alt: "Diver observing a school of yellow snapper on a reef, the kind of marine life CFA's youth programs study" },
+      { src: "/ingested/caribbeanfishingacademy/guest-el-morro.webp", alt: "Guest celebrating aboard the charter boat with El Morro fort in the background" },
+    ] as Img[],
   },
 
   connection: {
@@ -37,8 +41,8 @@ export const seaLifeResearchExpeditions = {
     body:
       "Our program capitalizes on the Caribbean's marine world to engage children in preserving our fragile marine environment, working alongside marine conservation organizations and marinas across Puerto Rico. A research expedition is that same work, opened up to a few more people at a time.",
     image: {
-      src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=80",
-      alt: "Diver observing a school of yellow snapper on a reef, the kind of marine life CFA's youth programs study",
+      src: "/ingested/caribbeanfishingacademy/img-011.webp",
+      alt: "Contender charter boat docked near the historic fort ruins on San Juan Bay, one of the vessels behind CFA's marina partnerships",
     } as Img,
   },
 

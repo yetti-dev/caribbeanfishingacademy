@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Anchor, CalendarCheck, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Anchor, CalendarCheck, MapPin } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
-import { Hero14 } from "@/components/sections/hero/hero-14";
+import { Hero18 } from "@/components/sections/hero/hero-18";
+import { CtaPhoto } from "@/components/sections/cta/cta-photo";
 import { ImageCard } from "@/components/magic/image-card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/magic/reveal";
 import { fishCookBeachDay } from "@/content/fish-cook-beach-day";
@@ -21,12 +22,13 @@ export default function FishCookBeachDayPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero14
+        <Hero18
           eyebrow={hero.eyebrow}
           title={hero.title}
           body={hero.body}
-          image={hero.image}
+          images={hero.images}
           ctas={hero.ctas}
+          compact
         />
 
         {/* Highlights */}
@@ -34,7 +36,7 @@ export default function FishCookBeachDayPage() {
           <div className="mx-auto max-w-6xl px-6">
             <Reveal className="max-w-2xl">
               <p className="eyebrow text-primary">{highlights.eyebrow}</p>
-              <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                 {highlights.title}
               </h2>
             </Reveal>
@@ -66,7 +68,7 @@ export default function FishCookBeachDayPage() {
             <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
               <Reveal>
                 <p className="eyebrow text-primary">Fishtorical moment</p>
-                <h2 className="mt-4 font-display text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                   Catch it, then cook it
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-muted-foreground">
@@ -89,36 +91,7 @@ export default function FishCookBeachDayPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="bg-navy py-20">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <Reveal>
-              <h2 className="font-display text-3xl font-bold tracking-tight text-balance text-navy-foreground sm:text-4xl">
-                {cta.title}
-              </h2>
-              <p className="mt-3 flex items-center justify-center gap-2 text-lg text-navy-foreground/80">
-                <Phone aria-hidden className="size-5" />
-                {cta.phone}
-              </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                {cta.ctas.map((c, i) => (
-                  <a
-                    key={c.label}
-                    href={c.href}
-                    className={
-                      i === 0
-                        ? "inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
-                        : "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-navy-foreground/30 px-6 py-3.5 text-sm font-semibold text-navy-foreground transition-colors duration-200 ease-out hover:bg-navy-foreground/10 focus-visible:ring-2 focus-visible:ring-navy-foreground focus-visible:outline-none"
-                    }
-                  >
-                    {i === 0 ? <MessageCircle aria-hidden className="size-4" /> : null}
-                    {c.label}
-                  </a>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        <CtaPhoto image={cta.image} badge={cta.badge} title={cta.title} body={cta.body} ctas={cta.ctas} />
       </main>
       <SiteFooter />
     </>
