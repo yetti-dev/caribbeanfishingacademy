@@ -54,28 +54,28 @@ export function Fleet02({
                   </span>
                 </div>
 
-                <div className="flex flex-1 flex-col p-7">
+                <div className="flex flex-col p-7">
                   <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">
                     {boat.name}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{boat.body}</p>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{boat.body}</p>
 
-                  <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-border pt-6">
-                    <div className="flex flex-col items-center gap-2 text-center">
+                  <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-5">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
                       <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-primary">
                         <Ruler className="size-4" aria-hidden="true" />
                       </span>
                       <dt className="sr-only">Length</dt>
                       <dd className="font-mono text-xs font-medium text-foreground">{boat.length}</dd>
                     </div>
-                    <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
                       <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-primary">
                         <Users className="size-4" aria-hidden="true" />
                       </span>
                       <dt className="sr-only">Guests</dt>
                       <dd className="font-mono text-xs font-medium text-foreground">{boat.guests} guests</dd>
                     </div>
-                    <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
                       <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-primary">
                         <Calendar className="size-4" aria-hidden="true" />
                       </span>
@@ -85,7 +85,7 @@ export function Fleet02({
                   </dl>
 
                   {boat.specs.length ? (
-                    <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-6">
+                    <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5 border-t border-border pt-5">
                       {boat.specs.map((s) => (
                         <div key={s.label} className="flex items-start gap-2">
                           <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -100,7 +100,7 @@ export function Fleet02({
 
                   <BookButton
                     activityId={activityId}
-                    className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-gradient px-5 py-3.5 text-sm font-semibold text-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-gradient px-5 py-3.5 text-sm font-semibold text-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
                     <MessageCircle aria-hidden className="size-4" />
                     {bookLabel}

@@ -88,7 +88,9 @@ export const sunsetOrBayCruise = {
         } as Img,
         specs: [
           { label: "Engines", value: "Twin Suzuki 150hp" },
+          { label: "Hull", value: "Deep-V" },
           { label: "Live well", value: "34 gallon" },
+          { label: "Shade", value: "T-top" },
           { label: "Fish boxes", value: "3" },
           { label: "Guests", value: "Up to 6" },
         ],
@@ -107,7 +109,9 @@ export const sunsetOrBayCruise = {
         } as Img,
         specs: [
           { label: "Engine", value: "Yanmar diesel" },
+          { label: "Sails", value: "Main and jib" },
           { label: "Cabins", value: "2" },
+          { label: "Layout", value: "Aft queen, fwd V-berth" },
           { label: "Bathroom", value: "1" },
           { label: "Guests", value: "Up to 6" },
         ],
