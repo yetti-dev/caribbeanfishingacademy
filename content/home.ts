@@ -3,7 +3,7 @@
  * package teaser, sunset cruise teaser, CFA moments gallery, sponsors,
  * fishing-with-purpose mission teaser, and the upcoming-event teaser.
  */
-import type { PageContent, Cta, Img } from "./types";
+import type { PageContent, Cta, Img, Testimonial } from "./types";
 
 export const home = {
   meta: {
@@ -92,8 +92,60 @@ export const home = {
     strip: { src: "/ingested/caribbeanfishingacademy/sponsors-strip.webp", alt: "Logos of Caribbean Fishing Academy sponsors: Suzuki Marine, Puerto Del Rey, Actual Mortgage Bankers, Bluewaters Insurers, Domino's Pizza, Antilles Power and more" } as Img,
     badges: [
       { src: "/ingested/caribbeanfishingacademy/badge-pr-tourism.png", alt: "Endorsed by the Puerto Rico Tourism Company" } as Img,
-      { src: "/ingested/caribbeanfishingacademy/badge-tripadvisor.webp", alt: "Top rated on TripAdvisor" } as Img,
     ],
+  },
+
+  /**
+   * Illustrative testimonial copy: first names only, no invented surnames,
+   * photos or dates presented as verified. A placeholder pattern meant to
+   * be swapped for the client's own real guest reviews before this goes
+   * live, not scraped or sourced from an actual review platform.
+   */
+  testimonials: {
+    eyebrow: "What guests say",
+    title: "Trusted by families and anglers across San Juan",
+    tripadvisor: { src: "/ingested/caribbeanfishingacademy/badge-tripadvisor.webp", alt: "Top rated on TripAdvisor" } as Img,
+    items: [
+      {
+        quote:
+          "Our captain knew exactly where the fish were biting. My kids caught more in four hours than I have in years of trying on my own. Easy to book, easy day, no surprises.",
+        name: "Maria",
+        role: "Half day inshore charter",
+      },
+      {
+        quote:
+          "Booked the sunset cruise for our anniversary. Watching El Morro light up from the water with a drink in hand was worth every dollar. The crew made it feel personal, not touristy.",
+        name: "James",
+        role: "Sunset & bay cruise",
+      },
+      {
+        quote:
+          "What sold me was learning the trips fund the kids' fishing program. Great day offshore, and knowing part of it goes back into the community made it better.",
+        name: "Carlos",
+        role: "Offshore fishing charter",
+      },
+    ] as Testimonial[],
+  },
+
+  /**
+   * About Us teaser: real founders, real facts already established on the
+   * About Us page, condensed for the home page so a visitor sees the people
+   * behind the boats before clicking through.
+   */
+  aboutTeaser: {
+    eyebrow: "Who we are",
+    title: "Two captains, one mission on the water",
+    body:
+      "Caribbean Fishing Academy Charters funds a nonprofit youth angling program through a professional fishing charter and bay tour business. Every trip you book pays for a kid's first day on the water.",
+    images: [
+      { src: "/ingested/caribbeanfishingacademy/founder-luis-burgos.webp", alt: "Captain Luis Burgos, founder and executive director of Caribbean Fishing Academy" },
+      { src: "/ingested/caribbeanfishingacademy/founder-rich-brochue.webp", alt: "Captain Rich Brochue, co-founder and mentor of Caribbean Fishing Academy" },
+    ] as Img[],
+    stats: [
+      { value: "2013", label: "Founded as a nonprofit" },
+      { value: "5,000+", label: "Kids reached" },
+    ],
+    cta: { label: "Meet the Founders", href: "/about-us", variant: "primary" } as Cta,
   },
 
   purpose: {

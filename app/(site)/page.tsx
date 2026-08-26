@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, Camera, CalendarDays } from "lucide-react";
+import { ArrowRight, Camera, CalendarDays, Quote, Star } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/sections/site-chrome";
 import { Hero18 } from "@/components/sections/hero/hero-18";
 import { TrustStats } from "@/components/sections/hero/trust-stats";
@@ -112,6 +112,107 @@ export default function Home() {
                 ))}
               </div>
             </Reveal>
+          </div>
+        </section>
+
+        {/* About Us teaser: the people behind the boats, overlapping photo frames */}
+        <section className="border-b border-border bg-background py-20 lg:py-24">
+          <div className="mx-auto max-w-6xl px-6">
+            <Reveal>
+              <div className="grid items-center gap-0 overflow-hidden rounded-3xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] lg:grid-cols-2">
+                <div className="relative isolate p-8 sm:p-10 lg:p-12">
+                  <img
+                    src={home.aboutTeaser.images[0].src}
+                    alt={home.aboutTeaser.images[0].alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="relative z-0 aspect-3/4 w-4/5 rounded-2xl object-cover"
+                  />
+                  <img
+                    src={home.aboutTeaser.images[1].src}
+                    alt={home.aboutTeaser.images[1].alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute right-8 bottom-8 z-10 aspect-square w-1/2 translate-y-6 rounded-2xl border-4 border-card object-cover shadow-xl sm:right-10 sm:bottom-10 lg:right-12 lg:bottom-12"
+                  />
+                </div>
+                <div className="p-8 sm:p-10 lg:p-12">
+                  <p className="eyebrow text-primary">{home.aboutTeaser.eyebrow}</p>
+                  <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
+                    {home.aboutTeaser.title}
+                  </h2>
+                  <p className="mt-4 text-base leading-relaxed text-muted-foreground">{home.aboutTeaser.body}</p>
+                  <dl className="mt-7 flex flex-wrap gap-x-10 gap-y-4 border-y border-border py-6">
+                    {home.aboutTeaser.stats.map((s) => (
+                      <div key={s.label}>
+                        <dt className="font-display text-3xl font-bold tracking-tight text-foreground">{s.value}</dt>
+                        <dd className="mt-0.5 text-sm text-muted-foreground">{s.label}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <a
+                    href={home.aboutTeaser.cta.href}
+                    className="group mt-7 inline-flex cursor-pointer items-center gap-2 self-start rounded-lg bg-brand-gradient px-6 py-3.5 text-sm font-semibold text-white transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+                  >
+                    {home.aboutTeaser.cta.label}
+                    <ArrowRight aria-hidden className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+                  </a>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* Guest reviews + TripAdvisor recognition, as real bordered cards */}
+        <section className="border-b border-border bg-secondary/30 py-20 lg:py-24">
+          <div className="mx-auto max-w-6xl px-6">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <p className="eyebrow text-primary">{home.testimonials.eyebrow}</p>
+              <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
+                {home.testimonials.title}
+              </h2>
+              <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-border bg-card px-4 py-2 shadow-sm">
+                <img
+                  src={home.testimonials.tripadvisor.src}
+                  alt={home.testimonials.tripadvisor.alt}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-6 w-auto object-contain"
+                />
+                <span className="flex items-center gap-0.5 text-primary" aria-hidden>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-3.5 fill-current" />
+                  ))}
+                </span>
+              </div>
+            </Reveal>
+
+            <RevealGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {home.testimonials.items.map((t) => (
+                <RevealItem key={t.name} className="h-full">
+                  <div className="flex h-full flex-col rounded-3xl border border-border bg-card p-7 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-24px_rgba(0,0,0,0.28)]">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-0.5 text-primary" aria-hidden>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className="size-3.5 fill-current" />
+                        ))}
+                      </span>
+                      <Quote aria-hidden className="size-6 text-primary/25" />
+                    </div>
+                    <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground">{t.quote}</p>
+                    <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 font-display text-sm font-semibold text-primary">
+                        {t.name.charAt(0)}
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                        {t.role ? <p className="text-xs text-muted-foreground">{t.role}</p> : null}
+                      </div>
+                    </div>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
           </div>
         </section>
 
