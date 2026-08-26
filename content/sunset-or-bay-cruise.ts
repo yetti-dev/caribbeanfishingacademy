@@ -121,6 +121,12 @@ export const sunsetOrBayCruise = {
         ],
       },
     ] as Boat[],
+    ctaCard: {
+      title: "Not sure which to pick?",
+      body: "Text or call and we will match you to the right boat for your group and your date.",
+      phone: "787-405-4100",
+      phoneHref: "tel:+17874054100",
+    },
   },
 
   included: {

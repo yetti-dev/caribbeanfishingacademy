@@ -63,7 +63,12 @@ export default function SunsetOrBayCruisePage() {
 
         <Feature04 heading={experience.heading} features={experience.features} />
 
-        <Fleet02 heading={fleet.heading} boats={fleet.boats} activityId={ACTIVITIES.sunsetCruise.id} />
+        <Fleet02
+          heading={fleet.heading}
+          boats={fleet.boats}
+          activityId={ACTIVITIES.sunsetCruise.id}
+          ctaCard={fleet.ctaCard}
+        />
 
         <Cta03
           heading={included.heading}

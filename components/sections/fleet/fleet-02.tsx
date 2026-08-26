@@ -1,25 +1,29 @@
-import { Calendar, Check, MessageCircle, Ruler, Users } from "lucide-react";
+import { Calendar, Check, MessageCircle, Phone, Ruler, Users } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/magic/reveal";
 import { BookButton } from "@/components/widget/book-button";
 import type { Boat } from "@/content/demo";
 import type { SectionHeading } from "@/content/types";
 
 /**
- * Fleet 02: the whole fleet as cards. A quick-glance icon strip (length,
- * guests, in service) up top, the full spec sheet below it, then a real
- * booking button, so a card carries everything needed to decide and act.
+ * Fleet 02: the whole fleet as cards, plus an optional "need help choosing"
+ * card closing out the row. Cards size to their own content (no forced
+ * equal-height stretch), so two boats with different amounts of copy never
+ * leave a card with a slab of dead space above its button.
  */
 export function Fleet02({
   heading,
   boats,
   activityId = "",
   bookLabel = "Book This Trip",
+  ctaCard,
 }: {
   heading?: SectionHeading;
   boats: Boat[];
   /** Yetti activity ID the booking button opens. Every boat here shares one trip. */
   activityId?: string;
   bookLabel?: string;
+  /** Optional closing card, e.g. "not sure which to pick, call us". */
+  ctaCard?: { title: string; body: string; phone: string; phoneHref: string };
 }) {
   return (
     <section className="border-b border-border bg-muted py-24">
@@ -36,10 +40,10 @@ export function Fleet02({
           </Reveal>
         ) : null}
 
-        <RevealGroup className="mt-14 grid gap-8 sm:grid-cols-2">
+        <RevealGroup className="mt-14 grid items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {boats.map((boat) => (
-            <RevealItem key={boat.name} className="h-full">
-              <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-24px_rgba(0,0,0,0.28)]">
+            <RevealItem key={boat.name}>
+              <article className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-24px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-24px_rgba(0,0,0,0.28)]">
                 <div className="relative aspect-4/3 overflow-hidden bg-muted">
                   <img
                     src={boat.image.src}
@@ -109,6 +113,25 @@ export function Fleet02({
               </article>
             </RevealItem>
           ))}
+
+          {ctaCard ? (
+            <RevealItem>
+              <div className="flex flex-col items-center justify-center rounded-3xl bg-brand-gradient p-8 text-center text-white shadow-xl shadow-primary/20 sm:min-h-full">
+                <span className="grid size-12 place-items-center rounded-full bg-white/15">
+                  <Phone aria-hidden className="size-5" />
+                </span>
+                <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">{ctaCard.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/85">{ctaCard.body}</p>
+                <a
+                  href={ctaCard.phoneHref}
+                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-primary transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                >
+                  <Phone aria-hidden className="size-4" />
+                  {ctaCard.phone}
+                </a>
+              </div>
+            </RevealItem>
+          ) : null}
         </RevealGroup>
       </div>
     </section>
